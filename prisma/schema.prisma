@@ -1,0 +1,192 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+
+}
+
+model profile {
+  id        Int      @id @default(autoincrement())
+  class     String
+  stream    String
+  interest  String[] // Accepts an array of strings in PostgreSQL
+  clarity   String
+  strength  String[] // Accepts an array of strings in PostgreSQL
+  priority  String[] // Accepts an array of strings in PostgreSQL
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Foreign key definition
+  userId    Int      @unique @map("userId")
+  user      Users    @relation(fields: [userId], references: [id])
+}
+
+model AdminUsers {
+  id        Int      @id @default(autoincrement())
+  firstName String?
+  lastName  String?
+  username  String?
+  email     String   @unique
+  password  String   
+  role     String   @default("admin")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+model Users {
+  id          Int      @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  username    String
+  email       String   @unique
+  password    String
+  isupgraded  Boolean  @default(false)
+  country     String?
+  state       String?
+  city        String?
+  district    String?
+  gender      String?
+  address     String?
+  dataOfBirth DateTime?
+  image       String?
+  mobile      String
+  status      String? @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  subscription Subscriptions[]
+
+
+  // Prisma relation field (does not create a column in the DB)
+  profile     profile?
+  payments    Payment[]
+  
+}
+
+model Subscriptions {
+  id       Int      @id @default(autoincrement())
+  userId    Int 
+  planType  String
+  startDate DateTime
+  endDate   DateTime
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Prisma relation field (does not create a column in the DB)
+  user      Users    @relation(fields: [userId], references: [id])
+}
+
+model Payment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  amount    Float
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Prisma relation field (does not create a column in the DB)
+  user      Users    @relation(fields: [userId], references: [id])
+}
+
+model Stream {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categories Category[]
+}
+
+model Institutions {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  logo     String?
+  address   String?
+  admission_process String?
+  tentative_date String?
+  institute_type String?
+  url String?
+  countruy String?
+  state String?
+  city String?
+  district String?
+  is_top Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categories Category[]
+  subcategories subcategory[]
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  streamId  Int
+  institutionId Int
+  title     String
+  path      String?
+  file String?
+  coverImage String?
+  description String?
+  specialization String?
+  importandt_facts String[]
+  category_access Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relation fields
+  stream Stream @relation(fields: [streamId], references: [id])
+  institution Institutions @relation(fields: [institutionId], references: [id])
+  secondCategories Secondcategory[]
+  subcategories subcategory[]
+}
+
+model Secondcategory {
+  id        Int      @id @default(autoincrement())
+  categoryId Int
+  name     String
+  path      String?
+  image String?
+  coverImage String?
+  description String?
+  specialization String?
+  importandt_facts String[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 🔗 Relation
+  category    Category @relation(fields: [categoryId], references: [id])
+  subcategories subcategory[]
+}
+
+model subcategory {
+  id        Int      @id @default(autoincrement())
+  categoryId Int
+  secondcategoryId Int
+  institutionId Int
+  title     String
+  path      String?
+  file String?
+  coverImage String?
+  description String?
+  specialization String?
+  importandt_facts String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 🔗 Relations
+  category        Category        @relation(fields: [categoryId], references: [id])
+  secondcategory  Secondcategory  @relation(fields: [secondcategoryId], references: [id])
+  institution     Institutions    @relation(fields: [institutionId], references: [id])
+}
