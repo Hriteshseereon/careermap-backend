@@ -6,6 +6,8 @@ import express from 'express';
  import streamRoutes from "./modules/stream/stream.routes.js";
  import instituteRoutes from "./modules/institution/institution.routes.js";
  import categoryRoutes from "./modules/category/category.routes.js";
+ import secondcategoryRoutes from "./modules/secondarycategory/secondcategory.routes.js";
+ import subcategoryRoutes from "./modules/subcategory/subcategory.routes.js";
 const app = express();
 app.use(express.json());
 app.get('/', (req, res) => {
@@ -17,4 +19,6 @@ app.use("/api/admin/auth", adminAuthRoutes);
 app.use("/api/streams", streamRoutes);
 app.use("/api/institutes", instituteRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/secondarycategories", secondcategoryRoutes);
+app.use("/api/subcategories", subcategoryRoutes);
 export default app;

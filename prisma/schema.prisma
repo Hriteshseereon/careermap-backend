@@ -126,6 +126,7 @@ model Institutions {
 
   categories Category[]
   subcategories subcategory[]
+  secondCategories Secondcategory[]
 }
 
 model Category {
@@ -153,19 +154,21 @@ model Category {
 model Secondcategory {
   id        Int      @id @default(autoincrement())
   categoryId Int
+  institutionId Int?
   name     String
   path      String?
   image String?
   coverImage String?
   description String?
   specialization String?
-  importandt_facts String[]
+  importandt_facts String?
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // 🔗 Relation
   category    Category @relation(fields: [categoryId], references: [id])
+  institution Institutions? @relation(fields: [institutionId], references: [id])
   subcategories subcategory[]
 }
 
@@ -180,7 +183,7 @@ model subcategory {
   coverImage String?
   description String?
   specialization String?
-  importandt_facts String[]
+  importandt_facts String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
