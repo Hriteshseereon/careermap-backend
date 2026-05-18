@@ -193,3 +193,17 @@ model subcategory {
   secondcategory  Secondcategory  @relation(fields: [secondcategoryId], references: [id])
   institution     Institutions    @relation(fields: [institutionId], references: [id])
 }
+// module schema 
+
+model Module {
+  id       Int      @id @default(autoincrement())
+  title     String
+  url       String?
+  image     String?
+  btn_text String?
+  position  String?
+  markas_free Boolean @default(false)
+ 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
