@@ -105,6 +105,8 @@ model Stream {
   updatedAt DateTime @updatedAt
 
   categories Category[]
+  details Details[]
+  entranceexam EntranceExam[]
 }
 
 model Institutions {
@@ -149,6 +151,9 @@ model Category {
   institution Institutions @relation(fields: [institutionId], references: [id])
   secondCategories Secondcategory[]
   subcategories subcategory[]
+   details Details[]
+    careerpath CareerPath[]
+    entranceexam EntranceExam[]
 }
 
 model Secondcategory {
@@ -170,6 +175,9 @@ model Secondcategory {
   category    Category @relation(fields: [categoryId], references: [id])
   institution Institutions? @relation(fields: [institutionId], references: [id])
   subcategories subcategory[]
+   details Details[]
+    careerpath CareerPath[]
+    entranceexam EntranceExam[]
 }
 
 model subcategory {
@@ -192,6 +200,9 @@ model subcategory {
   category        Category        @relation(fields: [categoryId], references: [id])
   secondcategory  Secondcategory  @relation(fields: [secondcategoryId], references: [id])
   institution     Institutions    @relation(fields: [institutionId], references: [id])
+   details Details[]
+    careerpath CareerPath[]
+    entranceexam EntranceExam[]
 }
 // module schema 
 
@@ -206,4 +217,99 @@ model Module {
  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  careerpath CareerPath[]
+  entranceexam EntranceExam[]
+}
+
+
+// details scheama design 
+
+model Details {
+  id                  Int      @id @default(autoincrement())
+
+  // Foreign Keys
+  streamId            Int
+  categoryId          Int
+  secondcategoryId    Int
+  subcategoryId       Int
+
+  // Relations
+  stream              Stream           @relation(fields: [streamId], references: [id])
+  category            Category         @relation(fields: [categoryId], references: [id])
+  secondcategory      Secondcategory   @relation(fields: [secondcategoryId], references: [id])
+  subcategory         subcategory      @relation(fields: [subcategoryId], references: [id])
+
+  // Salary Fields
+  salaryRanges    SalaryRange[]
+
+  // Job Scope (multiple values)
+  jobScope            String[]   // PostgreSQL array
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+}
+model SalaryRange {
+  id        Int     @id @default(autoincrement())
+  minSalary Float
+  maxSalary Float
+
+  detailsId Int
+  details   Details @relation(fields: [detailsId], references: [id])
+} 
+model PathType {
+  id Int @id @default(autoincrement())
+  pathtype String?
+   careerpath CareerPath[]
+
+   createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model CareerPath {
+  id  Int @id @default(autoincrement())
+
+  moduleId Int
+  categoryId Int
+  secondcategoryId Int
+  subcategoryId Int
+  pathId Int
+
+  module          Module          @relation(fields: [moduleId], references: [id])
+  category        Category        @relation(fields: [categoryId], references: [id])
+  secondcategory  Secondcategory  @relation(fields: [secondcategoryId], references: [id])
+  subcategory     subcategory     @relation(fields: [subcategoryId], references: [id])
+  path            PathType        @relation(fields: [pathId], references: [id])
+
+  graduation String?
+  aftergraduation String?
+  afterpostgraduation String?
+  anyother String?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model EntranceExam {
+  id Int @id @default(autoincrement())
+
+  moduleId Int
+  streamId Int
+  categoryId Int
+  secondcategoryId Int
+  subcategoryId Int
+
+  module          Module          @relation(fields: [moduleId], references: [id])
+  stream          Stream          @relation(fields: [streamId], references: [id])
+  category        Category        @relation(fields: [categoryId], references: [id])
+  secondcategory  Secondcategory  @relation(fields: [secondcategoryId], references: [id])
+  subcategory     subcategory     @relation(fields: [subcategoryId], references: [id])
+
+  examname String?
+  issuedate DateTime?
+  lastdate DateTime?
+  url String?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
