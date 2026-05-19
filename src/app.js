@@ -1,4 +1,5 @@
 import "dotenv/config";
+import cors from "cors";
 import express from 'express';
  import userRoutes from "./modules/user/user.routes.js";
  import authRoutes from "./modules/auth/auth.routes.js";
@@ -16,6 +17,10 @@ import express from 'express';
 
 const app = express();
 app.use(express.json());
+app.use(cors({
+   origin: "http://localhost:5173", // your frontend URL
+  credentials: true
+}));
 app.get('/', (req, res) => {
   res.send('app is running......');
 });
