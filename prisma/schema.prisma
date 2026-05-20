@@ -155,6 +155,7 @@ model Category {
    details Details[]
     careerpath CareerPath[]
     entranceexam EntranceExam[]
+    mentors Mentor[]
 }
 
 model Secondcategory {
@@ -179,6 +180,7 @@ model Secondcategory {
    details Details[]
     careerpath CareerPath[]
     entranceexam EntranceExam[]
+
 }
 
 model subcategory {
@@ -204,6 +206,7 @@ model subcategory {
    details Details[]
     careerpath CareerPath[]
     entranceexam EntranceExam[]
+    mentors Mentor[]
 }
 // module schema 
 
@@ -233,17 +236,17 @@ model Details {
   categoryId          Int
   secondcategoryId    Int
   subcategoryId       Int
-  careerpathId        Int
-  entranceexamId      Int
-  institutionId         Int
+  careerpathId        Int?
+  entranceexamId      Int?
+  institutionId         Int?
   // Relations
   stream              Stream           @relation(fields: [streamId], references: [id])
   category            Category         @relation(fields: [categoryId], references: [id])
   secondcategory      Secondcategory   @relation(fields: [secondcategoryId], references: [id])
   subcategory         subcategory      @relation(fields: [subcategoryId], references: [id])
-  careerpath          CareerPath       @relation(fields: [careerpathId],references: [id])
-  entranceexam        EntranceExam     @relation(fields: [entranceexamId],references: [id])
-  institution         Institutions     @relation(fields: [institutionId],references: [id])
+  careerpath          CareerPath?       @relation(fields: [careerpathId],references: [id])
+  entranceexam        EntranceExam?     @relation(fields: [entranceexamId],references: [id])
+  institution         Institutions?     @relation(fields: [institutionId],references: [id])
   // Salary Fields
   salaryRanges    SalaryRange[]
 
@@ -321,4 +324,40 @@ model EntranceExam {
   updatedAt           DateTime @updatedAt
 
   details Details[]
+}
+
+// mentor model  
+
+model Mentor {
+  id Int @id @default(autoincrement())
+
+  categoryId Int
+  subCategoryId Int
+
+  name String?
+  email String?
+  phone_number String?
+  dateof_birth DateTime?
+  designation String?
+  education String?
+  placeof_word String?
+  linkedin String?
+  facebook String?
+  skill String?
+  experience Int?
+  mentor_fees String?
+  rank String?
+
+  image String?
+  resume String?
+
+  description String?
+  status Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relations
+  category Category @relation(fields: [categoryId], references: [id])
+  subcategory subcategory @relation(fields: [subCategoryId], references: [id])
 }

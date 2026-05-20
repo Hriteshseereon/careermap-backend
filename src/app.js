@@ -14,6 +14,7 @@ import express from 'express';
  import entranceExamRoutes from "./modules/entranceexam/entranceexam.routes.js";
  import detailsRoutes from "./modules/details/details.routes.js";
  import careerPathRoutes from "./modules/careerpath/careerpath.routes.js"
+ import mentorRoutes from "./modules/mentor/mentor.routes.js"
 
 const app = express();
 app.use(express.json());
@@ -37,5 +38,5 @@ app.use("/api/path",pathTypeRoutes);
 app.use("/api/details",detailsRoutes);
 app.use("/api/entranceexam",entranceExamRoutes);
 app.use("/api/careerpath",careerPathRoutes);
-
+app.use("/api/mentor",mentorRoutes);
 export default app;
