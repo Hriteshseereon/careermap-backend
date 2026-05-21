@@ -12,18 +12,13 @@ export const sendOTP = async (req, res) => {
 
 export const verifyOTP = async (req, res) => {
   try {
-    if (!req.body) {
-      return res.status(400).json({ message: "Body missing" });
+    const { mobile, code, type } = req.body; // ✅ add type
+
+    if (!mobile || !code || !type) {
+      return res.status(400).json({ message: "Mobile, code and type required" });
     }
 
-    const { mobile, code } = req.body;
-
-    if (!mobile || !code) {
-      return res.status(400).json({ message: "Mobile and code required" });
-    }
-
-    const result = await verifyOTPService(mobile, code);
-
+    const result = await verifyOTPService(mobile, code, type);
     return res.status(result.success ? 200 : 400).json(result);
   } catch (err) {
     return res.status(500).json({ message: err.message });
