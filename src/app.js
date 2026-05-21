@@ -16,6 +16,7 @@ import express from 'express';
  import careerPathRoutes from "./modules/careerpath/careerpath.routes.js"
  import mentorRoutes from "./modules/mentor/mentor.routes.js"
  import scholarshipRoutes from "./modules/scholarship/scholarship.routes.js"
+ import plansRoutes    from  "./modules/plans/plans.routes.js"
 const app = express();
 app.use(express.json());
 app.use(cors({
@@ -40,4 +41,5 @@ app.use("/api/entranceexam",entranceExamRoutes);
 app.use("/api/careerpath",careerPathRoutes);
 app.use("/api/mentor",mentorRoutes);
 app.use("/api/scholarship",scholarshipRoutes);
+app.use("/api/plans",plansRoutes);
 export default app;
