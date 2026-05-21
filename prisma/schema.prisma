@@ -392,3 +392,37 @@ model Plans{
   updatedAt DateTime @updatedAt
 }
 
+model Quiz {
+  id        Int      @id @default(autoincrement())
+  title     String
+  type      String?
+  duration  Int?
+ from      DateTime?  
+  to        DateTime? 
+  questions QuizQuestion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QuizQuestion {
+  id        Int    @id @default(autoincrement())
+  question  String
+
+  quizId    Int
+  quiz      Quiz   @relation(fields: [quizId], references: [id])
+
+  options   QuizOption[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QuizOption {
+  id         Int    @id @default(autoincrement())
+  text       String
+  isCorrect  Boolean @default(false)
+
+  questionId Int
+  question   QuizQuestion @relation(fields: [questionId], references: [id])
+}

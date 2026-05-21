@@ -31,28 +31,40 @@ export const otpService = async (mobile,type) => {
   }
 };
 
-export const verifyOTPService = async (mobile, code) => {
+export const verifyOTPService = async (mobile, code, type) => {
   try {
-    const isValid = await verifyOTPViaTwilio(mobile, code);
+    const result = await verifyOTPViaTwilio(mobile, code);
 
-    if (!isValid) {
-      return { success: false, message: "Invalid OTP" };
+    if (!result.valid) {
+      return {
+        success: false,
+        message: result.message || "Invalid OTP. Please try again.",
+      };
     }
 
-    const user = await AuthRepository.findByMobile(mobile);
-
-    if (!user) {
-      return { success: false, message: "User not found. Please signup." };
+    // ✅ Handle signup vs login separately
+    if (type === "signup") {
+      // Don't look for user — just confirm OTP is valid
+      // Create user here or return verified status for next step
+      return {
+        success: true,
+        message: "Mobile verified successfully. Proceed to complete signup.",
+        mobileVerified: true,
+        mobile,
+      };
     }
 
-    const tokens = generateTokens(user);
+    if (type === "login") {
+      const user = await AuthRepository.findByMobile(mobile);
+      if (!user) {
+        return { success: false, message: "User not found. Please signup." };
+      }
+      const tokens = generateTokens(user);
+      return { success: true, message: "Login successful", user, ...tokens };
+    }
 
-    return {
-      success: true,
-      message: "Login successful",
-      user,
-      ...tokens,
-    };
+    return { success: false, message: "Invalid type" };
+
   } catch (error) {
     return { success: false, message: error.message };
   }
