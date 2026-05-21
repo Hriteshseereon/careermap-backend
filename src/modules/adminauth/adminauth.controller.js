@@ -1,6 +1,6 @@
 import { adminSignup, adminLogin } from "./adminauth.service.js";
 
-// 🔹 Signup
+ // 🔹 Signup
 export const signupAdmin = async (req, res) => {
   try {
     const result = await adminSignup(req.body);
