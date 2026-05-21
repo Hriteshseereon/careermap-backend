@@ -55,7 +55,7 @@ export const createPlan = async (body) => {
     return { success: false, message: error.message };
   }
 };
-
+// get all api 
 // 🔹 GET ALL
 export const getPlans = async () => {
   try {
