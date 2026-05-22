@@ -11,9 +11,9 @@ export const protectTemp = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
     // ✅ Ensure it's OTP token
-    if (!decoded.mobile) {
-      return res.status(401).json({ message: "Invalid temp token" });
-    }
+   if (!decoded.mobile || decoded.type !== "temp") {
+  return res.status(401).json({ message: "Invalid temp token" });
+}
 
     req.user = decoded; // contains mobile
     next();
