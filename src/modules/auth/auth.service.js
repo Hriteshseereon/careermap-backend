@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import {AuthRepository} from "../auth/auth.repository.js";
 
 import bcrypt from "bcryptjs";
-import {generateTokens} from "../../utils/helpers.js";
+import {generateTokens,generateTempToken} from "../../utils/helpers.js";
 import { UserRepository } from "../user/user.repository.js";
 
 export const otpService = async (mobile,type) => {
@@ -44,15 +44,16 @@ export const verifyOTPService = async (mobile, code, type) => {
 
     // ✅ Handle signup vs login separately
     if (type === "signup") {
-      // Don't look for user — just confirm OTP is valid
-      // Create user here or return verified status for next step
-      return {
-        success: true,
-        message: "Mobile verified successfully. Proceed to complete signup.",
-        mobileVerified: true,
-        mobile,
-      };
-    }
+
+  // 🔥 generate temp token
+  const tempToken = generateTempToken(mobile);
+
+  return {
+    success: true,
+    message: "Mobile verified successfully. Proceed to signup.",
+    tempToken, // ✅ send token
+  };
+}
 
     if (type === "login") {
       const user = await AuthRepository.findByMobile(mobile);

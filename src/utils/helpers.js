@@ -32,3 +32,18 @@ export const generateAdminTokens = (admin) => {
 
   return { accessToken, refreshToken };
 };
+
+export const generateTempToken = (mobile) => {
+  const payload = {
+    mobile,
+    type: "temp", // 🔥 important for middleware
+  };
+
+  const tempToken = jwt.sign(
+    payload,
+    process.env.JWT_ACCESS_SECRET,
+    { expiresIn: "10m" }
+  );
+
+  return tempToken;
+};

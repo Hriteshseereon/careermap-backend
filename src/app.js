@@ -1,6 +1,7 @@
 import "dotenv/config";
 import cors from "cors";
 import express from 'express';
+import cookieParser from "cookie-parser";
  import userRoutes from "./modules/user/user.routes.js";
  import authRoutes from "./modules/auth/auth.routes.js";
  import adminAuthRoutes from "./modules/adminauth/adminauth.routes.js";
@@ -20,6 +21,7 @@ import express from 'express';
  import quizRoutes   from "./modules/quiz/quiz.routes.js"
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
    origin: "http://localhost:5173", // your frontend URL
   credentials: true
