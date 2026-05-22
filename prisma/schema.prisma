@@ -122,6 +122,8 @@ model Institutions {
   state String?
   city String?
   district String?
+  about  String?
+  course_offered String[]
   is_top Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -320,6 +322,16 @@ model EntranceExam {
   issuedate DateTime?
   lastdate DateTime?
   url String?
+  about String?
+  eligibility String?
+  exam_date   DateTime?
+  mode   String?
+  duration String?
+  subject   String[]
+  total_mark  String?
+  frequncy     String?
+  exam_pattern  String?
+  top_institution   String[]
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -348,6 +360,8 @@ model Mentor {
   experience Int?
   mentor_fees String?
   rank String?
+  available_date  DateTime?
+  available_time DateTime?
 
   image String?
   resume String?
@@ -424,5 +438,36 @@ model QuizOption {
   isCorrect  Boolean @default(false)
 
   questionId Int
-  question   QuizQuestion @relation(fields: [questionId], references: [id])
+  question   QuizQuestion @relation(fields: [questionId], references: [id],onDelete: Cascade  )
+}                                                               
+
+model MasterClass {
+  id Int @id @default(autoincrement())
+  category String?
+  image  String?
+  title  String?
+  name   String?
+  time   DateTime?
+  views  String?
+  is_active Boolean @default(false)
+  video_url  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StudyAbroad {
+  id Int @id @default(autoincrement())
+  title String?
+  country_name String?
+  description  String?
+  overview     String?
+  visa_work    String?
+  living_cost  String?
+  tution_cost  String?
+  top_university String[]
+  scholarship    String[]
+  requirment    String[]
+  popular_course  String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
