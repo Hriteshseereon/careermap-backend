@@ -74,27 +74,34 @@ model Users {
 model Subscriptions {
   id       Int      @id @default(autoincrement())
   userId    Int 
-  planType  String
+  planId    Int
+  planType  String?
   startDate DateTime
   endDate   DateTime
+  amount Float
   status    String
+   stripeSessionId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Prisma relation field (does not create a column in the DB)
   user      Users    @relation(fields: [userId], references: [id])
+  plan      Plans    @relation(fields: [planId], references: [id])
 }
 
 model Payment {
   id        Int      @id @default(autoincrement())
   userId    Int
+  planId    Int
   amount    Float
+  stripeId  String? 
   status    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Prisma relation field (does not create a column in the DB)
   user      Users    @relation(fields: [userId], references: [id])
+   plan Plans @relation(fields: [planId], references: [id])
 }
 
 model Stream {
@@ -402,6 +409,8 @@ model Plans{
   description String?
   validity   String?
   price      String?
+  subscriptions Subscriptions[]
+  payments Payment[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

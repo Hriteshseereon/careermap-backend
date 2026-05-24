@@ -22,6 +22,7 @@ import cookieParser from "cookie-parser";
 
 //  user portal routes imported here
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
+import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -67,4 +68,6 @@ app.use("/api/quiz",quizRoutes);
 
 // user portal api 
 app.use("/api/user",userportalRoutes);
+app.use("/api/user/payment",paymentRoutes);
+
 export default app;
