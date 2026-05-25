@@ -19,7 +19,7 @@ import cookieParser from "cookie-parser";
  import scholarshipRoutes from "./modules/scholarship/scholarship.routes.js"
  import plansRoutes    from  "./modules/plans/plans.routes.js"
  import quizRoutes   from "./modules/quiz/quiz.routes.js"
-
+  import masterClassRoute from "./modules/masterclass/masterclass.routes.js"
 //  user portal routes imported here
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
 import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
@@ -63,7 +63,7 @@ app.use("/api/mentor",mentorRoutes);
 app.use("/api/scholarship",scholarshipRoutes);
 app.use("/api/plans",plansRoutes);
 app.use("/api/quiz",quizRoutes);
-
+app.use("/api/masterclass",masterClassRoute);
 
 // user portal api 
 app.use("/api/user",userportalRoutes);
