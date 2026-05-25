@@ -19,11 +19,28 @@ import cookieParser from "cookie-parser";
  import scholarshipRoutes from "./modules/scholarship/scholarship.routes.js"
  import plansRoutes    from  "./modules/plans/plans.routes.js"
  import quizRoutes   from "./modules/quiz/quiz.routes.js"
+
+//  user portal routes imported here
+import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
+import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:8081",
+];
 app.use(cors({
-   origin: "http://localhost:5173", // your frontend URL
+  origin: function (origin, callback) {
+    // allow requests with no origin (Postman, mobile apps, etc.)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed for this origin"));
+    }
+  },
   credentials: true
 }));
 app.get('/', (req, res) => {
@@ -46,4 +63,10 @@ app.use("/api/mentor",mentorRoutes);
 app.use("/api/scholarship",scholarshipRoutes);
 app.use("/api/plans",plansRoutes);
 app.use("/api/quiz",quizRoutes);
+
+
+// user portal api 
+app.use("/api/user",userportalRoutes);
+app.use("/api/user/payment",paymentRoutes);
+
 export default app;
