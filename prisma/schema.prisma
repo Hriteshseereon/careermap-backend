@@ -74,27 +74,34 @@ model Users {
 model Subscriptions {
   id       Int      @id @default(autoincrement())
   userId    Int 
-  planType  String
+  planId    Int
+  planType  String?
   startDate DateTime
   endDate   DateTime
+  amount Float
   status    String
+   stripeSessionId String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Prisma relation field (does not create a column in the DB)
   user      Users    @relation(fields: [userId], references: [id])
+  plan      Plans    @relation(fields: [planId], references: [id])
 }
 
 model Payment {
   id        Int      @id @default(autoincrement())
   userId    Int
+  planId    Int
   amount    Float
+  stripeId  String? 
   status    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Prisma relation field (does not create a column in the DB)
   user      Users    @relation(fields: [userId], references: [id])
+   plan Plans @relation(fields: [planId], references: [id])
 }
 
 model Stream {
@@ -122,6 +129,8 @@ model Institutions {
   state String?
   city String?
   district String?
+  about  String?
+  course_offered String[]
   is_top Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -320,6 +329,16 @@ model EntranceExam {
   issuedate DateTime?
   lastdate DateTime?
   url String?
+  about String?
+  eligibility String?
+  exam_date   DateTime?
+  mode   String?
+  duration String?
+  subject   String[]
+  total_mark  String?
+  frequncy     String?
+  exam_pattern  String?
+  top_institution   String[]
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -348,6 +367,8 @@ model Mentor {
   experience Int?
   mentor_fees String?
   rank String?
+  available_date  DateTime?
+  available_time DateTime?
 
   image String?
   resume String?
@@ -388,6 +409,8 @@ model Plans{
   description String?
   validity   String?
   price      String?
+  subscriptions Subscriptions[]
+  payments Payment[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -424,5 +447,36 @@ model QuizOption {
   isCorrect  Boolean @default(false)
 
   questionId Int
-  question   QuizQuestion @relation(fields: [questionId], references: [id])
+  question   QuizQuestion @relation(fields: [questionId], references: [id],onDelete: Cascade  )
+}                                                               
+
+model MasterClass {
+  id Int @id @default(autoincrement())
+  category String?
+  image  String?
+  title  String?
+  name   String?
+  time   DateTime?
+  views  String?
+  is_active Boolean @default(false)
+  video_url  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model StudyAbroad {
+  id Int @id @default(autoincrement())
+  title String?
+  country_name String?
+  description  String?
+  overview     String?
+  visa_work    String?
+  living_cost  String?
+  tution_cost  String?
+  top_university String[]
+  scholarship    String[]
+  requirment    String[]
+  popular_course  String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
