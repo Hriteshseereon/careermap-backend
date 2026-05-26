@@ -6,7 +6,7 @@ import prisma from "../../config/db.js";
 export const createMentor = async (body, files) => {
   try {
     const existing = await MentorRepository.findByName(body.name);
-     if (existing) {
+    if (existing) {
       return {
         success: false,
         message: "Mentor with this name already exists",
@@ -23,37 +23,66 @@ export const createMentor = async (body, files) => {
       resumeUrl = await uploadToS3(files.resume[0], "mentors");
     }
 
-    const mentor = await MentorRepository.create({
-      categoryId: Number(body.categoryId),
-      subCategoryId: Number(body.subCategoryId),
+    // 🔥 PARSE AVAILABILITY
+    let availabilityData = [];
+    if (body.availability) {
+      try {
+        availabilityData = JSON.parse(body.availability);
+      } catch {
+        return { success: false, message: "Invalid availability format" };
+      }
+    }
 
-      name: body.name,
-      email: body.email,
-      phone_number: body.phone_number,
-      dateof_birth: body.dateof_birth
-        ? new Date(body.dateof_birth)
-        : null,
-      designation: body.designation,
-      education: body.education,
-      placeof_word: body.placeof_word,
-      linkedin: body.linkedin,
-      facebook: body.facebook,
-      skill: body.skill,
-      experience: body.experience
-        ? Number(body.experience)
-        : null,
-      mentor_fees: body.mentor_fees,
-      rank: body.rank,
-      description: body.description,
-     status:
-  body.status !== undefined
-    ? body.status === "true" || body.status === true
-    : undefined,
-      ...(imageUrl && { image: imageUrl }),
-      ...(resumeUrl && { resume: resumeUrl }),
+    const mentor = await prisma.mentor.create({
+      data: {
+        categoryId: Number(body.categoryId),
+        subCategoryId: Number(body.subCategoryId),
+
+        name: body.name,
+        email: body.email,
+        phone_number: body.phone_number,
+        dateof_birth: body.dateof_birth
+          ? new Date(body.dateof_birth)
+          : null,
+
+        designation: body.designation,
+        education: body.education,
+        placeof_word: body.placeof_word,
+        linkedin: body.linkedin,
+        facebook: body.facebook,
+        skill: body.skill,
+
+        experience: body.experience
+          ? Number(body.experience)
+          : null,
+
+        mentor_fees: body.mentor_fees,
+        rank: body.rank,
+        description: body.description,
+
+        status:
+          body.status !== undefined
+            ? body.status === "true" || body.status === true
+            : undefined,
+
+        ...(imageUrl && { image: imageUrl }),
+        ...(resumeUrl && { resume: resumeUrl }),
+
+        // 🔥 CREATE AVAILABILITY (NESTED)
+        availability: {
+          create: availabilityData.map((item) => ({
+            date: new Date(item.date),
+            timeSlots: item.timeSlots || [],
+          })),
+        },
+      },
+      include: {
+        availability: true,
+      },
     });
 
     return { success: true, data: mentor };
+
   } catch (error) {
     console.error("❌ createMentor Error:", error);
     return { success: false, message: error.message };
@@ -92,6 +121,7 @@ export const updateMentor = async (id, body, files) => {
   try {
     let imageUrl, resumeUrl;
 
+    // 🔹 Upload files
     if (files?.image?.[0]) {
       imageUrl = await uploadToS3(files.image[0], "mentors");
     }
@@ -100,34 +130,68 @@ export const updateMentor = async (id, body, files) => {
       resumeUrl = await uploadToS3(files.resume[0], "mentors");
     }
 
-    const updated = await MentorRepository.update(Number(id), {
-      categoryId: body.categoryId
-        ? Number(body.categoryId)
-        : undefined,
-      subCategoryId: body.subCategoryId
-        ? Number(body.subCategoryId)
-        : undefined,
+    // 🔹 Parse availability
+    let availabilityData;
+    if (body.availability) {
+      try {
+        availabilityData = JSON.parse(body.availability);
+      } catch {
+        return { success: false, message: "Invalid availability format" };
+      }
+    }
 
-      name: body.name,
-      email: body.email,
-      phone_number: body.phone_number,
-      designation: body.designation,
-      education: body.education,
-      experience: body.experience
-        ? Number(body.experience)
-        : undefined,
-      mentor_fees: body.mentor_fees,
-      rank: body.rank,
-      description: body.description,
+    // 🔥 MAIN UPDATE (WITH AVAILABILITY)
+    const updated = await prisma.mentor.update({
+      where: { id: Number(id) },
+      data: {
+        categoryId: body.categoryId
+          ? Number(body.categoryId)
+          : undefined,
+
+        subCategoryId: body.subCategoryId
+          ? Number(body.subCategoryId)
+          : undefined,
+
+        name: body.name,
+        email: body.email,
+        phone_number: body.phone_number,
+        designation: body.designation,
+        education: body.education,
+
+        experience: body.experience
+          ? Number(body.experience)
+          : undefined,
+
+        mentor_fees: body.mentor_fees,
+        rank: body.rank,
+        description: body.description,
+
         status:
-  body.status !== undefined
-    ? body.status === "true" || body.status === true
-    : undefined,
-      ...(imageUrl && { image: imageUrl }),
-      ...(resumeUrl && { resume: resumeUrl }),
+          body.status !== undefined
+            ? body.status === "true" || body.status === true
+            : undefined,
+
+        ...(imageUrl && { image: imageUrl }),
+        ...(resumeUrl && { resume: resumeUrl }),
+
+        // 🔥 AVAILABILITY UPDATE
+        ...(availabilityData && {
+          availability: {
+            deleteMany: {}, // ❗ remove old slots
+            create: availabilityData.map((item) => ({
+              date: new Date(item.date),
+              timeSlots: item.timeSlots || [],
+            })),
+          },
+        }),
+      },
+      include: {
+        availability: true, // 🔥 return updated slots
+      },
     });
 
     return { success: true, data: updated };
+
   } catch (error) {
     console.error("❌ updateMentor Error:", error);
     return { success: false, message: error.message };
