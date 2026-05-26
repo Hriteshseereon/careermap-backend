@@ -58,6 +58,46 @@ getBookings(mentorId) {
       mentorId: Number(mentorId),
       status: "confirmed", // or paymentStatus: "paid"
     },
+
+  });
+},
+// 🔹 Get all categories
+getAllCategories() {
+  return prisma.category.findMany({
+   
+    orderBy: { createdAt: "desc" },
+  });
+},
+
+// 🔹 Get second categories by categoryId
+getSecondCategories(categoryId) {
+  return prisma.secondcategory.findMany({
+    where: { categoryId: Number(categoryId) },
+    orderBy: { createdAt: "desc" },
+  });
+},
+
+// 🔹 Get subcategories by secondcategoryId
+getSubCategories(secondcategoryId) {
+  return prisma.subcategory.findMany({
+    where: { secondcategoryId: Number(secondcategoryId) },
+    orderBy: { createdAt: "desc" },
+  });
+},
+
+// 🔹 Get details by subcategoryId
+getDetailsBySubCategory(subcategoryId) {
+  return prisma.details.findMany({
+    where: { subcategoryId: Number(subcategoryId) },
+    include: {
+      salaryRanges: true,
+      stream: true,
+      category: true,
+      secondcategory: true,
+      subcategory: true,
+      institution: true,
+    },
   });
 }
+
 };

@@ -1,12 +1,28 @@
 import { Router } from "express";
-import * as ctrl from "./careerpath.controller.js";
+
+import {
+  create,
+  getAll,
+  getById,
+  update,
+  remove,
+} from "./careerpath.controller.js";
 
 const router = Router();
 
-router.post("/", ctrl.create);
-router.get("/", ctrl.getAll);
-router.get("/:id", ctrl.getById);
-router.put("/:id", ctrl.update);
-router.delete("/:id", ctrl.remove);
+// 🔹 CREATE
+router.post("/", create);
+
+// 🔹 GET ALL
+router.get("/", getAll);
+
+// 🔹 GET BY ID (safe route)
+router.get("/id/:id", getById);
+
+// 🔹 UPDATE
+router.put("/:id", update);
+
+// 🔹 DELETE
+router.delete("/:id", remove);
 
 export default router;

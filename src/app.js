@@ -25,6 +25,7 @@ import cookieParser from "cookie-parser";
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
 import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
 import mentoravailabilityRoute from "./modules/userportal/routes/mentor.routes.js"
+import careerlibraryRoutes from "./modules/userportal/routes/careerLibrary.routes.js"
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -71,4 +72,5 @@ app.use("/api/studyabroad",studyAbroadRoute);
 app.use("/api/user",userportalRoutes);
 app.use("/api/user/payment",paymentRoutes);
 app.use("/api/mentor",mentoravailabilityRoute);
+app.use("/api/careerlibrary",careerlibraryRoutes)
 export default app;
