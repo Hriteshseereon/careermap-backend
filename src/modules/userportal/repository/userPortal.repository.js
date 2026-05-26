@@ -38,4 +38,26 @@ export const UserPortalRepository = {
       orderBy: { createdAt: "desc" },
     });
   },
+  getAvailability(mentorId) {
+  return prisma.mentorAvailability.findMany({
+    where: {
+      mentorId: Number(mentorId),
+      date: {
+        gte: new Date(), // 🔥 only future
+      },
+    },
+    orderBy: {
+      date: "asc",
+    },
+  });
+},
+
+getBookings(mentorId) {
+  return prisma.mentorbooking.findMany({
+    where: {
+      mentorId: Number(mentorId),
+      status: "confirmed", // or paymentStatus: "paid"
+    },
+  });
+}
 };
