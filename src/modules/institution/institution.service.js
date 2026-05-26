@@ -4,26 +4,41 @@ import { InstitutionRepository } from "./institution.repository.js";
 // 🔹 Create
 export const createInstitution = async (body, file) => {
   try {
-    const imageUrl = await uploadToS3(file, "institutions");   
-    
+    const imageUrl = file
+      ? await uploadToS3(file, "institutions")
+      : null;
+
+    // 🔥 FIX ARRAY PARSING
+    let course_offered = [];
+    if (body.course_offered) {
+      try {
+        course_offered = JSON.parse(body.course_offered);
+      } catch {
+        course_offered = [body.course_offered];
+      }
+    }
+
     const institution = await InstitutionRepository.createInstitution({
-  name: body.name,
-  logo: imageUrl,
-  address: body.address,
-  admission_process: body.admission_process,
-  tentative_date: body.tentative_date,
-  institute_type: body.institute_type,
-  url: body.url,
-  countruy: body.countruy,
-  state: body.state,
-  city: body.city,
-  district: body.district,
-  is_top: body.is_top === "true" || body.is_top === true,
-});
+      name: body.name,
+      logo: imageUrl,
+      address: body.address,
+      admission_process: body.admission_process,
+      tentative_date: body.tentative_date,
+      institute_type: body.institute_type,
+      url: body.url,
+      countruy: body.countruy,
+      state: body.state,
+      city: body.city,
+      district: body.district,
+
+      about: body.about,
+      course_offered, // ✅ parsed array
+
+      is_top: body.is_top === "true" || body.is_top === true,
+    });
 
     return { success: true, data: institution };
-    } catch (error) {
-    console.error("❌ createInstitution Error:", error);
+  } catch (error) {
     return { success: false, message: error.message };
   }
 };
@@ -48,6 +63,15 @@ export const updateInstitution = async (id, body, file) => {
       logoUrl = await uploadToS3(file, "institutions");
     }
 
+    let course_offered;
+    if (body.course_offered !== undefined) {
+      try {
+        course_offered = JSON.parse(body.course_offered);
+      } catch {
+        course_offered = [body.course_offered];
+      }
+    }
+
     const updated = await InstitutionRepository.update(Number(id), {
       name: body.name,
       address: body.address,
@@ -59,18 +83,22 @@ export const updateInstitution = async (id, body, file) => {
       state: body.state,
       city: body.city,
       district: body.district,
+
+      about: body.about,
+
+      ...(course_offered !== undefined && { course_offered }),
+
       is_top:
         body.is_top !== undefined
           ? body.is_top === "true" || body.is_top === true
           : undefined,
 
-      ...(logoUrl && { logo: logoUrl }), // ✅ correct field
+      ...(logoUrl && { logo: logoUrl }),
     });
 
     return { success: true, data: updated };
 
   } catch (error) {
-    console.error("❌ updateInstitution Error:", error);
     return { success: false, message: error.message };
   }
 };

@@ -1,22 +1,42 @@
 import prisma from "../../config/db.js";
 
 export const entranceExamRepository = {
-  create: (data)=> prisma.entranceExam.create({ data }),
+  create: (data) => prisma.entranceExam.create({ data }),
 
-  findAll: ()=> prisma.entranceExam.findMany({
-    include:{ stream:true, category:true }
-  }),
+  findAll: () =>
+    prisma.entranceExam.findMany({
+      include: {
+        module: true,
+        stream: true,
+        category: true,
+        secondcategory: true,
+        subcategory: true,
+        details: true,
+      },
+      orderBy: { createdAt: "desc" },
+    }),
 
-  findById: (id)=> prisma.entranceExam.findUnique({
-    where:{id}
-  }),
+  findById: (id) =>
+    prisma.entranceExam.findUnique({
+      where: { id },
+      include: {
+        module: true,
+        stream: true,
+        category: true,
+        secondcategory: true,
+        subcategory: true,
+        details: true,
+      },
+    }),
 
-  update: (id,data)=> prisma.entranceExam.update({
-    where:{id},
-    data
-  }),
+  update: (id, data) =>
+    prisma.entranceExam.update({
+      where: { id },
+      data,
+    }),
 
-  delete: (id)=> prisma.entranceExam.delete({
-    where:{id}
-  })
+  delete: (id) =>
+    prisma.entranceExam.delete({
+      where: { id },
+    }),
 };
