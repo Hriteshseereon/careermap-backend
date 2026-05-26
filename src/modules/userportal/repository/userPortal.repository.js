@@ -61,43 +61,107 @@ getBookings(mentorId) {
 
   });
 },
-// 🔹 Get all categories
-getAllCategories() {
-  return prisma.category.findMany({
-   
-    orderBy: { createdAt: "desc" },
-  });
-},
+  // 🔹 CATEGORY
+  getAllCategories() {
+    return prisma.category.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+  },
 
-// 🔹 Get second categories by categoryId
-getSecondCategories(categoryId) {
-  return prisma.secondcategory.findMany({
-    where: { categoryId: Number(categoryId) },
-    orderBy: { createdAt: "desc" },
-  });
-},
+  // 🔹 SECOND CATEGORY
+  getSecondCategories(categoryId) {
+    return prisma.secondcategory.findMany({
+      where: { categoryId: Number(categoryId) },
+      orderBy: { createdAt: "desc" },
+    });
+  },
 
-// 🔹 Get subcategories by secondcategoryId
-getSubCategories(secondcategoryId) {
-  return prisma.subcategory.findMany({
-    where: { secondcategoryId: Number(secondcategoryId) },
-    orderBy: { createdAt: "desc" },
-  });
-},
+  // 🔹 SUB CATEGORY
+  getSubCategories(secondcategoryId) {
+    return prisma.subcategory.findMany({
+      where: { secondcategoryId: Number(secondcategoryId) },
+      orderBy: { createdAt: "desc" },
+    });
+  },
 
-// 🔹 Get details by subcategoryId
-getDetailsBySubCategory(subcategoryId) {
-  return prisma.details.findMany({
-    where: { subcategoryId: Number(subcategoryId) },
-    include: {
-      salaryRanges: true,
-      stream: true,
-      category: true,
-      secondcategory: true,
-      subcategory: true,
-      institution: true,
-    },
-  });
-}
+  // 🔥 DETAILS BY SUBCATEGORY (DEEP LEVEL)
+  getDetailsBySubCategory(subcategoryId) {
+    return prisma.details.findMany({
+      where: { subcategoryId: Number(subcategoryId) },
 
+      include: {
+        salaryRanges: true,
+
+        stream: true,
+        category: true,
+        secondcategory: true,
+        subcategory: true,
+        institution: true,
+
+        careerpath: {
+          include: {
+            module: true,
+            path: true,
+          },
+        },
+
+        entranceexam: true,
+      },
+    });
+  },
+
+  // 🔥 DETAILS BY CATEGORY (DIRECT LEVEL)
+  getDetailsByCategory(categoryId) {
+    return prisma.details.findMany({
+      where: {
+        categoryId: Number(categoryId),
+        subcategoryId: null,        // 🔥 IMPORTANT (direct only)
+        secondcategoryId: null,     // 🔥 IMPORTANT
+      },
+
+      include: {
+        salaryRanges: true,
+
+        stream: true,
+        category: true,
+        institution: true,
+
+        careerpath: {
+          include: {
+            module: true,
+            path: true,
+          },
+        },
+
+        entranceexam: true,
+      },
+    });
+  },
+
+  // 🔥 DETAILS BY SECOND CATEGORY (MID LEVEL)
+  getDetailsBySecond(secondcategoryId) {
+    return prisma.details.findMany({
+      where: {
+        secondcategoryId: Number(secondcategoryId),
+        subcategoryId: null, // 🔥 only mid-level
+      },
+
+      include: {
+        salaryRanges: true,
+
+        stream: true,
+        category: true,
+        secondcategory: true,
+
+        careerpath: {
+          include: {
+            module: true,
+            path: true,
+          },
+        },
+
+        entranceexam: true,
+      },
+    });
+  },
 };

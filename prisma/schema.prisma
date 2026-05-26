@@ -244,18 +244,18 @@ model Details {
   id                  Int      @id @default(autoincrement())
 
   // Foreign Keys
-  streamId            Int
-  categoryId          Int
-  secondcategoryId    Int
-  subcategoryId       Int
+  streamId            Int?
+  categoryId          Int?
+  secondcategoryId    Int?
+  subcategoryId       Int?
   careerpathId        Int?
   entranceexamId      Int?
   institutionId         Int?
   // Relations
-  stream              Stream           @relation(fields: [streamId], references: [id])
-  category            Category         @relation(fields: [categoryId], references: [id])
-  secondcategory      Secondcategory   @relation(fields: [secondcategoryId], references: [id])
-  subcategory         subcategory      @relation(fields: [subcategoryId], references: [id])
+  stream              Stream?           @relation(fields: [streamId], references: [id])
+  category            Category?         @relation(fields: [categoryId], references: [id])
+  secondcategory      Secondcategory?   @relation(fields: [secondcategoryId], references: [id])
+  subcategory         subcategory?      @relation(fields: [subcategoryId], references: [id])
   careerpath          CareerPath?       @relation(fields: [careerpathId],references: [id])
   entranceexam        EntranceExam?     @relation(fields: [entranceexamId],references: [id])
   institution         Institutions?     @relation(fields: [institutionId],references: [id])
@@ -316,16 +316,16 @@ model EntranceExam {
   id Int @id @default(autoincrement())
 
   moduleId Int
-  streamId Int
-  categoryId Int
-  secondcategoryId Int
-  subcategoryId Int
+  streamId Int?
+  categoryId Int?
+  secondcategoryId Int?
+  subcategoryId Int?
 
   module          Module          @relation(fields: [moduleId], references: [id])
-  stream          Stream          @relation(fields: [streamId], references: [id])
-  category        Category        @relation(fields: [categoryId], references: [id])
-  secondcategory  Secondcategory  @relation(fields: [secondcategoryId], references: [id])
-  subcategory     subcategory     @relation(fields: [subcategoryId], references: [id])
+  stream          Stream?         @relation(fields: [streamId], references: [id])
+  category        Category?       @relation(fields: [categoryId], references: [id])
+  secondcategory  Secondcategory? @relation(fields: [secondcategoryId], references: [id])
+  subcategory     subcategory?    @relation(fields: [subcategoryId], references: [id])
 
   examname String?
   issuedate DateTime?

@@ -4,6 +4,7 @@ import {
   getSecondCategoriesController,
   getSubCategoriesController,
   getDetailsController,
+  getNextLevelController,
 } from "../controller/careerLibrary.controller.js";
 
 const router = Router();
@@ -26,5 +27,5 @@ router.get(
   "/subcategory/:subcategoryId/details",
   getDetailsController
 );
-
+router.get("/next/:type/:id", getNextLevelController);
 export default router;
