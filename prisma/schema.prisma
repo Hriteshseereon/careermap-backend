@@ -13,6 +13,7 @@ datasource db {
 
 }
 
+
 model profile {
   id        Int      @id @default(autoincrement())
   class     String
@@ -68,7 +69,8 @@ model Users {
   // Prisma relation field (does not create a column in the DB)
   profile     profile?
   payments    Payment[]
-  
+  mentorPayments Mentorpayment[]
+  mentorBoookings Mentorbooking[]
 }
 
 model Subscriptions {
@@ -367,8 +369,6 @@ model Mentor {
   experience Int?
   mentor_fees String?
   rank String?
-  available_date  DateTime?
-  available_time DateTime?
 
   image String?
   resume String?
@@ -379,11 +379,77 @@ model Mentor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // relations
   category Category @relation(fields: [categoryId], references: [id])
   subcategory subcategory @relation(fields: [subCategoryId], references: [id])
+
+  // 🔥 NEW RELATION
+  availability MentorAvailability[]
+  bookings Mentorbooking[] 
+}
+model MentorAvailability {
+  id Int @id @default(autoincrement())
+
+  mentorId Int
+  date DateTime
+  timeSlots String[]  // ["10:00", "11:00", "15:00"]
+
+  mentor Mentor @relation(fields: [mentorId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
 }
 
+enum PaymentStatus {
+  pending
+  paid
+  failed
+}
+model Mentorbooking {
+  id Int @id @default(autoincrement())
+
+  userId Int
+  mentorId Int
+
+  date DateTime
+  timeSlot String
+
+  status BookingStatus @default(pending)
+  paymentStatus PaymentStatus @default(pending)
+
+  amount Float?
+
+  createdAt DateTime @default(now())
+
+  user Users @relation(fields: [userId], references: [id])
+  mentor Mentor @relation(fields: [mentorId], references: [id])
+
+ payment Mentorpayment? @relation("BookingPayment")
+
+  @@unique([mentorId, date, timeSlot])
+}
+model Mentorpayment {
+  id Int @id @default(autoincrement())
+
+  bookingId Int  @unique 
+  userId Int
+
+  amount Float
+  currency String @default("INR")
+
+  paymentId String?
+  orderId String?
+
+  status PaymentStatus @default(pending)
+
+  createdAt DateTime @default(now())
+
+  booking Mentorbooking @relation("BookingPayment", fields: [bookingId], references: [id])
+  user Users @relation(fields: [userId], references: [id])
+}
 model Scholarship{
   id Int @id @default(autoincrement())
   name String @unique
