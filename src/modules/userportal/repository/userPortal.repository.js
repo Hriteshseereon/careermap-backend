@@ -85,83 +85,88 @@ getBookings(mentorId) {
   },
 
   // 🔥 DETAILS BY SUBCATEGORY (DEEP LEVEL)
-  getDetailsBySubCategory(subcategoryId) {
-    return prisma.details.findMany({
-      where: { subcategoryId: Number(subcategoryId) },
+ getDetailsBySubCategory(subcategoryId) {
+  return prisma.details.findMany({
+    where: { subcategoryId: Number(subcategoryId) },
 
-      include: {
-        salaryRanges: true,
+    include: {
+      salaryRanges: true,
 
-        stream: true,
-        category: true,
-        secondcategory: true,
-        subcategory: true,
-        institution: true,
+      stream: true,
+      category: true,
+      secondcategory: true,
+      subcategory: true,
 
-        careerpath: {
-          include: {
-            module: true,
-            path: true,
-          },
+      // ✅ MANY TO MANY
+      institutions: true,
+
+      careerpaths: {
+        include: {
+          module: true,
+          path: true,
         },
-
-        entranceexam: true,
       },
-    });
-  },
+
+      entranceexams: true,
+    },
+  });
+},
 
   // 🔥 DETAILS BY CATEGORY (DIRECT LEVEL)
-  getDetailsByCategory(categoryId) {
-    return prisma.details.findMany({
-      where: {
-        categoryId: Number(categoryId),
-        subcategoryId: null,        // 🔥 IMPORTANT (direct only)
-        secondcategoryId: null,     // 🔥 IMPORTANT
-      },
+ getDetailsByCategory(categoryId) {
+  return prisma.details.findMany({
+    where: {
+      categoryId: Number(categoryId),
+      subcategoryId: null,
+      secondcategoryId: null,
+    },
 
-      include: {
-        salaryRanges: true,
+    include: {
+      salaryRanges: true,
 
-        stream: true,
-        category: true,
-        institution: true,
+      stream: true,
+      category: true,
 
-        careerpath: {
-          include: {
-            module: true,
-            path: true,
-          },
+      institutions: true,
+
+      careerpaths: {
+        include: {
+          module: true,
+          path: true,
         },
-
-        entranceexam: true,
       },
-    });
-  },
+
+      entranceexams: true,
+    },
+  });
+},
 
   // 🔥 DETAILS BY SECOND CATEGORY (MID LEVEL)
-  getDetailsBySecond(secondcategoryId) {
-    return prisma.details.findMany({
-      where: {
-        secondcategoryId: Number(secondcategoryId),
-        subcategoryId: null, // 🔥 only mid-level
-      },
+getDetailsBySecond(secondcategoryId) {
+  return prisma.details.findMany({
+    where: {
+      secondcategoryId: Number(secondcategoryId),
+      subcategoryId: null,
+    },
 
-      include: {
-        salaryRanges: true,
+    include: {
+      salaryRanges: true,
 
-        stream: true,
-        category: true,
-        secondcategory: true,
+      stream: true,
+      category: true,
+      secondcategory: true,
 
-        careerpath: {
-          include: {
-            module: true,
-            path: true,
-          },
+      institutions: true,
+
+      careerpaths: {
+        include: {
+          module: true,
+          path: true,
         },
-
-        entranceexam: true,
       },
-    });
-  },
+
+      entranceexams: true,
+    },
+  });
+},
 };
