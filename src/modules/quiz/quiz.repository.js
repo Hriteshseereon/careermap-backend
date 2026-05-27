@@ -83,4 +83,22 @@ getQuestionById(id) {
     },
   });
 },
+
+getQuizForUser(id) {
+  return prisma.quiz.findUnique({
+    where: { id },
+    include: {
+      questions: {
+        include: {
+          options: {
+            select: {
+              id: true,
+              text: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
 };

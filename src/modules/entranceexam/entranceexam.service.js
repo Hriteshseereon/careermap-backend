@@ -2,6 +2,15 @@ import { entranceExamRepository } from "./entranceexam.repository.js";
 
 export const createExam = async (body) => {
   try {
+    const existing = await entranceExamRepository.findByExamName(body.examname);
+
+    if (existing) {
+      return {
+        success: false,
+        message: "Exam already exists",
+      };
+    }
+
     const data = await entranceExamRepository.create({
       moduleId: Number(body.moduleId),
       streamId: Number(body.streamId),
@@ -30,6 +39,12 @@ export const createExam = async (body) => {
 
     return { success: true, data };
   } catch (err) {
+    if (err.code === "P2002") {
+      return {
+        success: false,
+        message: "Exam already exists",
+      };
+    }
     return { success: false, message: err.message };
   }
 };
@@ -56,7 +71,21 @@ export const getExamById = async (id) => {
 
 export const updateExam = async (id, body) => {
   try {
-    const updated = await entranceExamRepository.update(Number(id), {
+    const examId = Number(id);
+
+    // ✅ Check uniqueness ONLY if examname is being updated
+    if (body.examname) {
+      const existing = await entranceExamRepository.findByExamName(body.examname);
+
+      if (existing && existing.id !== examId) {
+        return {
+          success: false,
+          message: "Exam already exists",
+        };
+      }
+    }
+
+    const updated = await entranceExamRepository.update(examId, {
       moduleId: body.moduleId ? Number(body.moduleId) : undefined,
       streamId: body.streamId ? Number(body.streamId) : undefined,
       categoryId: body.categoryId ? Number(body.categoryId) : undefined,
@@ -67,7 +96,8 @@ export const updateExam = async (id, body) => {
         ? Number(body.subcategoryId)
         : undefined,
 
-      examname: body.examname,
+      // ✅ Only update if provided
+      examname: body.examname !== undefined ? body.examname : undefined,
 
       issuedate:
         body.issuedate !== undefined
@@ -99,9 +129,7 @@ export const updateExam = async (id, body) => {
       frequncy: body.frequncy,
       exam_pattern: body.exam_pattern,
 
-      subject:
-        body.subject !== undefined ? body.subject : undefined,
-
+      subject: body.subject !== undefined ? body.subject : undefined,
       top_institution:
         body.top_institution !== undefined
           ? body.top_institution
@@ -109,7 +137,16 @@ export const updateExam = async (id, body) => {
     });
 
     return { success: true, data: updated };
+
   } catch (err) {
+    // ✅ Handle Prisma unique constraint (backup safety)
+    if (err.code === "P2002") {
+      return {
+        success: false,
+        message: "Exam already exists",
+      };
+    }
+
     return { success: false, message: err.message };
   }
 };

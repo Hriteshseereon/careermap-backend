@@ -5,7 +5,9 @@ export const careerPathRepository = {
     data,
     include: { module:true, category:true, secondcategory:true, subcategory:true, path:true }
   }),
-
+  findByPathName: (pathName) => prisma.careerPath.findUnique({
+  where: { pathName }
+}),
   findAll: () => prisma.careerPath.findMany({
     include: { module:true, category:true, path:true }
   }),

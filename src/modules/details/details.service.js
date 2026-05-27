@@ -2,14 +2,33 @@ import { detailsRepository } from "./details.repository.js";
 
 export const createDetails = async (body) => {
   try {
-    const { salaryRanges, jobScope, ...rest } = body;
+    const { salaryRanges, jobScope, careerpathIds, entranceexamIds, institutionIds, ...rest } = body;
 
     const data = {
       ...rest,
       jobScope,
+
       salaryRanges: {
         create: salaryRanges || []
-      }
+      },
+
+      ...(careerpathIds && {
+        careerpaths: {
+          connect: careerpathIds.map(id => ({ id }))
+        }
+      }),
+
+      ...(entranceexamIds && {
+        entranceexams: {
+          connect: entranceexamIds.map(id => ({ id }))
+        }
+      }),
+
+      ...(institutionIds && {
+        institutions: {
+          connect: institutionIds.map(id => ({ id }))
+        }
+      })
     };
 
     const result = await detailsRepository.create(data);
@@ -17,7 +36,6 @@ export const createDetails = async (body) => {
     return { success: true, data: result };
 
   } catch (err) {
-    console.error("Create Details Error:", err);
     return { success: false, message: err.message };
   }
 };
@@ -48,17 +66,47 @@ export const getDetailsById = async (id) => {
 
 export const updateDetails = async (id, body) => {
   try {
-    const { salaryRanges, jobScope, ...rest } = body;
+    const {
+      salaryRanges,
+      jobScope,
+      careerpathIds,
+      entranceexamIds,
+      institutionIds,
+      ...rest
+    } = body;
 
     const data = {
       ...rest,
-      jobScope,
+
+      // ✅ Update jobScope only if provided
+      ...(jobScope !== undefined && { jobScope }),
+
+      // ✅ Replace salary ranges
       ...(salaryRanges && {
         salaryRanges: {
-          deleteMany: {},      // 🔥 remove old
-          create: salaryRanges // 🔥 insert new
-        }
-      })
+          deleteMany: {},
+          create: salaryRanges,
+        },
+      }),
+
+      // ✅ MANY-TO-MANY updates
+      ...(careerpathIds && {
+        careerpaths: {
+          set: careerpathIds.map((id) => ({ id })),
+        },
+      }),
+
+      ...(entranceexamIds && {
+        entranceexams: {
+          set: entranceexamIds.map((id) => ({ id })),
+        },
+      }),
+
+      ...(institutionIds && {
+        institutions: {
+          set: institutionIds.map((id) => ({ id })),
+        },
+      }),
     };
 
     const result = await detailsRepository.update(Number(id), data);

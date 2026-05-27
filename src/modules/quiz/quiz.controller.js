@@ -8,6 +8,8 @@ import {
     updateQuestion,
   deleteQuestion,
     getQuestionById,
+    submitQuiz,
+    getQuizForUser,
 } from "./quiz.service.js";
 
 // CREATE
@@ -61,4 +63,15 @@ export const deleteQuestionController = async (req, res) => {
 export const getQuestionByIdController = async (req, res) => {
   const result = await getQuestionById(req.params.id);
   res.status(result.success ? 200 : 404).json(result);
+};
+
+export const getQuizForUserController = async (req, res) => {
+  const result = await getQuizForUser(req.params.id);
+  res.status(result.success ? 200 : 400).json(result);
+};
+
+export const submitQuizController = async (req, res) => {
+
+  const result = await submitQuiz(req.body);
+  res.status(result.success ? 200 : 400).json(result);
 };
