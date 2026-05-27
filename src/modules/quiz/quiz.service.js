@@ -184,3 +184,65 @@ export const getQuestionById = async (id) => {
     return { success: false, message: error.message };
   }
 };
+
+export const getQuizForUser = async (id) => {
+  try {
+    const data = await QuizRepository.getQuizForUser(Number(id));
+
+    if (!data) {
+      return { success: false, message: "Quiz not found" };
+    }
+
+    return { success: true, data };
+
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};
+
+export const submitQuiz = async (body) => {
+  try {
+    const { quizId, answers } = body; // ✅ correct
+
+    if (!quizId) {
+      return { success: false, message: "quizId is required" };
+    }
+
+    const questions = await prisma.quizQuestion.findMany({
+      where: { quizId: Number(quizId) },
+      include: { options: true },
+    });
+
+    let correct = 0;
+
+    questions.forEach((q) => {
+      const userAnswer = answers.find(
+        (a) => a.questionId === q.id
+      );
+
+      if (!userAnswer) return;
+
+      const correctOption = q.options.find((opt) => opt.isCorrect);
+
+      if (
+        correctOption &&
+        correctOption.id === userAnswer.selectedOption
+      ) {
+        correct++;
+      }
+    });
+
+    return {
+      success: true,
+      data: {
+        total: questions.length,
+        correct,
+        wrong: questions.length - correct,
+        score: `${correct}/${questions.length}`,
+      },
+    };
+
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};

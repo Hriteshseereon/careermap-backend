@@ -2,51 +2,65 @@ import prisma from "../../config/db.js";
 
 export const detailsRepository = {
 
-  create: (data) => {
+create: (data) => {
   return prisma.details.create({
     data: {
-  jobScope: data.jobScope,
+      jobScope: data.jobScope,
 
-  stream: {
-    connect: { id: data.streamId }
-  },
+      // Single relations
+      ...(data.streamId && {
+        stream: {
+          connect: { id: data.streamId }
+        }
+      }),
 
-  ...(data.categoryId && {
-    category: {
-      connect: { id: data.categoryId }
-    }
-  }),
+      ...(data.categoryId && {
+        category: {
+          connect: { id: data.categoryId }
+        }
+      }),
 
-  ...(data.secondcategoryId && {
-    secondcategory: {
-      connect: { id: data.secondcategoryId }
-    }
-  }),
+      ...(data.secondcategoryId && {
+        secondcategory: {
+          connect: { id: data.secondcategoryId }
+        }
+      }),
 
-  ...(data.subcategoryId && {
-    subcategory: {
-      connect: { id: data.subcategoryId }
-    }
-  }),
+      ...(data.subcategoryId && {
+        subcategory: {
+          connect: { id: data.subcategoryId }
+        }
+      }),
 
-  salaryRanges: data.salaryRanges,
+      // Salary ranges
+      salaryRanges: data.salaryRanges,
 
-  ...(data.careerpathId && {
-    careerpath: { connect: { id: data.careerpathId } }
-  }),
-  ...(data.entranceexamId && {
-    entranceexam: { connect: { id: data.entranceexamId } }
-  }),
-  ...(data.institutionId && {
-    institution: { connect: { id: data.institutionId } }
-  })
-},
+      // ✅ MANY-TO-MANY
+     ...(data.careerpaths && {
+  careerpaths: data.careerpaths
+}),
+
+...(data.entranceexams && {
+  entranceexams: data.entranceexams
+}),
+
+...(data.institutions && {
+  institutions: data.institutions
+})
+     
+    },
+
     include: {
       salaryRanges: true,
       stream: true,
       category: true,
       secondcategory: true,
-      subcategory: true
+      subcategory: true,
+
+      // ✅ INCLUDE THESE
+      careerpaths: true,
+      entranceexams: true,
+      institutions: true
     }
   });
 },
@@ -58,7 +72,10 @@ export const detailsRepository = {
         stream: true,
         category: true,
         secondcategory: true,
-        subcategory: true
+        subcategory: true,
+         careerpaths: true,
+      entranceexams: true,
+      institutions: true
       }
     });
   },
@@ -71,7 +88,10 @@ export const detailsRepository = {
         stream: true,
         category: true,
         secondcategory: true,
-        subcategory: true
+        subcategory: true,
+         careerpaths: true,
+      entranceexams: true,
+      institutions: true
       }
     });
   },

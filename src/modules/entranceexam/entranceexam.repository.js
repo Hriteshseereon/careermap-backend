@@ -28,7 +28,10 @@ export const entranceExamRepository = {
         details: true,
       },
     }),
-
+findByExamName: (examname) =>
+  prisma.entranceExam.findUnique({
+    where: { examname },
+  }),
   update: (id, data) =>
     prisma.entranceExam.update({
       where: { id },

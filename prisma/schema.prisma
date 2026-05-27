@@ -138,7 +138,7 @@ model Institutions {
   updatedAt DateTime @updatedAt
 
   categories Category[]
-  subcategories subcategory[]
+  subcategories Subcategory[]
   secondCategories Secondcategory[]
   details Details[]
 }
@@ -162,7 +162,7 @@ model Category {
   stream Stream @relation(fields: [streamId], references: [id])
   institution Institutions @relation(fields: [institutionId], references: [id])
   secondCategories Secondcategory[]
-  subcategories subcategory[]
+  subcategories Subcategory[]
    details Details[]
     careerpath CareerPath[]
     entranceexam EntranceExam[]
@@ -187,14 +187,14 @@ model Secondcategory {
   // 🔗 Relation
   category    Category @relation(fields: [categoryId], references: [id])
   institution Institutions? @relation(fields: [institutionId], references: [id])
-  subcategories subcategory[]
+  subcategories Subcategory[]
    details Details[]
     careerpath CareerPath[]
     entranceexam EntranceExam[]
 
 }
 
-model subcategory {
+model Subcategory {
   id        Int      @id @default(autoincrement())
   categoryId Int
   secondcategoryId Int
@@ -241,33 +241,39 @@ model Module {
 // details scheama design 
 
 model Details {
-  id                  Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  // Foreign Keys
-  streamId            Int?
-  categoryId          Int?
-  secondcategoryId    Int?
-  subcategoryId       Int?
-  careerpathId        Int?
-  entranceexamId      Int?
-  institutionId         Int?
-  // Relations
-  stream              Stream?           @relation(fields: [streamId], references: [id])
-  category            Category?         @relation(fields: [categoryId], references: [id])
-  secondcategory      Secondcategory?   @relation(fields: [secondcategoryId], references: [id])
-  subcategory         subcategory?      @relation(fields: [subcategoryId], references: [id])
-  careerpath          CareerPath?       @relation(fields: [careerpathId],references: [id])
-  entranceexam        EntranceExam?     @relation(fields: [entranceexamId],references: [id])
-  institution         Institutions?     @relation(fields: [institutionId],references: [id])
-  // Salary Fields
-  salaryRanges    SalaryRange[]
+  // Foreign Keys (still single)
+  streamId         Int?
+  categoryId       Int?
+  secondcategoryId Int?
+  subcategoryId    Int?
 
-  // Job Scope (multiple values)
-  jobScope            String[]   // PostgreSQL array
+  // Relations (single)
+  stream          Stream?          @relation(fields: [streamId], references: [id])
+  category        Category?        @relation(fields: [categoryId], references: [id])
+  secondcategory  Secondcategory?  @relation(fields: [secondcategoryId], references: [id])
+  subcategory     Subcategory?     @relation(fields: [subcategoryId], references: [id])
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  
+  // ✅ MANY-TO-MANY RELATIONS
+  careerpaths     CareerPath[]
+  entranceexams   EntranceExam[]
+  institutions    Institutions[]
+
+  // Salary
+  salaryRanges SalaryRange[]
+
+  // Array field
+  jobScope String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Indexes (optional but recommended)
+  @@index([streamId])
+  @@index([categoryId])
+  @@index([secondcategoryId])
+  @@index([subcategoryId])
 }
 model SalaryRange {
   id        Int     @id @default(autoincrement())
@@ -288,18 +294,18 @@ model PathType {
 
 model CareerPath {
   id  Int @id @default(autoincrement())
+  pathName  String? @unique
+  moduleId Int?
+  categoryId Int?
+  secondcategoryId Int?
+  subcategoryId Int?
+  pathId Int?
 
-  moduleId Int
-  categoryId Int
-  secondcategoryId Int
-  subcategoryId Int
-  pathId Int
-
-  module          Module          @relation(fields: [moduleId], references: [id])
-  category        Category        @relation(fields: [categoryId], references: [id])
-  secondcategory  Secondcategory  @relation(fields: [secondcategoryId], references: [id])
-  subcategory     subcategory     @relation(fields: [subcategoryId], references: [id])
-  path            PathType        @relation(fields: [pathId], references: [id])
+  module          Module?          @relation(fields: [moduleId], references: [id])
+  category        Category?        @relation(fields: [categoryId], references: [id])
+  secondcategory  Secondcategory?  @relation(fields: [secondcategoryId], references: [id])
+  subcategory     Subcategory?     @relation(fields: [subcategoryId], references: [id])
+  path            PathType?        @relation(fields: [pathId], references: [id])
 
   graduation String?
   aftergraduation String?
@@ -315,19 +321,19 @@ model CareerPath {
 model EntranceExam {
   id Int @id @default(autoincrement())
 
-  moduleId Int
+  moduleId Int?
   streamId Int?
   categoryId Int?
   secondcategoryId Int?
   subcategoryId Int?
 
-  module          Module          @relation(fields: [moduleId], references: [id])
+  module          Module?          @relation(fields: [moduleId], references: [id])
   stream          Stream?         @relation(fields: [streamId], references: [id])
   category        Category?       @relation(fields: [categoryId], references: [id])
   secondcategory  Secondcategory? @relation(fields: [secondcategoryId], references: [id])
-  subcategory     subcategory?    @relation(fields: [subcategoryId], references: [id])
+  subcategory     Subcategory?    @relation(fields: [subcategoryId], references: [id])
 
-  examname String?
+  examname String @unique
   issuedate DateTime?
   lastdate DateTime?
   url String?
@@ -380,7 +386,7 @@ model Mentor {
   updatedAt DateTime @updatedAt
 
   category Category @relation(fields: [categoryId], references: [id])
-  subcategory subcategory @relation(fields: [subCategoryId], references: [id])
+  subcategory Subcategory @relation(fields: [subCategoryId], references: [id])
 
   // 🔥 NEW RELATION
   availability MentorAvailability[]
