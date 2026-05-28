@@ -94,3 +94,16 @@ export const deleteSecondCategory = async (id) => {
     return { success: false, message: error.message };
   }
 };
+
+export const getSecondByCategory = async (categoryId) => {
+  try {
+
+    const data =
+      await SecondCategoryRepository.findByCategoryId(categoryId);
+
+    return { success: true, data };
+
+  } catch (error) {
+    return { success: false, message: error.message };
+  }
+};

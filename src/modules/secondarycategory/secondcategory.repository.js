@@ -23,7 +23,13 @@ export const SecondCategoryRepository = {
       },
     });
   },
-
+findByCategoryId(categoryId) {
+  return prisma.secondcategory.findMany({
+    where: {
+      categoryId: Number(categoryId),
+    },
+  });
+},
   update(id, data) {
     return prisma.secondcategory.update({
       where: { id },

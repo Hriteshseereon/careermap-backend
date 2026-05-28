@@ -8,6 +8,7 @@ import {
   getSubCategoryByIdController,
   updateSubCategoryController,
   deleteSubCategoryController,
+    getSubBySecondCategoryController,
 } from "./subcategory.controller.js";
 
 const router = Router();
@@ -42,5 +43,8 @@ router.put(
 
 // DELETE
 router.delete("/:id", protectAdmin, deleteSubCategoryController);
-
+router.get(
+  "/second/:secondcategoryId",
+  getSubBySecondCategoryController
+);
 export default router;
