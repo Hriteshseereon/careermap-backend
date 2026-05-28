@@ -200,49 +200,119 @@ export const getQuizForUser = async (id) => {
   }
 };
 
-export const submitQuiz = async (body) => {
+export const submitQuiz = async (body, userId) => {
   try {
-    const { quizId, answers } = body; // ✅ correct
+
+    const { quizId, answers } = body;
 
     if (!quizId) {
-      return { success: false, message: "quizId is required" };
+      return {
+        success: false,
+        message: "quizId is required",
+      };
     }
 
     const questions = await prisma.quizQuestion.findMany({
-      where: { quizId: Number(quizId) },
-      include: { options: true },
+      where: {
+        quizId: Number(quizId),
+      },
+
+      include: {
+        options: true,
+      },
     });
 
     let correct = 0;
 
+    const answerData = [];
+
     questions.forEach((q) => {
+
       const userAnswer = answers.find(
         (a) => a.questionId === q.id
       );
 
       if (!userAnswer) return;
 
-      const correctOption = q.options.find((opt) => opt.isCorrect);
+      const correctOption = q.options.find(
+        (opt) => opt.isCorrect
+      );
 
-      if (
+      const isCorrect =
         correctOption &&
-        correctOption.id === userAnswer.selectedOption
-      ) {
+        correctOption.id === userAnswer.selectedOption;
+
+      if (isCorrect) {
         correct++;
       }
+
+      answerData.push({
+        questionId: q.id,
+        selectedOptionId: userAnswer.selectedOption,
+        isCorrect,
+      });
+    });
+
+    const total = questions.length;
+    const wrong = total - correct;
+
+    // 🔥 SAVE ATTEMPT
+    const attempt = await prisma.quizAttempt.create({
+      data: {
+        quizId: Number(quizId),
+        userId: Number(userId),
+
+        totalQuestions: total,
+        correctAnswers: correct,
+        wrongAnswers: wrong,
+
+        score: `${correct}/${total}`,
+
+        answers: {
+          create: answerData,
+        },
+      },
     });
 
     return {
       success: true,
+
       data: {
-        total: questions.length,
+        attemptId: attempt.id,
+        total,
         correct,
-        wrong: questions.length - correct,
-        score: `${correct}/${questions.length}`,
+        wrong,
+        score: `${correct}/${total}`,
       },
     };
 
   } catch (error) {
-    return { success: false, message: error.message };
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+
+export const getQuizAttempts = async (quizId) => {
+
+  try {
+
+    const data =
+      await QuizRepository.getQuizAttempts(quizId);
+
+    return {
+      success: true,
+      totalUsers: data.length,
+      data,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
   }
 };

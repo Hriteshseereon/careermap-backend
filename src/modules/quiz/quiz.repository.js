@@ -7,15 +7,26 @@ export const QuizRepository = {
   },
 
   // GET ALL
-  getAllQuiz() {
-    return prisma.quiz.findMany({
-      include: {
-        questions: {
-          include: { options: true },
+ getAllQuiz() {
+  return prisma.quiz.findMany({
+
+    include: {
+
+      questions: {
+        include: {
+          options: true,
         },
       },
-    });
-  },
+
+      // 🔥 ADD THIS
+      _count: {
+        select: {
+          attempts: true,
+        },
+      },
+    },
+  });
+},
 
   // GET BY ID
   getQuizById(id) {
@@ -100,5 +111,31 @@ getQuizForUser(id) {
       },
     },
   });
-}
+},
+getQuizAttempts(quizId) {
+  return prisma.quizAttempt.findMany({
+
+    where: {
+      quizId: Number(quizId),
+    },
+
+    include: {
+
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+
+      quiz: true,
+    },
+
+    orderBy: {
+      attemptedAt: "desc",
+    },
+  });
+},
 };
