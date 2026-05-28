@@ -82,12 +82,9 @@ export const updateDetails = async (id, body) => {
       ...(jobScope !== undefined && { jobScope }),
 
       // ✅ Replace salary ranges
-      ...(salaryRanges && {
-        salaryRanges: {
-          deleteMany: {},
-          create: salaryRanges,
-        },
-      }),
+     ...(salaryRanges && {
+  salaryRanges,
+}),
 
       // ✅ MANY-TO-MANY updates
       ...(careerpathIds && {

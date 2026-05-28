@@ -284,7 +284,7 @@ model SalaryRange {
   maxSalary Float
 
   detailsId Int
-  details   Details @relation(fields: [detailsId], references: [id])
+  details   Details @relation(fields: [detailsId], references: [id],onDelete: Cascade)
 } 
 model PathType {
   id Int @id @default(autoincrement())
