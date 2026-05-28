@@ -10,6 +10,7 @@ import {
     getQuestionById,
     submitQuiz,
     getQuizForUser,
+    getQuizAttempts,
 } from "./quiz.service.js";
 
 // CREATE
@@ -72,6 +73,19 @@ export const getQuizForUserController = async (req, res) => {
 
 export const submitQuizController = async (req, res) => {
 
-  const result = await submitQuiz(req.body);
+  const result = await submitQuiz(
+    req.body,
+    req.user.id // 🔥 from auth token
+  );
+
+  res.status(result.success ? 200 : 400).json(result);
+};
+
+export const getQuizAttemptsController = async (req, res) => {
+
+  const result = await getQuizAttempts(
+    req.params.quizId
+  );
+
   res.status(result.success ? 200 : 400).json(result);
 };
