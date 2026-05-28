@@ -4,6 +4,7 @@ import {
   getSubCategoryById,
   updateSubCategory,
   deleteSubCategory,
+  getSubBySecondCategory
 } from "./subcategory.service.js";
 
 // CREATE
@@ -39,3 +40,11 @@ export const deleteSubCategoryController = async (req, res) => {
   const result = await deleteSubCategory(req.params.id);
   res.status(result.success ? 200 : 400).json(result);
 };  
+
+export const getSubBySecondCategoryController = async (req, res) => {
+
+  const result =
+    await getSubBySecondCategory(req.params.secondcategoryId);
+
+  res.status(result.success ? 200 : 400).json(result);
+};

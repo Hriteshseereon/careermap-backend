@@ -4,6 +4,7 @@ import {
   getSecondCategoryById,
   updateSecondCategory,
   deleteSecondCategory,
+  getSecondByCategory
 } from "./secondcategory.service.js";
 
 export const createSecondCategoryController = async (req, res) => {
@@ -32,5 +33,12 @@ export const updateSecondCategoryController = async (req, res) => {
 
 export const deleteSecondCategoryController = async (req, res) => {
   const result = await deleteSecondCategory(req.params.id);
+  res.status(result.success ? 200 : 400).json(result);
+};
+export const getSecondByCategoryController = async (req, res) => {
+
+  const result =
+    await getSecondByCategory(req.params.categoryId);
+
   res.status(result.success ? 200 : 400).json(result);
 };
