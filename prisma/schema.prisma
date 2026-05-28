@@ -71,6 +71,7 @@ model Users {
   payments    Payment[]
   mentorPayments Mentorpayment[]
   mentorBoookings Mentorbooking[]
+    consultations    StudyAbroadConsult[]
 }
 
 model Subscriptions {
@@ -359,8 +360,8 @@ model EntranceExam {
 model Mentor {
   id Int @id @default(autoincrement())
 
-  categoryId Int
-  subCategoryId Int
+  categoryId Int?
+  subCategoryId Int?
 
   name String?
   email String?
@@ -385,8 +386,8 @@ model Mentor {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  category Category @relation(fields: [categoryId], references: [id])
-  subcategory Subcategory @relation(fields: [subCategoryId], references: [id])
+  category Category? @relation(fields: [categoryId], references: [id])
+  subcategory Subcategory? @relation(fields: [subCategoryId], references: [id])
 
   // 🔥 NEW RELATION
   availability MentorAvailability[]
@@ -551,4 +552,30 @@ model StudyAbroad {
   popular_course  String[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+    consultations    StudyAbroadConsult[]
+}
+model StudyAbroadConsult {
+  id                 Int      @id @default(autoincrement())
+
+  userId             Int
+  studyAbroadId      Int
+
+  preferredCountry   String?
+  courseInterest     String?
+  budgetRange        String?
+  preferredIntake    String?
+
+  message            String?
+  status             String   @default("pending")
+
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relations
+  user               Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  studyAbroad        StudyAbroad @relation(fields: [studyAbroadId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([studyAbroadId])
 }

@@ -25,7 +25,13 @@ export const SubCategoryRepository = {
       },
     });
   },
-
+findBySecondCategoryId(secondcategoryId) {
+  return prisma.subcategory.findMany({
+    where: {
+      secondcategoryId: Number(secondcategoryId),
+    },
+  });
+},
   update(id, data) {
     return prisma.subcategory.update({
       where: { id },
