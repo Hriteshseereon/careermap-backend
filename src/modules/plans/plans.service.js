@@ -38,7 +38,7 @@ export const createPlan = async (body) => {
       description: body.description,
       validity: body.validity,
       price: body.price,
-
+      plan_type: body.plan_type,
       // 🔥 connect modules
       modules: body.moduleIds
         ? {
@@ -110,7 +110,7 @@ export const updatePlan = async (id, body) => {
       description: body.description,
       validity: body.validity,
       price: body.price,
-
+      plan_type: body.plan_type,
       // 🔥 replace modules
       modules: body.moduleIds
         ? {
