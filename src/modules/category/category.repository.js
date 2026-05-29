@@ -42,4 +42,15 @@ export const CategoryRepository = {
       where: { id },
     });
   },
+
+  getByStreamId(streamId) {
+  return prisma.category.findMany({
+    where: {
+      streamId: Number(streamId),
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+},
 };

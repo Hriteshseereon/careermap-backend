@@ -8,6 +8,7 @@ import {
   getCategoryByIdController,
   updateCategoryController,
   deleteCategoryController,
+  getCategoriesByStreamIdController,
 } from "./category.controller.js";
 
 const router = Router();
@@ -17,6 +18,9 @@ router.post("/", protectAdmin, upload.fields([
   { name: "coverImage", maxCount: 1 },
   { name: "file", maxCount: 1 }
 ]), createCategoryController);
+
+router.get(
+  "/stream/:streamId",getCategoriesByStreamIdController);
 router.get("/", getCategoriesController);
 router.get("/:id", getCategoryByIdController);
 router.put("/:id", protectAdmin, upload.fields([
