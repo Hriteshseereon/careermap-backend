@@ -1,4 +1,4 @@
-import { adminSignup, adminLogin } from "./adminauth.service.js";
+import { adminSignup, adminLogin, refreshAdminToken, } from "./adminauth.service.js";
 
 // 🔹 Signup
 export const signupAdmin = async (req, res) => {
@@ -29,4 +29,21 @@ export const loginAdmin = async (req, res) => {
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
+};
+
+export const refreshTokenAdmin = async (
+  req,
+  res
+) => {
+
+  const { refreshToken } = req.body;
+
+  const result =
+    await refreshAdminToken(
+      refreshToken
+    );
+
+  res.status(
+    result.success ? 200 : 401
+  ).json(result);
 };
