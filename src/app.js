@@ -21,6 +21,8 @@ import cookieParser from "cookie-parser";
  import quizRoutes   from "./modules/quiz/quiz.routes.js"
   import masterClassRoute from "./modules/masterclass/masterclass.routes.js"
   import studyAbroadRoute from "./modules/studyabroad/studyabroad.routes.js"
+  import notificationRoute from "./modules/notification/notification.routes.js"
+  import loginhistoryRoute from "./modules/loginhistory/userLoginHistory.routes.js"
 //  user portal routes imported here
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
 import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
@@ -68,9 +70,11 @@ app.use("/api/plans",plansRoutes);
 app.use("/api/quiz",quizRoutes);
 app.use("/api/masterclass",masterClassRoute);
 app.use("/api/studyabroad",studyAbroadRoute);
+app.use("/api/notification",notificationRoute);
 // user portal api 
 app.use("/api/user",userportalRoutes);
 app.use("/api/user/payment",paymentRoutes);
 app.use("/api/mentor",mentoravailabilityRoute);
 app.use("/api/careerlibrary",careerlibraryRoutes)
+app.use("/api/userhistory",loginhistoryRoute);
 export default app;
