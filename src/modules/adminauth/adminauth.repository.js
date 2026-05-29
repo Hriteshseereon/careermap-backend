@@ -15,4 +15,9 @@ export const AdminAuthRepository = {
       data,
     });
   },
+  findById(id) {
+  return prisma.adminUsers.findUnique({
+    where: { id }
+  });
+},
 };
