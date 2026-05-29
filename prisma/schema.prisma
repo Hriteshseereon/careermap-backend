@@ -73,7 +73,7 @@ model Users {
   mentorBoookings Mentorbooking[]
     consultations    StudyAbroadConsult[]
   quizattempt QuizAttempt[]
-
+   userloginhistory  UserLoginHistory[]
 }
 
 model Subscriptions {
@@ -633,5 +633,24 @@ model Notification {
 
   createdAt DateTime @default(now())
 
+  updatedAt DateTime @updatedAt
+}
+
+model UserLoginHistory {
+  id Int @id @default(autoincrement())
+
+  userId Int
+
+  ipAddress String?
+  location String?
+  device String?
+  browser String?
+  os String?
+
+  loginAt DateTime @default(now())
+
+  user Users @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
