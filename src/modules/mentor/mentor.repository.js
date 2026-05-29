@@ -10,6 +10,7 @@ export const MentorRepository = {
       include: {
         category: true,
         subcategory: true,
+        availability:true,
       },
     });
   },
@@ -20,6 +21,7 @@ export const MentorRepository = {
       include: {
         category: true,
         subcategory: true,
+        availability:true,
       },
     });
   },
