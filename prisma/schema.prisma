@@ -73,7 +73,7 @@ model Users {
   mentorBoookings Mentorbooking[]
     consultations    StudyAbroadConsult[]
   quizattempt QuizAttempt[]
-
+   userloginhistory  UserLoginHistory[]
 }
 
 model Subscriptions {
@@ -484,6 +484,7 @@ model Plans{
   description String?
   validity   String?
   price      String?
+  plan_type  String?
   subscriptions Subscriptions[]
   payments Payment[]
   createdAt DateTime @default(now())
@@ -614,4 +615,42 @@ model StudyAbroadConsult {
 
   @@index([userId])
   @@index([studyAbroadId])
+}
+
+model Notification {
+
+  id Int @id @default(autoincrement())
+
+  title String
+
+  message String?
+
+  target String?
+
+  status String? @default("pending")
+
+  type String?
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
+
+model UserLoginHistory {
+  id Int @id @default(autoincrement())
+
+  userId Int
+
+  ipAddress String?
+  location String?
+  device String?
+  browser String?
+  os String?
+
+  loginAt DateTime @default(now())
+
+  user Users @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
