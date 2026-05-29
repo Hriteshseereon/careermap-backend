@@ -117,3 +117,32 @@ export const deleteCategory = async (id) => {
     return { success: false, message: error.message };
   }
 };
+
+export const getCategoriesByStreamId = async (
+  streamId
+) => {
+  try {
+
+    const data =
+      await CategoryRepository.getByStreamId(
+        streamId
+      );
+
+    return {
+      success: true,
+      data,
+    };
+
+  } catch (error) {
+
+    console.error(
+      "❌ getCategoriesByStreamId Error:",
+      error
+    );
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};

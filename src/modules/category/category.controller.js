@@ -4,6 +4,7 @@ import {
   getCategoryById,
   updateCategory,
   deleteCategory,
+  getCategoriesByStreamId,
 } from "./category.services.js";
 
 // CREATE
@@ -54,4 +55,17 @@ export const updateCategoryController = async (req, res) => {
 export const deleteCategoryController = async (req, res) => {
   const result = await deleteCategory(req.params.id);
   res.status(result.success ? 200 : 400).json(result);
+};
+
+export const getCategoriesByStreamIdController =
+async (req, res) => {
+
+  const result =
+    await getCategoriesByStreamId(
+      req.params.streamId
+    );
+
+  res.status(
+    result.success ? 200 : 400
+  ).json(result);
 };
