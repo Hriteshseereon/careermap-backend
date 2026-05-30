@@ -74,6 +74,7 @@ model Users {
     consultations    StudyAbroadConsult[]
   quizattempt QuizAttempt[]
    userloginhistory  UserLoginHistory[]
+   helpandSupport HelpAndSupport[]
 }
 
 model Subscriptions {
@@ -651,6 +652,20 @@ model UserLoginHistory {
 
   user Users @relation(fields: [userId], references: [id])
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model HelpAndSupport {
+  id Int @id @default(autoincrement())
+
+  userId Int
+  email String?
+  subject String?
+  message String?
+  status String? @default("pending")
+
+   user Users @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
