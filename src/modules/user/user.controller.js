@@ -1,4 +1,4 @@
-import { registerUser } from "./user.service.js";
+import { registerUser,  updateProfile,changePassword,forgotPassword,resetPassword } from "./user.service.js";
 
 export const signup = async (req, res) => {
   try {
@@ -22,3 +22,75 @@ export const signup = async (req, res) => {
   }
 };
 
+export const updateProfileController =
+async (req, res) => {
+
+  try {
+
+    const user =
+      await updateProfile(
+        req.user.id,
+        req.body
+      );
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Profile updated successfully",
+      data: user,
+    });
+
+  } catch (error) {
+
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const changePasswordController =
+async (req, res) => {
+
+  try {
+
+    const result =
+      await changePassword(
+        req.user.id,
+        req.body
+      );
+
+    res.status(200).json(result);
+
+  } catch (error) {
+
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const forgotPasswordController =
+async (req,res) => {
+
+  const result =
+    await forgotPassword(
+      req.body.email
+    );
+
+  res.json(result);
+};
+
+export const resetPasswordController =
+async (req,res) => {
+
+  const result =
+    await resetPassword(
+      req.body.token,
+      req.body.newPassword,
+      req.body.confirmPassword
+    );
+
+  res.json(result);
+};

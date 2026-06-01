@@ -22,6 +22,7 @@ export const createOrderController = async (req, res) => {
 
 export const verifyPaymentController = async (req, res) => {
   try {
+    const userId = req.user.id;
     await verifyPayment(req.body);
 
     res.json({
