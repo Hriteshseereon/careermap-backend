@@ -28,12 +28,11 @@ export const createOrder = async (userId, planId) => {
 
   return order;
 };
-export const verifyPayment = async (body) => {
+export const verifyPayment = async (userId,body) => {
   const {
     razorpay_order_id,
     razorpay_payment_id,
     razorpay_signature,
-    userId,
     planId,
   } = body;
 

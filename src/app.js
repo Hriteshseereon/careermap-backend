@@ -23,6 +23,7 @@ import cookieParser from "cookie-parser";
   import studyAbroadRoute from "./modules/studyabroad/studyabroad.routes.js"
   import notificationRoute from "./modules/notification/notification.routes.js"
   import loginhistoryRoute from "./modules/loginhistory/userLoginHistory.routes.js"
+import helpAndSupportRoute from "./modules/helpsupport/helpandsupport.routes.js"
 //  user portal routes imported here
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
 import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
@@ -34,6 +35,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:8081",
+   "http://localhost:5174",
 ];
 app.use(cors({
   origin: function (origin, callback) {
@@ -71,6 +73,7 @@ app.use("/api/quiz",quizRoutes);
 app.use("/api/masterclass",masterClassRoute);
 app.use("/api/studyabroad",studyAbroadRoute);
 app.use("/api/notification",notificationRoute);
+app.use("/api/helpandsupport",helpAndSupportRoute);
 // user portal api 
 app.use("/api/user",userportalRoutes);
 app.use("/api/user/payment",paymentRoutes);
