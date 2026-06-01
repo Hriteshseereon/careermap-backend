@@ -87,3 +87,70 @@ export const updateProfile = async (
 
   return updated;
 };
+
+// change password logic 
+export const changePassword = async (
+  userId,
+  body
+) => {
+
+  const {
+    currentPassword,
+    newPassword,
+    confirmPassword,
+  } = body;
+
+  const user =
+    await UserRepository.findById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // check current password
+
+  const isMatch =
+    await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+  if (!isMatch) {
+    throw new Error(
+      "Current password is incorrect"
+    );
+  }
+
+  // check confirm password
+
+  if (newPassword !== confirmPassword) {
+    throw new Error(
+      "New password and confirm password do not match"
+    );
+  }
+
+  // optional validation
+
+  if (newPassword.length < 6) {
+    throw new Error(
+      "Password must be at least 6 characters"
+    );
+  }
+
+  const hashedPassword =
+    await bcrypt.hash(
+      newPassword,
+      12
+    );
+
+  await UserRepository.updatePassword(
+    userId,
+    hashedPassword
+  );
+
+  return {
+    success: true,
+    message:
+      "Password changed successfully",
+  };
+};

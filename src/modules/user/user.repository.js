@@ -18,6 +18,14 @@ async updateUser(id, data) {
     data,
   });
 },
+async updatePassword(id, password) {
+  return prisma.users.update({
+    where: { id },
+    data: {
+      password,
+    },
+  });
+},
   async createUserWithLandingData(userData, landingData) {
     return prisma.users.create({
       data: {

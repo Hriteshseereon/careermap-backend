@@ -1,4 +1,4 @@
-import { registerUser,  updateProfile } from "./user.service.js";
+import { registerUser,  updateProfile,changePassword } from "./user.service.js";
 
 export const signup = async (req, res) => {
   try {
@@ -39,6 +39,28 @@ async (req, res) => {
         "Profile updated successfully",
       data: user,
     });
+
+  } catch (error) {
+
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const changePasswordController =
+async (req, res) => {
+
+  try {
+
+    const result =
+      await changePassword(
+        req.user.id,
+        req.body
+      );
+
+    res.status(200).json(result);
 
   } catch (error) {
 
