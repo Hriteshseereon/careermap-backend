@@ -1,4 +1,4 @@
-import { registerUser,  updateProfile,changePassword } from "./user.service.js";
+import { registerUser,  updateProfile,changePassword,forgotPassword,resetPassword } from "./user.service.js";
 
 export const signup = async (req, res) => {
   try {
@@ -69,4 +69,28 @@ async (req, res) => {
       message: error.message,
     });
   }
+};
+
+export const forgotPasswordController =
+async (req,res) => {
+
+  const result =
+    await forgotPassword(
+      req.body.email
+    );
+
+  res.json(result);
+};
+
+export const resetPasswordController =
+async (req,res) => {
+
+  const result =
+    await resetPassword(
+      req.body.token,
+      req.body.newPassword,
+      req.body.confirmPassword
+    );
+
+  res.json(result);
 };
