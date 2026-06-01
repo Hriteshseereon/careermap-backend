@@ -47,3 +47,43 @@ export const registerUser = async (body, mobileFromToken) => {
 
   return { user: newUser, accessToken, refreshToken };
 };
+
+export const updateProfile = async (
+  userId,
+  body
+) => {
+
+  const user =
+    await UserRepository.findById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const updated =
+    await UserRepository.updateUser(
+      userId,
+      {
+        firstName: body.firstName,
+        lastName: body.lastName,
+        username: body.username,
+        email: body.email,
+
+        country: body.country,
+        state: body.state,
+        city: body.city,
+        district: body.district,
+
+        gender: body.gender,
+        address: body.address,
+
+        dataOfBirth: body.dataOfBirth
+          ? new Date(body.dataOfBirth)
+          : undefined,
+
+        image: body.image,
+      }
+    );
+
+  return updated;
+};

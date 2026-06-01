@@ -12,6 +12,12 @@ async findByMobile(mobile) {
     where: { mobile }
   });
 },
+async updateUser(id, data) {
+  return prisma.users.update({
+    where: { id },
+    data,
+  });
+},
   async createUserWithLandingData(userData, landingData) {
     return prisma.users.create({
       data: {

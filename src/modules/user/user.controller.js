@@ -1,4 +1,4 @@
-import { registerUser } from "./user.service.js";
+import { registerUser,  updateProfile } from "./user.service.js";
 
 export const signup = async (req, res) => {
   try {
@@ -22,3 +22,29 @@ export const signup = async (req, res) => {
   }
 };
 
+export const updateProfileController =
+async (req, res) => {
+
+  try {
+
+    const user =
+      await updateProfile(
+        req.user.id,
+        req.body
+      );
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Profile updated successfully",
+      data: user,
+    });
+
+  } catch (error) {
+
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
