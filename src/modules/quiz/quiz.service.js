@@ -316,3 +316,24 @@ export const getQuizAttempts = async (quizId) => {
     };
   }
 };
+
+// repository to get quiz attempts by quiz id
+export const getUserQuizHistory = async (userId) => {
+  try {
+    const data =
+      await QuizRepository.getUserQuizHistory(userId);
+
+    return {
+      success: true,
+      totalTests: data.length,
+      data,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};

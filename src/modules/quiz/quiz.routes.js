@@ -11,7 +11,8 @@ import {
   getQuestionByIdController,
   getQuizForUserController,
   submitQuizController,
-  getQuizAttemptsController
+  getQuizAttemptsController,
+   getUserQuizHistoryController
 } from "./quiz.controller.js";
 import { protectAdmin } from "../../middlewares/protectAdmin.js";
 import {protectAuth} from "../../middlewares/protectAuth.js"
@@ -31,6 +32,11 @@ router.delete("/question/:id", deleteQuestionController);
 
 // 🔹 GENERAL QUIZ ROUTES
 router.get("/", getAllQuizController);
+router.get(
+  "/history",
+  protectAuth,
+  getUserQuizHistoryController
+);
 router.get("/:id", getQuizByIdController); // ✅ LAST
 router.get(
   "/:quizId/attempts",

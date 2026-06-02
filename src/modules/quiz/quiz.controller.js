@@ -11,6 +11,7 @@ import {
     submitQuiz,
     getQuizForUser,
     getQuizAttempts,
+    getUserQuizHistory
 } from "./quiz.service.js";
 
 // CREATE
@@ -88,4 +89,15 @@ export const getQuizAttemptsController = async (req, res) => {
   );
 
   res.status(result.success ? 200 : 400).json(result);
+};
+
+export const getUserQuizHistoryController =
+async (req, res) => {
+
+  const result =
+    await getUserQuizHistory(req.user.id);
+
+  res
+    .status(result.success ? 200 : 400)
+    .json(result);
 };

@@ -138,4 +138,28 @@ getQuizAttempts(quizId) {
     },
   });
 },
+
+// repository to get the quiz attempt by user and quiz id
+getUserQuizHistory(userId) {
+  return prisma.quizAttempt.findMany({
+    where: {
+      userId: Number(userId),
+    },
+
+    include: {
+      quiz: {
+        select: {
+          id: true,
+          title: true,
+          type: true,
+          duration: true,
+        },
+      },
+    },
+
+    orderBy: {
+      attemptedAt: "desc",
+    },
+  });
+},
 };
