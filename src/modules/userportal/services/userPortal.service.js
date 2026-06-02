@@ -86,6 +86,7 @@ export const getDashboardData = async (userId) => {
         mentors,
         scholarships,
         institutions,
+        subscription, // 🔥 include subscription details in response
       },
     };
 
