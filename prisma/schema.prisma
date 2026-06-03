@@ -283,7 +283,7 @@ model SalaryRange {
   id        Int     @id @default(autoincrement())
   minSalary Float
   maxSalary Float
-
+  currency  String @default("INR")
   detailsId Int
   details   Details @relation(fields: [detailsId], references: [id],onDelete: Cascade)
 } 

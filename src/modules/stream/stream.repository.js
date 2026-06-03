@@ -12,6 +12,16 @@ export const StreamRepository = {
   findById(id) {
     return prisma.stream.findUnique({ where: { id } });
   },
+  findByName(name) {
+  return prisma.stream.findFirst({
+    where: {
+      name: {
+        equals: name,
+        mode: "insensitive",
+      },
+    },
+  });
+},
 
   update(id, data) {
     return prisma.stream.update({
