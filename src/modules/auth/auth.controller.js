@@ -1,5 +1,6 @@
 import { otpService, verifyOTPService,loginWithEmailPassword} from "./auth.service.js";
-
+import jwt from "jsonwebtoken";
+import { UserRepository } from "../user/user.repository.js";
 export const sendOTP = async (req, res) => {
     const { mobile,type } = req.body;
     const result = await otpService(mobile,type);
@@ -48,10 +49,15 @@ export const loginWithPassword = async (req, res) => {
 
 export const refreshToken = async (req, res) => {
   try {
-    const token = req.cookies.refreshToken;
+
+    const token =
+      req.body.refreshToken ||
+      req.cookies.refreshToken;
 
     if (!token) {
-      return res.status(401).json({ message: "No refresh token" });
+      return res.status(401).json({
+        message: "No refresh token",
+      });
     }
 
     const decoded = jwt.verify(
@@ -59,21 +65,34 @@ export const refreshToken = async (req, res) => {
       process.env.JWT_REFRESH_SECRET
     );
 
-    const user = await UserRepository.findById(decoded.id);
+    const user =
+      await UserRepository.findById(
+        decoded.id
+      );
 
     const accessToken = jwt.sign(
-      { id: user.id, email: user.email },
+      {
+        id: user.id,
+        email: user.email,
+      },
       process.env.JWT_ACCESS_SECRET,
-      { expiresIn: "15m" }
+      {
+        expiresIn: "15m",
+      }
     );
 
-    return res.json({ accessToken });
+    return res.json({
+      success: true,
+      accessToken,
+    });
 
   } catch (error) {
-    return res.status(401).json({ message: "Invalid refresh token" });
+
+    return res.status(401).json({
+      message: error.message,
+    });
   }
 };
-
 export const logout = async (req, res) => {
   try {
     // 🔥 clear cookie
