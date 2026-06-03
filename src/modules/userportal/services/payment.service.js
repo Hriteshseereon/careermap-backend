@@ -3,8 +3,9 @@ import prisma from "../../../config/db.js";
 import crypto from "crypto";
 
 export const createOrder = async (userId, planId) => {
+  planId = Number(planId);
   const plan = await prisma.plans.findUnique({
-    where: { id: Number(planId) },
+    where: { id: planId },
   });
 
   if (!plan) throw new Error("Plan not found");
@@ -22,12 +23,13 @@ export const createOrder = async (userId, planId) => {
       planId,
       amount: Number(plan.price),
       status: "pending",
-      stripeSessionId: order.id, // reuse field or rename
+      stripeId: order.id, // reuse field or rename
     },
   });
 
   return order;
 };
+
 export const verifyPayment = async (userId,body) => {
   const {
     razorpay_order_id,
@@ -47,10 +49,15 @@ export const verifyPayment = async (userId,body) => {
 
   // 🔥 update payment
   await prisma.payment.updateMany({
-    where: { stripeSessionId: razorpay_order_id },
+    where: { stripeId: razorpay_order_id },
     data: {
       status: "success",
     },
+  });
+
+  // get plan details
+  const plan = await prisma.plans.findUnique({
+    where: { id: Number(planId) },
   });
 
   // 🔥 create subscription
@@ -63,6 +70,7 @@ export const verifyPayment = async (userId,body) => {
         new Date().setFullYear(new Date().getFullYear() + 1)
       ),
       status: "active",
+      amount: Number(plan.price),
     },
   });
 
