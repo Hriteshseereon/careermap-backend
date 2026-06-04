@@ -1,5 +1,5 @@
 import { registerUser,  updateProfile,changePassword,forgotPassword,resetPassword, getAllUsers,getUserById, banUser,
-  unbanUser } from "./user.service.js";
+  unbanUser,getBannedUsers } from "./user.service.js";
 
 export const signup = async (req, res) => {
   try {
@@ -151,5 +151,17 @@ async (req, res) => {
 
   res.status(
     result.success ? 200 : 404
+  ).json(result);
+};
+// 🔥 GET ALL BANNED USERS
+
+export const getBannedUsersController =
+async (req, res) => {
+
+  const result =
+    await getBannedUsers();
+
+  res.status(
+    result.success ? 200 : 400
   ).json(result);
 };

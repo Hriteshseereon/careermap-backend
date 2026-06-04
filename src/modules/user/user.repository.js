@@ -91,6 +91,17 @@ unbanUser(id) {
     },
   });
 },
+
+getBannedUsers() {
+  return prisma.users.findMany({
+    where: {
+      status: "banned",
+    },
+     include: {
+      profile: true,
+    },
+  });
+}
 }
 
 export { UserRepository };

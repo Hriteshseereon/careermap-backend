@@ -383,3 +383,25 @@ export const unbanUser = async (id) => {
     };
   }
 };
+
+// 🔥 GET ALL BANNED USERS
+
+export const getBannedUsers = async () => {
+  try {
+
+    const users =
+      await UserRepository.getBannedUsers();
+
+    return {
+      success: true,
+      data: users,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
