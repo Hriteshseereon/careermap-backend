@@ -60,6 +60,14 @@ export const verifyOTPService = async (mobile, code, type) => {
       if (!user) {
         return { success: false, message: "User not found. Please signup." };
       }
+        // 🔥 BAN CHECK
+  if (user.status === "banned") {
+    return {
+      success: false,
+      message:
+        "Your account has been banned. Contact support.",
+    };
+  }
       const tokens = generateTokens(user);
       return { success: true, message: "Login successful", user, ...tokens };
     }
@@ -80,6 +88,12 @@ export const loginWithEmailPassword = async (email, password) => {
     if (!user) {
       throw new Error("User not found");
     }
+    if (user.status === "banned") {
+  throw new Error(
+    "Your account has been banned. Contact support."
+  );
+}
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       throw new Error("Invalid credentials");

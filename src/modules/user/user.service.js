@@ -255,3 +255,201 @@ export const resetPassword = async (
       "Password reset successful",
   };
 };
+
+export const getAllUsers = async () => {
+  try {
+
+    const users =
+      await UserRepository.getAllUsers();
+
+    return {
+      success: true,
+      data: users,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+  
+};
+
+// 🔥 ADMIN GET USER BY ID
+
+export const getUserById = async (id) => {
+  try {
+
+    const user =
+      await UserRepository.getUserById(
+        Number(id)
+      );
+
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    return {
+      success: true,
+      data: user,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+
+// 🔥 BAN USER
+
+export const banUser = async (id) => {
+  try {
+
+    const user =
+      await UserRepository.findById(
+        Number(id)
+      );
+
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    const updated =
+      await UserRepository.banUser(
+        Number(id)
+      );
+
+    return {
+      success: true,
+      message:
+        "User banned successfully",
+      data: updated,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+
+// 🔥 UNBAN USER
+
+export const unbanUser = async (id) => {
+  try {
+
+    const user =
+      await UserRepository.findById(
+        Number(id)
+      );
+
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    const updated =
+      await UserRepository.unbanUser(
+        Number(id)
+      );
+
+    return {
+      success: true,
+      message:
+        "User activated successfully",
+      data: updated,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+
+// 🔥 GET ALL BANNED USERS
+
+export const getBannedUsers = async () => {
+  try {
+
+    const users =
+      await UserRepository.getBannedUsers();
+
+    return {
+      success: true,
+      data: users,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+
+// 🔥 GET USER TRANSACTIONS
+
+export const getUserTransactions = async (userId) => {
+  try {
+
+    const transactions =
+      await UserRepository.getUserTransactions(
+        Number(userId)
+      );
+
+    return {
+      success: true,
+      data: transactions,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+
+// 🔥 GET LOGIN HISTORY
+
+export const getLoginHistory = async (userId) => {
+  try {
+
+    const history =
+      await UserRepository.getLoginHistory(
+        Number(userId)
+      );
+
+    return {
+      success: true,
+      data: history,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
