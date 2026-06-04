@@ -126,3 +126,10 @@ export const refreshAdminToken = async (
     };
   }
 };
+
+export const logoutAdmin = async () => {
+  return {
+    success: true,
+    message: "Admin logged out successfully",
+  };
+};

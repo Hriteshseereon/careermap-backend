@@ -46,7 +46,99 @@ async updatePassword(id, password) {
          profile: true
       }
     });
-  }
+  },
+
+  // get all user list with pagination
+  getAllUsers() {
+  return prisma.users.findMany({
+    include: {
+      profile: true,
+      subscription: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+},
+getUserById(id) {
+  return prisma.users.findUnique({
+    where: {
+      id,
+    },
+
+    include: {
+      profile: true,
+      subscription: true,
+      payments: true,
+      userloginhistory: true,
+    },
+  });
+},
+
+banUser(id) {
+  return prisma.users.update({
+    where: { id },
+    data: {
+      status: "banned",
+    },
+  });
+},
+unbanUser(id) {
+  return prisma.users.update({
+    where: { id },
+    data: {
+      status: "active",
+    },
+  });
+},
+
+getBannedUsers() {
+  return prisma.users.findMany({
+    where: {
+      status: "banned",
+    },
+     include: {
+      profile: true,
+    },
+  });
+},
+getUserTransactions(userId) {
+  return prisma.payment.findMany({
+    where: {
+      userId,
+    },
+
+    include: {
+      plan: true,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+},
+async getLoginHistory(userId) {
+  return prisma.userLoginHistory.findMany({
+    where: {
+      userId,
+    },
+
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+    },
+
+    orderBy: {
+      loginAt: "desc",
+    },
+  });
+}
 }
 
 export { UserRepository };
