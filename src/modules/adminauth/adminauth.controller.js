@@ -1,4 +1,4 @@
-import { adminSignup, adminLogin, refreshAdminToken, } from "./adminauth.service.js";
+import { adminSignup, adminLogin, refreshAdminToken, logoutAdmin } from "./adminauth.service.js";
 
 // 🔹 Signup
 export const signupAdmin = async (req, res) => {
@@ -46,4 +46,15 @@ export const refreshTokenAdmin = async (
   res.status(
     result.success ? 200 : 401
   ).json(result);
+};
+
+export const adminLogout = async (
+  req,
+  res
+) => {
+
+  const result =
+    await logoutAdmin();
+
+  res.status(200).json(result);
 };
