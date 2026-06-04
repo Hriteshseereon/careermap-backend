@@ -405,3 +405,27 @@ export const getBannedUsers = async () => {
     };
   }
 };
+
+// 🔥 GET USER TRANSACTIONS
+
+export const getUserTransactions = async (userId) => {
+  try {
+
+    const transactions =
+      await UserRepository.getUserTransactions(
+        Number(userId)
+      );
+
+    return {
+      success: true,
+      data: transactions,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};

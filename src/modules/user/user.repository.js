@@ -101,6 +101,21 @@ getBannedUsers() {
       profile: true,
     },
   });
+},
+getUserTransactions(userId) {
+  return prisma.payment.findMany({
+    where: {
+      userId,
+    },
+
+    include: {
+      plan: true,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 }
 }
 

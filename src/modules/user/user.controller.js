@@ -1,5 +1,5 @@
 import { registerUser,  updateProfile,changePassword,forgotPassword,resetPassword, getAllUsers,getUserById, banUser,
-  unbanUser,getBannedUsers } from "./user.service.js";
+  unbanUser,getBannedUsers, getUserTransactions } from "./user.service.js";
 
 export const signup = async (req, res) => {
   try {
@@ -160,6 +160,21 @@ async (req, res) => {
 
   const result =
     await getBannedUsers();
+
+  res.status(
+    result.success ? 200 : 400
+  ).json(result);
+};
+
+// 🔥 GET USER TRANSACTIONS
+
+export const getUserTransactionsController =
+async (req, res) => {
+
+  const result =
+    await getUserTransactions(
+      req.params.id
+    );
 
   res.status(
     result.success ? 200 : 400
