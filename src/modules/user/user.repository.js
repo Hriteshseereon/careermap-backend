@@ -116,6 +116,28 @@ getUserTransactions(userId) {
       createdAt: "desc",
     },
   });
+},
+async getLoginHistory(userId) {
+  return prisma.userLoginHistory.findMany({
+    where: {
+      userId,
+    },
+
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+    },
+
+    orderBy: {
+      loginAt: "desc",
+    },
+  });
 }
 }
 

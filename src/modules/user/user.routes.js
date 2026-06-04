@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {signup, updateProfileController,changePasswordController,forgotPasswordController,resetPasswordController, getAllUsersController,getUserByIdController, banUserController,
-  unbanUserController,getBannedUsersController,getUserTransactionsController} from "./user.controller.js";
+  unbanUserController,getBannedUsersController,getUserTransactionsController, getLoginHistoryController} from "./user.controller.js";
 import { protectAuth } from "../../middlewares/protectAuth.js";
 import {protectAdmin} from "../../middlewares/protectAdmin.js";
 import { protectTemp } from "../../middlewares/protectTemp.js";
@@ -58,6 +58,11 @@ router.get(
   "/admin/users/:id/transactions",
   protectAdmin,
   getUserTransactionsController
+);
+router.get(
+  "/admin/users/:id/login-history",
+  protectAdmin,
+  getLoginHistoryController
 );
 export default router;
     

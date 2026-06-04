@@ -429,3 +429,27 @@ export const getUserTransactions = async (userId) => {
     };
   }
 };
+
+// 🔥 GET LOGIN HISTORY
+
+export const getLoginHistory = async (userId) => {
+  try {
+
+    const history =
+      await UserRepository.getLoginHistory(
+        Number(userId)
+      );
+
+    return {
+      success: true,
+      data: history,
+    };
+
+  } catch (error) {
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
