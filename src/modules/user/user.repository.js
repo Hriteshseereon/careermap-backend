@@ -46,7 +46,51 @@ async updatePassword(id, password) {
          profile: true
       }
     });
-  }
+  },
+
+  // get all user list with pagination
+  getAllUsers() {
+  return prisma.users.findMany({
+    include: {
+      profile: true,
+      subscription: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+},
+getUserById(id) {
+  return prisma.users.findUnique({
+    where: {
+      id,
+    },
+
+    include: {
+      profile: true,
+      subscription: true,
+      payments: true,
+      userloginhistory: true,
+    },
+  });
+},
+
+banUser(id) {
+  return prisma.users.update({
+    where: { id },
+    data: {
+      status: "banned",
+    },
+  });
+},
+unbanUser(id) {
+  return prisma.users.update({
+    where: { id },
+    data: {
+      status: "active",
+    },
+  });
+},
 }
 
 export { UserRepository };

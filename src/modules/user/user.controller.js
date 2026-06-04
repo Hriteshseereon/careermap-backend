@@ -1,4 +1,5 @@
-import { registerUser,  updateProfile,changePassword,forgotPassword,resetPassword } from "./user.service.js";
+import { registerUser,  updateProfile,changePassword,forgotPassword,resetPassword, getAllUsers,getUserById, banUser,
+  unbanUser } from "./user.service.js";
 
 export const signup = async (req, res) => {
   try {
@@ -93,4 +94,62 @@ async (req,res) => {
     );
 
   res.json(result);
+};
+
+// 🔥 ADMIN GET ALL USERS
+
+export const getAllUsersController =
+async (req, res) => {
+
+  const result =
+    await getAllUsers();
+
+  res.status(
+    result.success ? 200 : 400
+  ).json(result);
+};
+
+// 🔥 ADMIN GET USER BY ID
+
+export const getUserByIdController =
+async (req, res) => {
+
+  const result =
+    await getUserById(
+      req.params.id
+    );
+
+  res.status(
+    result.success ? 200 : 404
+  ).json(result);
+};
+
+// 🔥 BAN USER
+
+export const banUserController =
+async (req, res) => {
+
+  const result =
+    await banUser(
+      req.params.id
+    );
+
+  res.status(
+    result.success ? 200 : 404
+  ).json(result);
+};
+
+// 🔥 UNBAN USER
+
+export const unbanUserController =
+async (req, res) => {
+
+  const result =
+    await unbanUser(
+      req.params.id
+    );
+
+  res.status(
+    result.success ? 200 : 404
+  ).json(result);
 };
