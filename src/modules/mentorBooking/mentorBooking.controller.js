@@ -5,6 +5,7 @@ import {
   getAllBookings,
   getBookedSlots,
   getUserMentorBookings,
+  getUserSubscriptions,
 } from "./mentorBooking.service.js";
 
 export const createOrderController =
@@ -94,6 +95,17 @@ async (req, res) => {
 
   const result =
     await getUserMentorBookings(
+      req.user.id
+    );
+
+  res.json(result);
+};
+
+export const getUserSubscriptionsController =
+async (req, res) => {
+
+  const result =
+    await getUserSubscriptions(
       req.user.id
     );
 

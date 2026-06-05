@@ -110,5 +110,20 @@ getUserMentorBookings(userId) {
       createdAt: "desc",
     },
   });
+},
+getUserSubscriptions(userId) {
+  return prisma.subscriptions.findMany({
+    where: {
+      userId: Number(userId),
+    },
+
+    include: {
+      plan: true,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 }
 };

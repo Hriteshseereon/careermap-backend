@@ -190,3 +190,17 @@ async (userId) => {
     data,
   };
 };
+
+export const getUserSubscriptions =
+async (userId) => {
+
+  const data =
+    await MentorBookingRepository.getUserSubscriptions(
+      userId
+    );
+
+  return {
+    success: true,
+    data,
+  };
+};
