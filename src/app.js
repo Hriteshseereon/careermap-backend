@@ -25,6 +25,7 @@ import cookieParser from "cookie-parser";
   import loginhistoryRoute from "./modules/loginhistory/userLoginHistory.routes.js"
 import helpAndSupportRoute from "./modules/helpsupport/helpandsupport.routes.js"
 import mentorBookingRoute from "./modules/mentorBooking/mentorBooking.routes.js"
+import moduleAccessRoute from "./modules/moduleAccess/moduleAccess.routes.js"
 //  user portal routes imported here
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
 import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
@@ -77,6 +78,8 @@ app.use("/api/studyabroad",studyAbroadRoute);
 app.use("/api/notification",notificationRoute);
 app.use("/api/helpandsupport",helpAndSupportRoute);
 app.use("/api/mentor-booking",mentorBookingRoute);
+app.use(
+  "/api/module-access",moduleAccessRoute);
 // user portal api 
 app.use("/api/user",userportalRoutes);
 app.use("/api/user/payment",paymentRoutes);

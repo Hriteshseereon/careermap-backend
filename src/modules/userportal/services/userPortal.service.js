@@ -76,6 +76,8 @@ export const getDashboardData = async (userId) => {
   ...mod,
   isUnlocked:
     mod.markas_free || unlockedModuleIds.includes(mod.id),
+     hasPreview:
+    mod.freePreview,
 }));
 
     return {
