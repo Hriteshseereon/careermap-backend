@@ -94,5 +94,21 @@ export const MentorBookingRepository = {
       timeSlot: true,
     },
   });
+},
+getUserMentorBookings(userId) {
+  return prisma.mentorbooking.findMany({
+    where: {
+      userId: Number(userId),
+    },
+
+    include: {
+      mentor: true,
+      payment: true,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 }
 };

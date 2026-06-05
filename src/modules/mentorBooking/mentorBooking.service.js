@@ -176,3 +176,17 @@ export const getBookedSlots = async (
     ),
   };
 };
+
+export const getUserMentorBookings =
+async (userId) => {
+
+  const data =
+    await MentorBookingRepository.getUserMentorBookings(
+      userId
+    );
+
+  return {
+    success: true,
+    data,
+  };
+};

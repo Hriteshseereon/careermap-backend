@@ -5,7 +5,8 @@ import {
   verifyPaymentController,
   myBookingsController,
   allBookingsController,
-   getBookedSlotsController
+   getBookedSlotsController,
+    userMentorBookingsController
 } from "./mentorBooking.controller.js";
 
 import { protectAuth } from "../../middlewares/protectAuth.js";
@@ -39,5 +40,10 @@ router.get(
 router.get(
   "/booked-slots",
   getBookedSlotsController
+);
+router.get(
+  "/my-mentor-bookings",
+  protectAuth,
+  userMentorBookingsController
 );
 export default router;

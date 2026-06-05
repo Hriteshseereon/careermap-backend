@@ -3,7 +3,8 @@ import {
   verifyMentorPayment,
   getMyBookings,
   getAllBookings,
-  getBookedSlots
+  getBookedSlots,
+  getUserMentorBookings,
 } from "./mentorBooking.service.js";
 
 export const createOrderController =
@@ -83,6 +84,17 @@ async (req, res) => {
     await getBookedSlots(
       req.query.mentorId,
       req.query.date
+    );
+
+  res.json(result);
+};
+
+export const userMentorBookingsController =
+async (req, res) => {
+
+  const result =
+    await getUserMentorBookings(
+      req.user.id
     );
 
   res.json(result);
