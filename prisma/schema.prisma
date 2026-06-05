@@ -483,7 +483,7 @@ model Plans{
   modules     Module[] 
   features  String?
   description String?
-  validity   String?
+  validity   Int?
   price      String?
   plan_type  String?
   subscriptions Subscriptions[]
