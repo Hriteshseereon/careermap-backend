@@ -484,7 +484,7 @@ model Plans{
   features  String?
   description String?
   validity   Int?
-  price      String?
+  price    Float?
   plan_type  String?
   subscriptions Subscriptions[]
   payments Payment[]
