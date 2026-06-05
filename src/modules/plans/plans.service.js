@@ -33,22 +33,26 @@ export const createPlan = async (body) => {
     }
 
     const data = await PlansRepository.create({
-      name: body.name,
-      features: body.features,
-      description: body.description,
-      validity: body.validity,
-      price: body.price,
-      plan_type: body.plan_type,
-      // 🔥 connect modules
-      modules: body.moduleIds
-        ? {
-            connect: body.moduleIds.map((id) => ({
-              id: Number(id),
-            })),
-          }
-        : undefined,
-    });
+  name: body.name,
+  features: body.features,
+  description: body.description,
 
+  validity: body.validity
+    ? Number(body.validity)
+    : null,
+
+  price: Number(body.price),
+
+  plan_type: body.plan_type,
+
+  modules: body.moduleIds
+    ? {
+        connect: body.moduleIds.map((id) => ({
+          id: Number(id),
+        })),
+      }
+    : undefined,
+});
     return { success: true, data };
   } catch (error) {
     console.error("❌ createPlan Error:", error);
@@ -108,8 +112,10 @@ export const updatePlan = async (id, body) => {
       name: body.name,
       features: body.features,
       description: body.description,
-      validity: body.validity,
-      price: body.price,
+     validity: body.validity
+    ? Number(body.validity)
+    : null,
+       price: Number(body.price),
       plan_type: body.plan_type,
       // 🔥 replace modules
       modules: body.moduleIds
