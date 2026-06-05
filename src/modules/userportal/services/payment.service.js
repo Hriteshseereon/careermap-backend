@@ -56,21 +56,53 @@ export const verifyPayment = async (userId,body) => {
   });
 
   // get plan details
-  const plan = await prisma.plans.findUnique({
-    where: { id: Number(planId) },
-  });
+  // get plan details
+const plan = await prisma.plans.findUnique({
+  where: { id: Number(planId) },
+});
+const validityDays =
+  Number(plan.validity) || 30;
+const startDate = new Date();
 
-  // 🔥 create subscription
-  await prisma.subscriptions.create({
+const endDate = new Date();
+
+endDate.setDate(
+  endDate.getDate() +
+   validityDays
+);
+
+// 4 Expire old plans
+await prisma.subscriptions.updateMany({
+  where: {
+    userId: Number(userId),
+    status: "active",
+  },
+  data: {
+    status: "expired",
+  },
+});
+
+// 🔥 create subscription
+await prisma.subscriptions.create({
+  data: {
+    userId: Number(userId),
+    planId: Number(planId),
+
+    startDate,
+    endDate,
+
+    status: "active",
+    amount: Number(plan.price),
+  },
+});
+  // 6 Mark user upgraded
+
+   await prisma.users.update({
+    where: {
+      id: Number(userId),
+    },
     data: {
-      userId: Number(userId),
-      planId: Number(planId),
-      startDate: new Date(),
-      endDate: new Date(
-        new Date().setFullYear(new Date().getFullYear() + 1)
-      ),
-      status: "active",
-      amount: Number(plan.price),
+      isupgraded: true,
     },
   });
 
