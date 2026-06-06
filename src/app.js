@@ -39,6 +39,8 @@ const allowedOrigins = [
   "http://localhost:8081",
    "http://localhost:5174",
   "http://localhost:5175",
+  "https://careermap-user-portal.vercel.app",
+  "https://careermap-admin-portal.vercel.app",
 ];
 app.use(cors({
   origin: function (origin, callback) {
