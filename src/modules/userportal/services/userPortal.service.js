@@ -34,6 +34,7 @@ import { UserPortalRepository } from "../repository/userPortal.repository.js";
 // };
 export const getDashboardData = async (userId) => {
   try {
+
     const [
       user,
       allModules,
@@ -43,7 +44,6 @@ export const getDashboardData = async (userId) => {
     ] = await Promise.all([
       UserPortalRepository.getUserById(userId),
 
-      // 🔥 get ALL modules (not filtered)
       prisma.module.findMany(),
 
       UserPortalRepository.getMentors(),
@@ -51,34 +51,62 @@ export const getDashboardData = async (userId) => {
       UserPortalRepository.getInstitutions(),
     ]);
 
-    // 🔥 get active subscription
-    const subscription = await prisma.subscriptions.findFirst({
-      where: {
-        userId,
-        status: "active",
-        endDate: { gte: new Date() },
-      },
-      include: {
-        plan: {
-          include: {
-            modules: true,
+    // Active Subscription
+    const subscription =
+      await prisma.subscriptions.findFirst({
+        where: {
+          userId: Number(userId),
+          status: "active",
+          endDate: {
+            gte: new Date(),
           },
         },
-      },
-    });
 
-    // 🔥 get unlocked module IDs
+        include: {
+          plan: {
+            include: {
+              modules: true,
+            },
+          },
+        },
+      });
+
+    // Subscription se unlocked modules
     const unlockedModuleIds =
-      subscription?.plan?.modules.map((m) => m.id) || [];
+      subscription?.plan?.modules?.map(
+        (m) => m.id
+      ) || [];
 
-    // 🔥 attach unlock logic
-    const modules = allModules.map((mod) => ({
-  ...mod,
-  isUnlocked:
-    mod.markas_free || unlockedModuleIds.includes(mod.id),
-     hasPreview:
-    mod.freePreview,
-}));
+    // Preview usage
+    const accesses =
+      await UserPortalRepository.getModuleAccess(
+        userId
+      );
+
+    const usedPreviewIds =
+      accesses.map(
+        (item) => item.moduleId
+      );
+
+    // Final module status
+    const modules = allModules.map(
+      (mod) => ({
+        ...mod,
+
+        accessStatus:
+          mod.markas_free ||
+          unlockedModuleIds.includes(
+            mod.id
+          )
+            ? "unlocked"
+            : mod.freePreview &&
+              !usedPreviewIds.includes(
+                mod.id
+              )
+            ? "preview"
+            : "locked",
+      })
+    );
 
     return {
       success: true,
@@ -88,11 +116,17 @@ export const getDashboardData = async (userId) => {
         mentors,
         scholarships,
         institutions,
-        subscription, // 🔥 include subscription details in response
+        subscription,
       },
     };
 
   } catch (error) {
-    return { success: false, message: error.message };
+
+    console.log(error);
+
+    return {
+      success: false,
+      message: error.message,
+    };
   }
 };

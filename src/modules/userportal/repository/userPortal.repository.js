@@ -169,4 +169,11 @@ getDetailsBySecond(secondcategoryId) {
     },
   });
 },
+getModuleAccess(userId) {
+  return prisma.moduleAccess.findMany({
+    where: {
+      userId: Number(userId),
+    },
+  });
+},
 };
