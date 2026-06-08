@@ -75,6 +75,7 @@ model Users {
   quizattempt QuizAttempt[]
    userloginhistory  UserLoginHistory[]
    helpandSupport HelpAndSupport[]
+   moduleAccess ModuleAccess[]
 }
 
 model Subscriptions {
@@ -233,15 +234,31 @@ model Module {
   btn_text String?
   position  String?
   markas_free Boolean @default(false)
- 
+  freePreview Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   careerpath CareerPath[]
   entranceexam EntranceExam[]
   plans     Plans[]
+  moduleAccess ModuleAccess[]
 }
 
+model ModuleAccess {
+  id Int @id @default(autoincrement())
 
+  userId Int
+  moduleId Int
+
+  freeVisitUsed Boolean @default(false)
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, moduleId])
+}
 // details scheama design 
 
 model Details {

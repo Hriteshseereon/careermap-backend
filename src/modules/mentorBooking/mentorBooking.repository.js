@@ -94,5 +94,36 @@ export const MentorBookingRepository = {
       timeSlot: true,
     },
   });
+},
+getUserMentorBookings(userId) {
+  return prisma.mentorbooking.findMany({
+    where: {
+      userId: Number(userId),
+    },
+
+    include: {
+      mentor: true,
+      payment: true,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+},
+getUserSubscriptions(userId) {
+  return prisma.subscriptions.findMany({
+    where: {
+      userId: Number(userId),
+    },
+
+    include: {
+      plan: true,
+    },
+
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 }
 };
