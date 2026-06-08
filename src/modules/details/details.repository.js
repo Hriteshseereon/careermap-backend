@@ -145,5 +145,15 @@ create: (data) => {
     return prisma.details.delete({
       where: { id }
     });
-  }
+  },
+  findExisting: (data) => {
+  return prisma.details.findFirst({
+    where: {
+      streamId: data.streamId,
+      categoryId: data.categoryId,
+      secondcategoryId: data.secondcategoryId,
+      subcategoryId: data.subcategoryId,
+    },
+  });
+},
 };

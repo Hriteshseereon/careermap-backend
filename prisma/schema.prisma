@@ -295,6 +295,7 @@ model Details {
   @@index([categoryId])
   @@index([secondcategoryId])
   @@index([subcategoryId])
+   @@unique([streamId, categoryId, secondcategoryId, subcategoryId])
 }
 model SalaryRange {
   id        Int     @id @default(autoincrement())
