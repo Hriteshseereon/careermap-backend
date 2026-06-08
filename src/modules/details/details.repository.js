@@ -96,26 +96,37 @@ create: (data) => {
     });
   },
 
- update: (id, data) => {
+update: (id, data) => {
   return prisma.details.update({
     where: { id },
+
     data: {
-      jobScope: data.jobScope,
+      ...(data.jobScope !== undefined && {
+        jobScope: data.jobScope
+      }),
 
       ...(data.streamId && {
-        stream: { connect: { id: data.streamId } }
+        stream: {
+          connect: { id: data.streamId }
+        }
       }),
 
       ...(data.categoryId && {
-        category: { connect: { id: data.categoryId } }
+        category: {
+          connect: { id: data.categoryId }
+        }
       }),
 
       ...(data.secondcategoryId && {
-        secondcategory: { connect: { id: data.secondcategoryId } }
+        secondcategory: {
+          connect: { id: data.secondcategoryId }
+        }
       }),
 
       ...(data.subcategoryId && {
-        subcategory: { connect: { id: data.subcategoryId } }
+        subcategory: {
+          connect: { id: data.subcategoryId }
+        }
       }),
 
       ...(data.salaryRanges && {
@@ -125,18 +136,24 @@ create: (data) => {
         }
       }),
 
-      ...(data.careerpathId && {
-        careerpath: { connect: { id: data.careerpathId } }
-      }),
-      ...(data.entranceexamId && {
-        entranceexam: { connect: { id: data.entranceexamId } }
-      }),
-      ...(data.institutionId && {
-        institution: { connect: { id: data.institutionId } }
-      })
+      ...(data.careerpaths && {
+  careerpaths: data.careerpaths,
+}),
+
+...(data.entranceexams && {
+  entranceexams: data.entranceexams,
+}),
+
+...(data.institutions && {
+  institutions: data.institutions,
+}),
     },
+
     include: {
-      salaryRanges: true
+      salaryRanges: true,
+      careerpaths: true,
+      entranceexams: true,
+      institutions: true
     }
   });
 },
