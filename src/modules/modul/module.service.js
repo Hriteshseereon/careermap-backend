@@ -12,7 +12,10 @@ export const createModule = async (body,image)=>{
             btn_text:body.btn_text,
             position:body.position,
             markas_free:body.markas_free === "true" || body.markas_free === true,
-            freePreview: body.freePreview === "true" || body.freePreview === true,
+             freePreview:
+    body.freePreview === undefined
+      ? true
+      : body.freePreview === "true" || body.freePreview === true,
         })
         return {success: true, data: module  }
 
@@ -56,7 +59,10 @@ export const updateModuleById = async (id,body,image) => {
             btn_text:body.btn_text,
             position:body.position,
             markas_free:body.markas_free === "true" || body.markas_free === true,
-                freePreview: body.freePreview === "true" || body.freePreview === true,
+             freePreview:
+    body.freePreview === undefined
+      ? true
+      : body.freePreview === "true" || body.freePreview === true,
             ...(imageUrl && { image: imageUrl })
         })
           return { success: true, data: update };
