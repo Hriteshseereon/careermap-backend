@@ -42,6 +42,7 @@ const allowedOrigins = [
   "http://localhost:5175",
   "https://careermap-user-portal.vercel.app",
   "https://careermap-admin-portal.vercel.app",
+  "https://unregarded-shameka-forensically.ngrok-free.dev"
 ];
 app.use(cors({
   origin: function (origin, callback) {
