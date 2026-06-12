@@ -69,12 +69,12 @@ export const updateSubCategory = async (id, body, files) => {
   try {
     let coverImageUrl, fileUrl;
 
-    if (files?.coverImage) {
-      coverImageUrl = await uploadToS3(files.coverImage, "subcategory");
+    if (files?.coverImage?.[0]) {
+      coverImageUrl = await uploadToS3(files.coverImage[0], "subcategory"); // ✅ added [0]
     }
 
-    if (files?.file) {
-      fileUrl = await uploadToS3(files.file, "subcategory/files");
+    if (files?.file?.[0]) {
+      fileUrl = await uploadToS3(files.file[0], "subcategory/files"); // ✅ added [0]
     }
 
     const updated = await SubCategoryRepository.update(Number(id), {
