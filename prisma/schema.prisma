@@ -10,9 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-
 }
-
 
 model profile {
   id        Int      @id @default(autoincrement())
@@ -26,8 +24,8 @@ model profile {
   updatedAt DateTime @updatedAt
 
   // Foreign key definition
-  userId    Int      @unique @map("userId")
-  user      Users    @relation(fields: [userId], references: [id])
+  userId Int   @unique @map("userId")
+  user   Users @relation(fields: [userId], references: [id])
 }
 
 model AdminUsers {
@@ -36,64 +34,62 @@ model AdminUsers {
   lastName  String?
   username  String?
   email     String   @unique
-  password  String   
-  role     String   @default("admin")
+  password  String
+  role      String   @default("admin")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 }
 
 model Users {
-  id          Int      @id @default(autoincrement())
-  firstName   String
-  lastName    String
-  username    String
-  email       String   @unique
-  password    String
-  isupgraded  Boolean  @default(false)
-  country     String?
-  state       String?
-  city        String?
-  district    String?
-  gender      String?
-  address     String?
-  dataOfBirth DateTime?
-  image       String?
-  mobile      String
-  status      String? @default("active")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           Int             @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  username     String
+  email        String          @unique
+  password     String
+  isupgraded   Boolean         @default(false)
+  country      String?
+  state        String?
+  city         String?
+  district     String?
+  gender       String?
+  address      String?
+  dataOfBirth  DateTime?
+  image        String?
+  mobile       String
+  status       String?         @default("active")
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
   subscription Subscriptions[]
 
-
   // Prisma relation field (does not create a column in the DB)
-  profile     profile?
-  payments    Payment[]
-  mentorPayments Mentorpayment[]
-  mentorBoookings Mentorbooking[]
-    consultations    StudyAbroadConsult[]
-  quizattempt QuizAttempt[]
-   userloginhistory  UserLoginHistory[]
-   helpandSupport HelpAndSupport[]
-   moduleAccess ModuleAccess[]
+  profile          profile?
+  payments         Payment[]
+  mentorPayments   Mentorpayment[]
+  mentorBoookings  Mentorbooking[]
+  consultations    StudyAbroadConsult[]
+  quizattempt      QuizAttempt[]
+  userloginhistory UserLoginHistory[]
+  helpandSupport   HelpAndSupport[]
+  moduleAccess     ModuleAccess[]
 }
 
 model Subscriptions {
-  id       Int      @id @default(autoincrement())
-  userId    Int 
-  planId    Int
-  planType  String?
-  startDate DateTime
-  endDate   DateTime
-  amount Float
-  status    String
-   stripeSessionId String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  userId          Int
+  planId          Int
+  planType        String?
+  startDate       DateTime
+  endDate         DateTime
+  amount          Float
+  status          String
+  stripeSessionId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Prisma relation field (does not create a column in the DB)
-  user      Users    @relation(fields: [userId], references: [id])
-  plan      Plans    @relation(fields: [planId], references: [id])
+  user Users @relation(fields: [userId], references: [id])
+  plan Plans @relation(fields: [planId], references: [id])
 }
 
 model Payment {
@@ -101,14 +97,14 @@ model Payment {
   userId    Int
   planId    Int
   amount    Float
-  stripeId  String? 
+  stripeId  String?
   status    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Prisma relation field (does not create a column in the DB)
-  user      Users    @relation(fields: [userId], references: [id])
-   plan Plans @relation(fields: [planId], references: [id])
+  user Users @relation(fields: [userId], references: [id])
+  plan Plans @relation(fields: [planId], references: [id])
 }
 
 model Stream {
@@ -118,135 +114,135 @@ model Stream {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  categories Category[]
-  details Details[]
+  categories   Category[]
+  details      Details[]
   entranceexam EntranceExam[]
 }
 
 model Institutions {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  logo     String?
-  address   String?
+  id                Int      @id @default(autoincrement())
+  name              String   @unique
+  logo              String?
+  address           String?
   admission_process String?
-  tentative_date String?
-  institute_type String?
-  url String?
-  countruy String?
-  state String?
-  city String?
-  district String?
-  about  String?
-  course_offered String[]
-  is_top Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  tentative_date    String?
+  institute_type    String?
+  url               String?
+  countruy          String?
+  state             String?
+  city              String?
+  district          String?
+  about             String?
+  course_offered    String[]
+  is_top            Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  categories Category[]
-  subcategories Subcategory[]
+  categories       Category[]
+  subcategories    Subcategory[]
   secondCategories Secondcategory[]
-  details Details[]
+  details          Details[]
 }
 
 model Category {
-  id        Int      @id @default(autoincrement())
-  streamId  Int
-  institutionId Int
-  title     String
-  path      String?
-  file String?
-  coverImage String?
-  description String?
-  specialization String?
+  id               Int      @id @default(autoincrement())
+  streamId         Int
+  institutionId    Int
+  title            String
+  path             String?
+  file             String?
+  coverImage       String?
+  description      String?
+  specialization   String?
   importandt_facts String[]
-  category_access Boolean @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  category_access  Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   // relation fields
-  stream Stream @relation(fields: [streamId], references: [id])
-  institution Institutions @relation(fields: [institutionId], references: [id])
+  stream           Stream           @relation(fields: [streamId], references: [id])
+  institution      Institutions     @relation(fields: [institutionId], references: [id])
   secondCategories Secondcategory[]
-  subcategories Subcategory[]
-   details Details[]
-    careerpath CareerPath[]
-    entranceexam EntranceExam[]
-    mentors Mentor[]
+  subcategories    Subcategory[]
+  details          Details[]
+  careerpath       CareerPath[]
+  entranceexam     EntranceExam[]
+  mentors          Mentor[]
 }
 
 model Secondcategory {
-  id        Int      @id @default(autoincrement())
-  categoryId Int
-  institutionId Int?
-  name     String
-  path      String?
-  image String?
-  coverImage String?
-  description String?
-  specialization String?
+  id               Int     @id @default(autoincrement())
+  categoryId       Int
+  institutionId    Int?
+  name             String
+  path             String?
+  image            String?
+  coverImage       String?
+  description      String?
+  specialization   String?
   importandt_facts String?
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // 🔗 Relation
-  category    Category @relation(fields: [categoryId], references: [id])
-  institution Institutions? @relation(fields: [institutionId], references: [id])
+  category      Category       @relation(fields: [categoryId], references: [id])
+  institution   Institutions?  @relation(fields: [institutionId], references: [id])
   subcategories Subcategory[]
-   details Details[]
-    careerpath CareerPath[]
-    entranceexam EntranceExam[]
-
+  details       Details[]
+  careerpath    CareerPath[]
+  entranceexam  EntranceExam[]
 }
 
 model Subcategory {
-  id        Int      @id @default(autoincrement())
-  categoryId Int
+  id               Int     @id @default(autoincrement())
+  categoryId       Int
   secondcategoryId Int
-  institutionId Int
-  title     String
-  path      String?
-  file String?
-  coverImage String?
-  description String?
-  specialization String?
+  institutionId    Int
+  title            String
+  path             String?
+  file             String?
+  coverImage       String?
+  description      String?
+  specialization   String?
   importandt_facts String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // 🔗 Relations
-  category        Category        @relation(fields: [categoryId], references: [id])
-  secondcategory  Secondcategory  @relation(fields: [secondcategoryId], references: [id])
-  institution     Institutions    @relation(fields: [institutionId], references: [id])
-   details Details[]
-    careerpath CareerPath[]
-    entranceexam EntranceExam[]
-    mentors Mentor[]
+  category       Category       @relation(fields: [categoryId], references: [id])
+  secondcategory Secondcategory @relation(fields: [secondcategoryId], references: [id])
+  institution    Institutions   @relation(fields: [institutionId], references: [id])
+  details        Details[]
+  careerpath     CareerPath[]
+  entranceexam   EntranceExam[]
+  mentors        Mentor[]
 }
+
 // module schema 
 
 model Module {
-  id       Int      @id @default(autoincrement())
-  title     String
-  url       String?
-  image     String?
-  btn_text String?
-  position  String?
-  markas_free Boolean @default(false)
-  freePreview Boolean @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  careerpath CareerPath[]
+  id           Int            @id @default(autoincrement())
+  title        String
+  url          String?
+  image        String?
+  btn_text     String?
+  position     String?
+  markas_free  Boolean        @default(false)
+  freePreview  Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  careerpath   CareerPath[]
   entranceexam EntranceExam[]
-  plans     Plans[]
+  plans        Plans[]
   moduleAccess ModuleAccess[]
 }
 
 model ModuleAccess {
   id Int @id @default(autoincrement())
 
-  userId Int
+  userId   Int
   moduleId Int
 
   freeVisitUsed Boolean @default(false)
@@ -259,6 +255,7 @@ model ModuleAccess {
 
   @@unique([userId, moduleId])
 }
+
 // details scheama design 
 
 model Details {
@@ -271,15 +268,15 @@ model Details {
   subcategoryId    Int?
 
   // Relations (single)
-  stream          Stream?          @relation(fields: [streamId], references: [id])
-  category        Category?        @relation(fields: [categoryId], references: [id])
-  secondcategory  Secondcategory?  @relation(fields: [secondcategoryId], references: [id])
-  subcategory     Subcategory?     @relation(fields: [subcategoryId], references: [id])
+  stream         Stream?         @relation(fields: [streamId], references: [id])
+  category       Category?       @relation(fields: [categoryId], references: [id])
+  secondcategory Secondcategory? @relation(fields: [secondcategoryId], references: [id])
+  subcategory    Subcategory?    @relation(fields: [subcategoryId], references: [id])
 
   // ✅ MANY-TO-MANY RELATIONS
-  careerpaths     CareerPath[]
-  entranceexams   EntranceExam[]
-  institutions    Institutions[]
+  careerpaths   CareerPath[]
+  entranceexams EntranceExam[]
+  institutions  Institutions[]
 
   // Salary
   salaryRanges SalaryRange[]
@@ -290,52 +287,54 @@ model Details {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@unique([streamId, categoryId, secondcategoryId, subcategoryId])
   // Indexes (optional but recommended)
   @@index([streamId])
   @@index([categoryId])
   @@index([secondcategoryId])
   @@index([subcategoryId])
-   @@unique([streamId, categoryId, secondcategoryId, subcategoryId])
 }
+
 model SalaryRange {
   id        Int     @id @default(autoincrement())
   minSalary Float
   maxSalary Float
-  currency  String @default("INR")
+  currency  String  @default("INR")
   detailsId Int
-  details   Details @relation(fields: [detailsId], references: [id],onDelete: Cascade)
-} 
-model PathType {
-  id Int @id @default(autoincrement())
-  pathtype String?
-   careerpath CareerPath[]
+  details   Details @relation(fields: [detailsId], references: [id], onDelete: Cascade)
+}
 
-   createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+model PathType {
+  id         Int          @id @default(autoincrement())
+  pathtype   String?
+  careerpath CareerPath[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model CareerPath {
-  id  Int @id @default(autoincrement())
-  pathName  String? @unique
-  moduleId Int?
-  categoryId Int?
+  id               Int     @id @default(autoincrement())
+  pathName         String? @unique
+  moduleId         Int?
+  categoryId       Int?
   secondcategoryId Int?
-  subcategoryId Int?
-  pathId Int?
+  subcategoryId    Int?
+  pathId           Int?
 
-  module          Module?          @relation(fields: [moduleId], references: [id])
-  category        Category?        @relation(fields: [categoryId], references: [id])
-  secondcategory  Secondcategory?  @relation(fields: [secondcategoryId], references: [id])
-  subcategory     Subcategory?     @relation(fields: [subcategoryId], references: [id])
-  path            PathType?        @relation(fields: [pathId], references: [id])
+  module         Module?         @relation(fields: [moduleId], references: [id])
+  category       Category?       @relation(fields: [categoryId], references: [id])
+  secondcategory Secondcategory? @relation(fields: [secondcategoryId], references: [id])
+  subcategory    Subcategory?    @relation(fields: [subcategoryId], references: [id])
+  path           PathType?       @relation(fields: [pathId], references: [id])
 
-  graduation String?
-  aftergraduation String?
+  graduation          String?
+  aftergraduation     String?
   afterpostgraduation String?
-  anyother String?
+  anyother            String?
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   details Details[]
 }
@@ -343,35 +342,35 @@ model CareerPath {
 model EntranceExam {
   id Int @id @default(autoincrement())
 
-  moduleId Int?
-  streamId Int?
-  categoryId Int?
+  moduleId         Int?
+  streamId         Int?
+  categoryId       Int?
   secondcategoryId Int?
-  subcategoryId Int?
+  subcategoryId    Int?
 
-  module          Module?          @relation(fields: [moduleId], references: [id])
-  stream          Stream?         @relation(fields: [streamId], references: [id])
-  category        Category?       @relation(fields: [categoryId], references: [id])
-  secondcategory  Secondcategory? @relation(fields: [secondcategoryId], references: [id])
-  subcategory     Subcategory?    @relation(fields: [subcategoryId], references: [id])
+  module         Module?         @relation(fields: [moduleId], references: [id])
+  stream         Stream?         @relation(fields: [streamId], references: [id])
+  category       Category?       @relation(fields: [categoryId], references: [id])
+  secondcategory Secondcategory? @relation(fields: [secondcategoryId], references: [id])
+  subcategory    Subcategory?    @relation(fields: [subcategoryId], references: [id])
 
-  examname String @unique
-  issuedate DateTime?
-  lastdate DateTime?
-  url String?
-  about String?
-  eligibility String?
-  exam_date   DateTime?
-  mode   String?
-  duration String?
-  subject   String[]
-  total_mark  String?
-  frequncy     String?
-  exam_pattern  String?
-  top_institution   String[]
+  examname        String    @unique
+  issuedate       DateTime?
+  lastdate        DateTime?
+  url             String?
+  about           String?
+  eligibility     String?
+  exam_date       DateTime?
+  mode            String?
+  duration        String?
+  subject         String[]
+  total_mark      String?
+  frequncy        String?
+  exam_pattern    String?
+  top_institution String[]
 
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   details Details[]
 }
@@ -381,50 +380,52 @@ model EntranceExam {
 model Mentor {
   id Int @id @default(autoincrement())
 
-  categoryId Int?
+  categoryId    Int?
   subCategoryId Int?
 
-  name String?
-  email String?
+  name         String?
+  email        String?
   phone_number String?
   dateof_birth DateTime?
-  designation String?
-  education String?
+  designation  String?
+  education    String?
   placeof_word String?
-  linkedin String?
-  facebook String?
-  skill String?
-  experience Int?
-  mentor_fees String?
-  rank String?
+  linkedin     String?
+  facebook     String?
+  skill        String?
+  experience   Int?
+  mentor_fees  String?
+  rank         String?
 
-  image String?
-  resume String?
-  year  String?
+  image       String?
+  resume      String?
+  year        String?
   description String?
-  status Boolean @default(false)
+  status      Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  category Category? @relation(fields: [categoryId], references: [id])
+  category    Category?    @relation(fields: [categoryId], references: [id])
   subcategory Subcategory? @relation(fields: [subCategoryId], references: [id])
 
   // 🔥 NEW RELATION
   availability MentorAvailability[]
-  bookings Mentorbooking[] 
+  bookings     Mentorbooking[]
 }
+
 model MentorAvailability {
   id Int @id @default(autoincrement())
 
-  mentorId Int
-  date DateTime
-  timeSlots String[]  // ["10:00", "11:00", "15:00"]
+  mentorId  Int
+  date      DateTime
+  timeSlots String[] // ["10:00", "11:00", "15:00"]
 
   mentor Mentor @relation(fields: [mentorId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }
+
 enum BookingStatus {
   pending
   confirmed
@@ -436,57 +437,60 @@ enum PaymentStatus {
   paid
   failed
 }
+
 model Mentorbooking {
   id Int @id @default(autoincrement())
 
-  userId Int
+  userId   Int
   mentorId Int
 
-  date DateTime
+  date     DateTime
   timeSlot String
 
-  status BookingStatus @default(pending)
+  status        BookingStatus @default(pending)
   paymentStatus PaymentStatus @default(pending)
 
   amount Float?
 
   createdAt DateTime @default(now())
 
-  user Users @relation(fields: [userId], references: [id])
-  mentor Mentor @relation(fields: [mentorId], references: [id],onDelete: Cascade)
+  user   Users  @relation(fields: [userId], references: [id])
+  mentor Mentor @relation(fields: [mentorId], references: [id], onDelete: Cascade)
 
- payment Mentorpayment? @relation("BookingPayment")
+  payment Mentorpayment? @relation("BookingPayment")
 
   @@unique([mentorId, date, timeSlot])
 }
+
 model Mentorpayment {
   id Int @id @default(autoincrement())
 
-  bookingId Int  @unique 
-  userId Int
+  bookingId Int @unique
+  userId    Int
 
-  amount Float
+  amount   Float
   currency String @default("INR")
 
   paymentId String?
-  orderId String?
+  orderId   String?
 
   status PaymentStatus @default(pending)
 
   createdAt DateTime @default(now())
 
   booking Mentorbooking @relation("BookingPayment", fields: [bookingId], references: [id])
-  user Users @relation(fields: [userId], references: [id])
+  user    Users         @relation(fields: [userId], references: [id])
 }
-model Scholarship{
-  id Int @id @default(autoincrement())
-  name String @unique
-  type String?
-  url String?
-  is_free Boolean @default(false)
-  price String?
-  deadline DateTime?
-  image String?
+
+model Scholarship {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  type        String?
+  url         String?
+  is_free     Boolean   @default(false)
+  price       String?
+  deadline    DateTime?
+  image       String?
   eligibility String?
   requirement String?
   description String?
@@ -495,56 +499,57 @@ model Scholarship{
   updatedAt DateTime @updatedAt
 }
 
-model Plans{
-  id Int @id @default(autoincrement())
-  name  String @unique
-  modules     Module[] 
-  features  String?
-  description String?
-  validity   Int?
-  price    Float?
-  plan_type  String?
+model Plans {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  modules       Module[]
+  features      String?
+  description   String?
+  validity      Int?
+  price         Float?
+  plan_type     String?
   subscriptions Subscriptions[]
-  payments Payment[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  payments      Payment[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 model Quiz {
-  id        Int      @id @default(autoincrement())
+  id        Int            @id @default(autoincrement())
   title     String
   type      String?
   duration  Int?
- from      DateTime?  
-  to        DateTime? 
+  from      DateTime?
+  to        DateTime?
   questions QuizQuestion[]
-  attempts QuizAttempt[] 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  attempts  QuizAttempt[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 }
 
 model QuizQuestion {
-  id        Int    @id @default(autoincrement())
-  question  String
+  id       Int    @id @default(autoincrement())
+  question String
 
-  quizId    Int
-  quiz      Quiz   @relation(fields: [quizId], references: [id])
+  quizId Int
+  quiz   Quiz @relation(fields: [quizId], references: [id])
 
-  options   QuizOption[]
+  options          QuizOption[]
   quizattempanswer QuizAttemptAnswer[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 }
 
 model QuizOption {
-  id         Int    @id @default(autoincrement())
-  text       String
-  isCorrect  Boolean @default(false)
+  id        Int     @id @default(autoincrement())
+  text      String
+  isCorrect Boolean @default(false)
 
-  questionId Int
-  question   QuizQuestion @relation(fields: [questionId], references: [id],onDelete: Cascade  )
+  questionId       Int
+  question         QuizQuestion        @relation(fields: [questionId], references: [id], onDelete: Cascade)
   quizattempanswer QuizAttemptAnswer[]
-}                                                               
+}
+
 model QuizAttempt {
   id Int @id @default(autoincrement())
 
@@ -553,12 +558,12 @@ model QuizAttempt {
 
   totalQuestions Int
   correctAnswers Int
-  wrongAnswers Int
-  score String
+  wrongAnswers   Int
+  score          String
 
   attemptedAt DateTime @default(now())
 
-  quiz Quiz @relation(fields: [quizId], references: [id])
+  quiz Quiz  @relation(fields: [quizId], references: [id])
   user Users @relation(fields: [userId], references: [id])
 
   answers QuizAttemptAnswer[]
@@ -567,8 +572,8 @@ model QuizAttempt {
 model QuizAttemptAnswer {
   id Int @id @default(autoincrement())
 
-  attemptId Int
-  questionId Int
+  attemptId        Int
+  questionId       Int
   selectedOptionId Int
 
   isCorrect Boolean
@@ -579,65 +584,66 @@ model QuizAttemptAnswer {
 
   option QuizOption @relation(fields: [selectedOptionId], references: [id])
 }
+
 model MasterClass {
-  id Int @id @default(autoincrement())
-  category String?
-  image  String?
-  title  String?
-  name   String?
-  time   DateTime?
-  views  String?
-  is_active Boolean @default(false)
-  video_url  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        Int       @id @default(autoincrement())
+  category  String?
+  image     String?
+  title     String?
+  name      String?
+  time      DateTime?
+  views     String?
+  is_active Boolean   @default(false)
+  video_url String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model StudyAbroad {
-  id Int @id @default(autoincrement())
-  title String?
-  country_name String?
-  description  String?
-  overview     String?
-  visa_work    String?
-  living_cost  String?
-  tution_cost  String?
+  id             Int                  @id @default(autoincrement())
+  title          String?
+  country_name   String?
+  description    String?
+  overview       String?
+  visa_work      String?
+  living_cost    String?
+  tution_cost    String?
   top_university String[]
   scholarship    String[]
-  requirment    String[]
-  popular_course  String[]
+  requirment     String[]
+  popular_course String[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  consultations  StudyAbroadConsult[]
+}
+
+model StudyAbroadConsult {
+  id Int @id @default(autoincrement())
+
+  userId        Int
+  studyAbroadId Int
+
+  preferredCountry String?
+  courseInterest   String?
+  budgetRange      String?
+  preferredIntake  String?
+
+  message String?
+  status  String  @default("pending")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-    consultations    StudyAbroadConsult[]
-}
-model StudyAbroadConsult {
-  id                 Int      @id @default(autoincrement())
-
-  userId             Int
-  studyAbroadId      Int
-
-  preferredCountry   String?
-  courseInterest     String?
-  budgetRange        String?
-  preferredIntake    String?
-
-  message            String?
-  status             String   @default("pending")
-
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
 
   // Relations
-  user               Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  studyAbroad        StudyAbroad @relation(fields: [studyAbroadId], references: [id], onDelete: Cascade)
+  studyAbroad StudyAbroad @relation(fields: [studyAbroadId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([studyAbroadId])
 }
 
 model Notification {
-
   id Int @id @default(autoincrement())
 
   title String
@@ -661,10 +667,10 @@ model UserLoginHistory {
   userId Int
 
   ipAddress String?
-  location String?
-  device String?
-  browser String?
-  os String?
+  location  String?
+  device    String?
+  browser   String?
+  os        String?
 
   loginAt DateTime @default(now())
 
@@ -677,17 +683,16 @@ model UserLoginHistory {
 model HelpAndSupport {
   id Int @id @default(autoincrement())
 
-  userId Int
-  email String?
+  userId  Int
+  email   String?
   subject String?
   message String?
-  status String? @default("pending")
+  status  String? @default("pending")
 
-   user Users @relation(fields: [userId], references: [id])
+  user      Users    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
 
 model CounselingForm {
   id          Int     @id @default(autoincrement())
@@ -698,4 +703,56 @@ model CounselingForm {
   interest    String?
   study       String?
   description String?
+}
+
+model StaffUser {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  email String @unique
+
+  password String
+
+  status Boolean @default(true)
+
+  roleId Int
+
+  role Role @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id Int @id @default(autoincrement())
+
+  name String @unique
+
+  description String?
+
+  users StaffUser[]
+
+  permissions Permission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Permission {
+  id Int @id @default(autoincrement())
+
+  roleId Int
+
+  module String
+
+  canView   Boolean @default(false)
+  canCreate Boolean @default(false)
+  canEdit   Boolean @default(false)
+  canDelete Boolean @default(false)
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
