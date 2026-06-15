@@ -27,6 +27,7 @@ import helpAndSupportRoute from "./modules/helpsupport/helpandsupport.routes.js"
 import mentorBookingRoute from "./modules/mentorBooking/mentorBooking.routes.js"
 import moduleAccessRoute from "./modules/moduleAccess/moduleAccess.routes.js"
 import adminDashboardRoutes from "./modules/adminDashboard/adminDashboard.routes.js"
+import coinselingFormRoutes from "./modules/counselingform/counseling.routes.js"
 //  user portal routes imported here
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
 import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
@@ -85,6 +86,7 @@ app.use("/api/mentor-booking",mentorBookingRoute);
 app.use(
   "/api/module-access",moduleAccessRoute);
   app.use("/api/admin",adminDashboardRoutes);
+  app.use('/api/counseling',coinselingFormRoutes);
 // user portal api 
 app.use("/api/user",userportalRoutes);
 app.use("/api/user/payment",paymentRoutes);
