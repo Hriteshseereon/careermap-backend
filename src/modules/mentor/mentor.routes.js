@@ -36,12 +36,11 @@ router.get("/:id", getMentorByIdController);
 // 🔹 UPDATE
 router.put(
   "/:id",
-   protectStaff,
+   protectAdminOrStaff,
   checkPermission(
     "mentor",
     "edit"
   ),
-  protectAdmin,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "resume", maxCount: 1 },
