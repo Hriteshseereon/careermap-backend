@@ -1,7 +1,9 @@
 import { Router } from "express";
 import upload from "../../middlewares/upload.js";
 import { protectAdmin } from "../../middlewares/protectAdmin.js";
-
+import { protectStaff } from "../../middlewares/protectStaff.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
+import { checkPermission } from "../../middlewares/checkPermission.js";
 import {
   createMentorController,
   getMentorsController,
@@ -15,7 +17,11 @@ const router = Router();
 // 🔹 CREATE
 router.post(
   "/",
-  protectAdmin,
+   protectAdminOrStaff,
+  checkPermission(
+    "mentor",
+    "create"
+  ),
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "resume", maxCount: 1 },
@@ -30,6 +36,11 @@ router.get("/:id", getMentorByIdController);
 // 🔹 UPDATE
 router.put(
   "/:id",
+   protectStaff,
+  checkPermission(
+    "mentor",
+    "edit"
+  ),
   protectAdmin,
   upload.fields([
     { name: "image", maxCount: 1 },
