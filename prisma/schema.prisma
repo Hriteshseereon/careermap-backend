@@ -750,15 +750,16 @@ model Permission {
 
   module String
 
-  canView   Boolean @default(false)
-  canCreate Boolean @default(false)
-  canEdit   Boolean @default(false)
-  canDelete Boolean @default(false)
+  canView   Boolean @default(true)
+  canCreate Boolean @default(true)
+  canEdit   Boolean @default(true)
+  canDelete Boolean @default(true)
 
   role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@unique([roleId, module])
 }
 model Institutes {
   id Int @id @default(autoincrement())
