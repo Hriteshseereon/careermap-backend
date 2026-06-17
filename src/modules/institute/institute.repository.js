@@ -1,0 +1,51 @@
+import prisma from "../../config/db.js";
+
+export const InstituteRepository = {
+
+  create(data) {
+    return prisma.institutes.create({
+      data,
+    });
+  },
+
+  findAll() {
+    return prisma.institutes.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  },
+
+  findById(id) {
+    return prisma.institutes.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+  },
+
+  findByEmail(email) {
+    return prisma.institutes.findUnique({
+      where: {
+        email,
+      },
+    });
+  },
+
+  update(id, data) {
+    return prisma.institutes.update({
+      where: {
+        id: Number(id),
+      },
+      data,
+    });
+  },
+
+  delete(id) {
+    return prisma.institutes.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+  },
+};
