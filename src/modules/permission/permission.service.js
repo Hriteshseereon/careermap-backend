@@ -2,38 +2,23 @@ import { PermissionRepository } from "./permission.repository.js";
 
 export const createPermission = async (body) => {
   try {
+    const permissions = body.modules.map((module) => ({
+      roleId: Number(body.roleId),
+      module,
+      canView: true,
+      canCreate: true,
+      canEdit: true,
+      canDelete: true,
+    }));
 
-    const existing =
-      await PermissionRepository.findByRoleAndModule(
-        body.roleId,
-        body.module
-      );
-
-    if (existing) {
-      return {
-        success: false,
-        message:
-          "Permission already exists for this module",
-      };
-    }
-
-    const permission =
-      await PermissionRepository.create({
-        roleId: Number(body.roleId),
-
-        module: body.module,
-
-        canView: body.canView || false,
-        canCreate: body.canCreate || false,
-        canEdit: body.canEdit || false,
-        canDelete: body.canDelete || false,
-      });
+    await PermissionRepository.createMany(
+      permissions
+    );
 
     return {
       success: true,
-      data: permission,
+      message: "Permissions created successfully",
     };
-
   } catch (error) {
     return {
       success: false,
@@ -90,31 +75,41 @@ export const getPermissionById = async (id) => {
 };
 
 export const updatePermission = async (
-  id,
+  roleId,
   body
 ) => {
   try {
 
-    const permission =
-      await PermissionRepository.update(
-        id,
-        {
-          module: body.module,
+    await prisma.permission.deleteMany({
+      where: {
+        roleId: Number(roleId),
+      },
+    });
 
-          canView: body.canView,
-          canCreate: body.canCreate,
-          canEdit: body.canEdit,
-          canDelete: body.canDelete,
-        }
-      );
+    await prisma.permission.createMany({
+      data: body.modules.map((module) => ({
+        roleId: Number(roleId),
+        module,
+        canView: true,
+        canCreate: true,
+        canEdit: true,
+        canDelete: true,
+      })),
+    });
+
+    const permissions =
+      await prisma.permission.findMany({
+        where: {
+          roleId: Number(roleId),
+        },
+      });
 
     return {
       success: true,
-      data: permission,
+      data: permissions,
     };
 
   } catch (error) {
-
     return {
       success: false,
       message: error.message,

@@ -10,7 +10,12 @@ export const PermissionRepository = {
       },
     });
   },
-
+  createMany(data) {
+  return prisma.permission.createMany({
+    data,
+    skipDuplicates: true,
+  });
+},
   findAll() {
     return prisma.permission.findMany({
       include: {
@@ -61,4 +66,18 @@ export const PermissionRepository = {
       },
     });
   },
+  deleteByRoleId(roleId) {
+  return prisma.permission.deleteMany({
+    where: {
+      roleId: Number(roleId),
+    },
+  });
+},
+findByRoleId(roleId) {
+  return prisma.permission.findMany({
+    where: {
+      roleId: Number(roleId),
+    },
+  });
+},
 };

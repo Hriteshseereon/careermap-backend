@@ -57,10 +57,14 @@ model Users {
   dataOfBirth  DateTime?
   image        String?
   mobile       String
+    instituteId Int?
+
+  isInstituteStudent Boolean @default(false)
   status       String?         @default("active")
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
   subscription Subscriptions[]
+ institute Institutes? @relation(fields: [instituteId], references: [id])
 
   // Prisma relation field (does not create a column in the DB)
   profile          profile?
@@ -746,13 +750,39 @@ model Permission {
 
   module String
 
-  canView   Boolean @default(false)
-  canCreate Boolean @default(false)
-  canEdit   Boolean @default(false)
-  canDelete Boolean @default(false)
+  canView   Boolean @default(true)
+  canCreate Boolean @default(true)
+  canEdit   Boolean @default(true)
+  canDelete Boolean @default(true)
 
   role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@unique([roleId, module])
+}
+model Institutes {
+  id Int @id @default(autoincrement())
+
+  name String @unique
+
+  email String @unique
+
+  password String
+
+  contract_person String?
+
+  mobile String?
+
+  address String?
+   limit Int @default(100)
+  student_allow Boolean @default(true)
+
+  status Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+    users Users[]
+
 }
