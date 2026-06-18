@@ -18,7 +18,7 @@ export const createCategory = async (body, files) => {
     const category = await CategoryRepository.create({
       title: body.title,
       streamId: Number(body.streamId),
-      institutionId: Number(body.institutionId),
+    
       path: body.path,
       file: fileUrl, // ✅ uploaded file
       coverImage: coverImageUrl, // ✅ uploaded image
@@ -83,7 +83,7 @@ export const updateCategory = async (id, body, files) => {
     const updated = await CategoryRepository.update(Number(id), {
       title: body.title,
       streamId: Number(body.streamId),
-      institutionId: Number(body.institutionId),
+    
       path: body.path,
       description: body.description,
       specialization: body.specialization,

@@ -11,7 +11,6 @@ export const CategoryRepository = {
     return prisma.category.findMany({
       include: {
         stream: true,
-        institution: true,
         secondCategories: true,
         subcategories: true,
       },
@@ -23,7 +22,7 @@ export const CategoryRepository = {
       where: { id },
       include: {
         stream: true,
-        institution: true,
+        
         secondCategories: true,
         subcategories: true,
       },
