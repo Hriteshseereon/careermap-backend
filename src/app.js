@@ -1,6 +1,6 @@
 import "dotenv/config";
 import cors from "cors";
-import express from 'express';
+import express, { application } from 'express';
 import cookieParser from "cookie-parser";
  import userRoutes from "./modules/user/user.routes.js";
  import authRoutes from "./modules/auth/auth.routes.js";
@@ -33,6 +33,7 @@ import staffRoutes from "./modules/staff/staff.routes.js"
 import permissionRoutes from "./modules/permission/permission.routes.js"
 import instituteCreateRoutes from "./modules/institute/institute.routes.js"
 import studentAddRoutes from "./modules/instituteStudent/instituteStudent.routes.js"
+import adminnotificationRoutes from "./modules/adminnotification/adminnotification.routes.js"
 //  user portal routes imported here
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
 import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
@@ -97,6 +98,7 @@ app.use(
   app.use('/api/role',roleCreationRoutes);
   app.use('/api/staff',staffRoutes);
   app.use('/api/permissions',permissionRoutes);
+app.use('/api/adminnotification',adminnotificationRoutes);
 // user portal api 
 app.use("/api/user",userportalRoutes);
 app.use("/api/user/payment",paymentRoutes);
