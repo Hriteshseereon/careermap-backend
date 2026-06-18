@@ -7,12 +7,12 @@ import {
 import {
   protectAdmin,
 } from "../../middlewares/protectAdmin.js";
-
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 const router = Router();
 
 router.get(
   "/dashboard",
-  protectAdmin,
+  protectAdminOrStaff,
   getDashboardController
 );
 
