@@ -6,14 +6,25 @@ export const ScholarshipRepository = {
   },
 
   findAll() {
-    return prisma.scholarship.findMany();
-  },
+  return prisma.scholarship.findMany({
+    include: {
+      category: true,
+      secondcategory: true,
+      subcategory: true,
+    },
+  });
+},
 
   findById(id) {
-    return prisma.scholarship.findUnique({
-      where: { id },
-    });
-  },
+  return prisma.scholarship.findUnique({
+    where: { id },
+    include: {
+      category: true,
+      secondcategory: true,
+      subcategory: true,
+    },
+  });
+},
 
   findByName(name) {   // ✅ for unique check
     return prisma.scholarship.findFirst({

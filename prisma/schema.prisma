@@ -41,30 +41,30 @@ model AdminUsers {
 }
 
 model Users {
-  id           Int             @id @default(autoincrement())
-  firstName    String
-  lastName     String
-  username     String
-  email        String          @unique
-  password     String
-  isupgraded   Boolean         @default(false)
-  country      String?
-  state        String?
-  city         String?
-  district     String?
-  gender       String?
-  address      String?
-  dataOfBirth  DateTime?
-  image        String?
-  mobile       String
-    instituteId Int?
+  id          Int       @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  username    String
+  email       String    @unique
+  password    String
+  isupgraded  Boolean   @default(false)
+  country     String?
+  state       String?
+  city        String?
+  district    String?
+  gender      String?
+  address     String?
+  dataOfBirth DateTime?
+  image       String?
+  mobile      String
+  instituteId Int?
 
-  isInstituteStudent Boolean @default(false)
-  status       String?         @default("active")
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  subscription Subscriptions[]
- institute Institutes? @relation(fields: [instituteId], references: [id])
+  isInstituteStudent Boolean         @default(false)
+  status             String?         @default("active")
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  subscription       Subscriptions[]
+  institute          Institutes?     @relation(fields: [instituteId], references: [id])
 
   // Prisma relation field (does not create a column in the DB)
   profile          profile?
@@ -124,13 +124,19 @@ model Stream {
 }
 
 model Institutions {
-  id                Int      @id @default(autoincrement())
-  name              String   @unique
+  id                Int             @id @default(autoincrement())
+  name              String          @unique
   logo              String?
   address           String?
   admission_process String?
   tentative_date    String?
   institute_type    String?
+  categoryId        Int?
+  secondcategoryId  Int?
+  subcategoryId     Int?
+  category          Category?       @relation(fields: [categoryId], references: [id])
+  secondcategory    Secondcategory? @relation(fields: [secondcategoryId], references: [id])
+  subcategory       Subcategory?    @relation(fields: [subcategoryId], references: [id])
   url               String?
   countruy          String?
   state             String?
@@ -138,20 +144,17 @@ model Institutions {
   district          String?
   about             String?
   course_offered    String[]
-  is_top            Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  is_top            Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
-  categories       Category[]
-  subcategories    Subcategory[]
-  secondCategories Secondcategory[]
-  details          Details[]
+  details Details[]
 }
 
 model Category {
-  id               Int      @id @default(autoincrement())
-  streamId         Int
-  institutionId    Int
+  id       Int @id @default(autoincrement())
+  streamId Int
+
   title            String
   path             String?
   file             String?
@@ -164,20 +167,22 @@ model Category {
   updatedAt        DateTime @updatedAt
 
   // relation fields
-  stream           Stream           @relation(fields: [streamId], references: [id])
-  institution      Institutions     @relation(fields: [institutionId], references: [id])
-  secondCategories Secondcategory[]
-  subcategories    Subcategory[]
-  details          Details[]
-  careerpath       CareerPath[]
-  entranceexam     EntranceExam[]
-  mentors          Mentor[]
+  stream Stream @relation(fields: [streamId], references: [id])
+
+  secondCategories  Secondcategory[]
+  subcategories     Subcategory[]
+  details           Details[]
+  careerpath        CareerPath[]
+  entranceexam      EntranceExam[]
+  mentors           Mentor[]
+  scholarships      Scholarship[]
+  institutions_list Institutions[]
 }
 
 model Secondcategory {
-  id               Int     @id @default(autoincrement())
-  categoryId       Int
-  institutionId    Int?
+  id         Int @id @default(autoincrement())
+  categoryId Int
+
   name             String
   path             String?
   image            String?
@@ -190,19 +195,21 @@ model Secondcategory {
   updatedAt DateTime @updatedAt
 
   // 🔗 Relation
-  category      Category       @relation(fields: [categoryId], references: [id])
-  institution   Institutions?  @relation(fields: [institutionId], references: [id])
-  subcategories Subcategory[]
-  details       Details[]
-  careerpath    CareerPath[]
-  entranceexam  EntranceExam[]
+  category Category @relation(fields: [categoryId], references: [id])
+
+  subcategories     Subcategory[]
+  details           Details[]
+  careerpath        CareerPath[]
+  entranceexam      EntranceExam[]
+  scholarships      Scholarship[]
+  institutions_list Institutions[]
 }
 
 model Subcategory {
-  id               Int     @id @default(autoincrement())
+  id               Int @id @default(autoincrement())
   categoryId       Int
   secondcategoryId Int
-  institutionId    Int
+
   title            String
   path             String?
   file             String?
@@ -217,11 +224,13 @@ model Subcategory {
   // 🔗 Relations
   category       Category       @relation(fields: [categoryId], references: [id])
   secondcategory Secondcategory @relation(fields: [secondcategoryId], references: [id])
-  institution    Institutions   @relation(fields: [institutionId], references: [id])
-  details        Details[]
-  careerpath     CareerPath[]
-  entranceexam   EntranceExam[]
-  mentors        Mentor[]
+
+  details           Details[]
+  careerpath        CareerPath[]
+  entranceexam      EntranceExam[]
+  mentors           Mentor[]
+  scholarships      Scholarship[]
+  institutions_list Institutions[]
 }
 
 // module schema 
@@ -487,20 +496,25 @@ model Mentorpayment {
 }
 
 model Scholarship {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  type        String?
-  url         String?
-  is_free     Boolean   @default(false)
-  price       String?
-  deadline    DateTime?
-  image       String?
-  eligibility String?
-  requirement String?
-  description String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               Int             @id @default(autoincrement())
+  name             String          @unique
+  type             String?
+  url              String?
+  is_free          Boolean         @default(false)
+  price            String?
+  deadline         DateTime?
+  image            String?
+  eligibility      String?
+  requirement      String?
+  description      String?
+  categoryId       Int?
+  secondcategoryId Int?
+  subcategoryId    Int?
+  category         Category?       @relation(fields: [categoryId], references: [id])
+  secondcategory   Secondcategory? @relation(fields: [secondcategoryId], references: [id])
+  subcategory      Subcategory?    @relation(fields: [subcategoryId], references: [id])
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 }
 
 model Plans {
@@ -759,8 +773,10 @@ model Permission {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   @@unique([roleId, module])
 }
+
 model Institutes {
   id Int @id @default(autoincrement())
 
@@ -774,8 +790,8 @@ model Institutes {
 
   mobile String?
 
-  address String?
-   limit Int @default(100)
+  address       String?
+  limit         Int     @default(100)
   student_allow Boolean @default(true)
 
   status Boolean @default(true)
@@ -783,6 +799,5 @@ model Institutes {
   createdAt DateTime @default(now())
 
   updatedAt DateTime @updatedAt
-    users Users[]
-
+  users     Users[]
 }

@@ -19,6 +19,19 @@ export const createInstitution = async (body, file) => {
     }
 
     const institution = await InstitutionRepository.createInstitution({
+       categoryId: body.categoryId
+        ? Number(body.categoryId)
+        : null,
+
+      secondcategoryId:
+        body.secondcategoryId
+          ? Number(body.secondcategoryId)
+          : null,
+
+      subcategoryId:
+        body.subcategoryId
+          ? Number(body.subcategoryId)
+          : null,
       name: body.name,
       logo: imageUrl,
       address: body.address,
@@ -73,6 +86,20 @@ export const updateInstitution = async (id, body, file) => {
     }
 
     const updated = await InstitutionRepository.update(Number(id), {
+        categoryId:
+        body.categoryId !== undefined
+          ? Number(body.categoryId)
+          : undefined,
+
+      secondcategoryId:
+        body.secondcategoryId !== undefined
+          ? Number(body.secondcategoryId)
+          : undefined,
+
+      subcategoryId:
+        body.subcategoryId !== undefined
+          ? Number(body.subcategoryId)
+          : undefined,
       name: body.name,
       address: body.address,
       admission_process: body.admission_process,
