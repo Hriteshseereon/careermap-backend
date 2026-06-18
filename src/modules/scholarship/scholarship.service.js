@@ -20,6 +20,17 @@ export const createScholarship = async (body, file) => {
     }
 
     const data = await ScholarshipRepository.create({
+      categoryId: body.categoryId
+    ? Number(body.categoryId)
+    : null,
+
+  secondcategoryId: body.secondcategoryId
+    ? Number(body.secondcategoryId)
+    : null,
+
+  subcategoryId: body.subcategoryId
+    ? Number(body.subcategoryId)
+    : null,
       name: body.name,
       type: body.type,
       url: body.url,
@@ -78,6 +89,20 @@ export const updateScholarship = async (id, body, file) => {
     }
 
     const updated = await ScholarshipRepository.update(Number(id), {
+       categoryId:
+        body.categoryId !== undefined
+          ? Number(body.categoryId)
+          : undefined,
+
+      secondcategoryId:
+        body.secondcategoryId !== undefined
+          ? Number(body.secondcategoryId)
+          : undefined,
+
+      subcategoryId:
+        body.subcategoryId !== undefined
+          ? Number(body.subcategoryId)
+          : undefined,
       name: body.name,
       type: body.type,
       url: body.url,

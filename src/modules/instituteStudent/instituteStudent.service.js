@@ -1,89 +1,139 @@
 import bcrypt from "bcryptjs";
-
+import crypto from "crypto"
 import {
   InstituteStudentRepository,
 } from "./instituteStudent.repository.js";
 
-
+import { sendStudentCredentials } from "../../utils/sendStudentCredentials.js";
 // CREATE
-export const createStudent = async (
-  body
-) => {
+export const createStudent = async (body) => {
+  try {
 
-  const institute =
-    await InstituteStudentRepository.getInstitute(
-      body.instituteId
+    const generatedPassword =
+      crypto
+        .randomBytes(4)
+        .toString("hex");
+
+    const institute =
+      await InstituteStudentRepository.getInstitute(
+        body.instituteId
+      );
+
+    if (!institute) {
+      return {
+        success: false,
+        message: "Institute not found",
+      };
+    }
+
+    if (!institute.student_allow) {
+      return {
+        success: false,
+        message:
+          "Student creation disabled for this institute",
+      };
+    }
+
+    if (
+      institute.users.length >=
+      institute.limit
+    ) {
+      return {
+        success: false,
+        message:
+          "Institute student limit exceeded",
+      };
+    }
+
+    const existing =
+      await InstituteStudentRepository.findByEmail(
+        body.email
+      );
+
+    if (existing) {
+      return {
+        success: false,
+        message:
+          "Email already exists",
+      };
+    }
+
+    const hashedPassword =
+      await bcrypt.hash(
+        generatedPassword,
+        12
+      );
+
+    const student =
+      await InstituteStudentRepository.createStudent({
+
+        firstName:
+          body.firstName,
+
+        lastName:
+          body.lastName,
+
+        username:
+          body.username,
+
+        email:
+          body.email,
+
+        password:
+          hashedPassword,
+
+        mobile:
+          body.mobile,
+
+        instituteId:
+          Number(body.instituteId),
+
+        isInstituteStudent:
+          true,
+      });
+
+    // Email send
+    try {
+
+      await sendStudentCredentials(
+        student.email,
+        student.firstName,
+        generatedPassword
+      );
+
+    } catch (emailError) {
+
+      console.error(
+        "Email Send Error:",
+        emailError.message
+      );
+
+    }
+
+    const { password, ...studentData } =
+      student;
+
+    return {
+      success: true,
+      message:
+        "Student created successfully",
+      data: studentData,
+    };
+
+  } catch (error) {
+
+    console.error(
+      "Create Student Error:",
+      error
     );
 
-  if (!institute) {
-    return {
-      success: false,
-      message: "Institute not found",
-    };
-  }
-
-  if (
-    institute.users.length >=
-    institute.limit
-  ) {
     return {
       success: false,
       message:
-        "Institute student limit exceeded",
+        error.message ||
+        "Failed to create student",
     };
   }
-
-  const existing =
-    await InstituteStudentRepository.findByEmail(
-      body.email
-    );
-
-  if (existing) {
-    return {
-      success: false,
-      message:
-        "Email already exists",
-    };
-  }
-
-  const hashedPassword =
-    await bcrypt.hash(
-      body.password,
-      12
-    );
-
-  const student =
-    await InstituteStudentRepository.createStudent({
-
-      firstName:
-        body.firstName,
-
-      lastName:
-        body.lastName,
-
-      username:
-        body.username,
-
-      email:
-        body.email,
-
-      password:
-        hashedPassword,
-
-      mobile:
-        body.mobile,
-
-      instituteId:
-        Number(body.instituteId),
-
-      isInstituteStudent:
-        true,
-    });
-
-  return {
-    success: true,
-    data: student,
-  };
 };
 
 

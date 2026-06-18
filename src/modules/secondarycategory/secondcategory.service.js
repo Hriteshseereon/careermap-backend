@@ -16,7 +16,7 @@ if (files?.coverImage?.[0]) {
     const data = await SecondCategoryRepository.create({
       name: body.name,
       categoryId: Number(body.categoryId),
-        institutionId: Number(body.institutionId),
+
       path: body.path,
       image: imageUrl,
       coverImage: coverImageUrl,

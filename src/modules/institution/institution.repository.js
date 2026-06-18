@@ -5,13 +5,26 @@ const InstitutionRepository = {
   },
 
   async findAll() {
-    return prisma.institutions.findMany();
-  },
+  return prisma.institutions.findMany({
+    include: {
+      category: true,
+      secondcategory: true,
+      subcategory: true,
+    },
+  });
+},
 async findById(id) {
-    return prisma.institutions.findUnique({ where: { id } });
-  },
+  return prisma.institutions.findUnique({
+    where: { id },
+    include: {
+      category: true,
+      secondcategory: true,
+      subcategory: true,
+    },
+  });
+},
   async update(id, data) {
-    return prisma.institutions.update({
+    return prisma.institutions.update({ 
       where: { id },
       data,
     });

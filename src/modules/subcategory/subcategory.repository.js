@@ -10,7 +10,7 @@ export const SubCategoryRepository = {
       include: {
         category: true,
         secondcategory: true,
-        institution: true,
+       
       },
     });
   },
@@ -21,7 +21,7 @@ export const SubCategoryRepository = {
       include: {
         category: true,
         secondcategory: true,
-        institution: true,
+        
       },
     });
   },

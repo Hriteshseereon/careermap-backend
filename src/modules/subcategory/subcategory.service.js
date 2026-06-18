@@ -18,7 +18,7 @@ export const createSubCategory = async (body, files) => {
       title: body.title,
       categoryId: Number(body.categoryId),
       secondcategoryId: Number(body.secondcategoryId),
-      institutionId: Number(body.institutionId),
+      
       path: body.path,
       file: fileUrl,
       coverImage: coverImageUrl,
@@ -81,7 +81,7 @@ export const updateSubCategory = async (id, body, files) => {
       title: body.title,
       categoryId: Number(body.categoryId),
       secondcategoryId: Number(body.secondcategoryId),
-      institutionId: Number(body.institutionId),
+     
       path: body.path,
       description: body.description,
       specialization: body.specialization,
