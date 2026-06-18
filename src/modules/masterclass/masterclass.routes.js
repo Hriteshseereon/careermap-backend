@@ -8,13 +8,13 @@ import {
 } from "./masterclass.controller.js";
 
 import { protectAdmin } from "../../middlewares/protectAdmin.js";
-
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 const router = Router();
 
-router.post("/", protectAdmin, createMasterClassController);
+router.post("/", protectAdminOrStaff, createMasterClassController);
 router.get("/", getMasterClassesController);
 router.get("/:id", getMasterClassByIdController);
-router.put("/:id", protectAdmin, updateMasterClassController);
-router.delete("/:id", protectAdmin, deleteMasterClassController);
+router.put("/:id", protectAdminOrStaff, updateMasterClassController);
+router.delete("/:id", protectAdminOrStaff, deleteMasterClassController);
 
 export default router;
