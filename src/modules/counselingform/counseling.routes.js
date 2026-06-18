@@ -7,13 +7,14 @@ import {
   deleteCounselingController,
 } from "./counseling.controller.js";
 import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 
 const router = express.Router();
 
-router.post("/",protectAdmin, createCounselingController);
-router.get("/",protectAdmin, getCounselingsController);
-router.get("/:id",protectAdmin, getCounselingByIdController);
-router.put("/:id",protectAdmin, updateCounselingController);
-router.delete("/:id",protectAdmin, deleteCounselingController);
+router.post("/",protectAdminOrStaff, createCounselingController);
+router.get("/",protectAdminOrStaff, getCounselingsController);
+router.get("/:id",protectAdminOrStaff, getCounselingByIdController);
+router.put("/:id",protectAdminOrStaff, updateCounselingController);
+router.delete("/:id",protectAdminOrStaff, deleteCounselingController);
 
 export default router;
