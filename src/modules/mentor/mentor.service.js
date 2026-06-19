@@ -156,6 +156,10 @@ export const updateMentor = async (id, body, files) => {
         name: body.name,
         email: body.email,
         phone_number: body.phone_number,
+         dateof_birth: body.dateof_birth
+          ? new Date(body.dateof_birth)
+          : null,
+
         year:body.year,
         designation: body.designation,
         education: body.education,
