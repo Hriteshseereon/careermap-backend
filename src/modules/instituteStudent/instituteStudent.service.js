@@ -64,33 +64,46 @@ export const createStudent = async (body) => {
         12
       );
 
-    const student =
-      await InstituteStudentRepository.createStudent({
+   const student =
+   
+  await InstituteStudentRepository.createStudent({
 
-        firstName:
-          body.firstName,
+    firstName: body.firstName,
 
-        lastName:
-          body.lastName,
+    lastName: body.lastName,
 
-        username:
-          body.username,
+    username: body.username,
 
-        email:
-          body.email,
+    email: body.email,
 
-        password:
-          hashedPassword,
+    password: hashedPassword,
 
-        mobile:
-          body.mobile,
+    mobile: body.mobile,
 
-        instituteId:
-          Number(body.instituteId),
+    country: body.country,
 
-        isInstituteStudent:
-          true,
-      });
+    state: body.state,
+
+    city: body.city,
+
+    district: body.district,
+
+    gender: body.gender,
+
+    address: body.address,
+
+    dataOfBirth: body.dataOfBirth
+      ? new Date(body.dataOfBirth)
+      : null,
+
+    image: body.image,
+
+    instituteId: Number(body.instituteId),
+
+    isInstituteStudent: true,
+
+    status: body.status || "active",
+  });
 
     // Email send
     try {

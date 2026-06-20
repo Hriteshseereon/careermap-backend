@@ -99,7 +99,19 @@ export const loginWithEmailPassword = async (email, password) => {
       throw new Error("Invalid credentials");
     }
     const tokens = generateTokens(user);
-    return { success: true, message: "Login successful", ...tokens };
+    return { success: true, message: "Login successful",
+         user: {
+    id: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    mobile: user.mobile,
+    status: user.status,
+    isInstituteStudent: user.isInstituteStudent,
+    instituteId: user.instituteId,
+  },
+      
+      ...tokens };
   } catch (error) {
     return { success: false, message: error.message };
   }
