@@ -9,11 +9,11 @@ export const CounselingRepository = {
     findAll(){
       return  prisma.counselingForm.findMany()
     },
-    findById(id){
-        return prisma.counselingForm.findByUnique({
-            where:{id}
-        })
-    },
+    findById(id) {
+  return prisma.counselingForm.findUnique({
+    where: { id },
+  });
+},
     update(id,data){
         return prisma.counselingForm.update({
             where:{id},

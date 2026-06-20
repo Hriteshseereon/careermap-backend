@@ -117,3 +117,19 @@ message: err.message,
 };
 }
 };
+
+export const generateCounselingReport = async (id) => {
+  const counseling = await CounselingRepository.findById(Number(id));
+
+  if (!counseling) {
+    return {
+      success: false,
+      message: "Counseling record not found",
+    };
+  }
+
+  return {
+    success: true,
+    data: counseling,
+  };
+};
