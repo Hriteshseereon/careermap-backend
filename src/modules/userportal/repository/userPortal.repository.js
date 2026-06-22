@@ -38,6 +38,12 @@ export const UserPortalRepository = {
       orderBy: { createdAt: "desc" },
     });
   },
+  getPlans(){
+    return prisma.plans.findMany({
+      take:8,
+      orderBy: { createdAt: "desc" },
+    })
+  },
   getAvailability(mentorId) {
   return prisma.mentorAvailability.findMany({
     where: {

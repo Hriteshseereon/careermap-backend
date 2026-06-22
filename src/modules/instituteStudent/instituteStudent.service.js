@@ -64,33 +64,46 @@ export const createStudent = async (body) => {
         12
       );
 
-    const student =
-      await InstituteStudentRepository.createStudent({
+   const student =
 
-        firstName:
-          body.firstName,
+  await InstituteStudentRepository.createStudent({
 
-        lastName:
-          body.lastName,
+    firstName: body.firstName,
 
-        username:
-          body.username,
+    lastName: body.lastName,
 
-        email:
-          body.email,
+    username: body.username,
 
-        password:
-          hashedPassword,
+    email: body.email,
 
-        mobile:
-          body.mobile,
+    password: hashedPassword,
 
-        instituteId:
-          Number(body.instituteId),
+    mobile: body.mobile,
 
-        isInstituteStudent:
-          true,
-      });
+    country: body.country,
+
+    state: body.state,
+
+    city: body.city,
+
+    district: body.district,
+
+    gender: body.gender,
+
+    address: body.address,
+
+    dataOfBirth: body.dataOfBirth
+      ? new Date(body.dataOfBirth)
+      : null,
+
+    image: body.image,
+
+    instituteId: Number(body.instituteId),
+
+    isInstituteStudent: true,
+
+    status: body.status || "active",
+  });
 
     // Email send
     try {
@@ -191,8 +204,7 @@ async (id) => {
 
 
 // UPDATE
-export const updateStudent =
-async (
+export const updateStudent = async (
   id,
   body
 ) => {
@@ -205,32 +217,44 @@ async (
   if (!student) {
     return {
       success: false,
-      message:
-        "Student not found",
+      message: "Student not found",
     };
   }
+
+  const updateData = {
+    ...body,
+  };
+
+  if (body.dataOfBirth) {
+    updateData.dataOfBirth =
+      new Date(body.dataOfBirth);
+  }
+
+  if (body.instituteId) {
+    updateData.instituteId =
+      Number(body.instituteId);
+  }
+
+  // Security
+  delete updateData.password;
+  delete updateData.isInstituteStudent;
+  delete updateData.id;
+  delete updateData.createdAt;
+  delete updateData.updatedAt;
 
   const updated =
     await InstituteStudentRepository.updateStudent(
       id,
-      {
-        firstName:
-          body.firstName,
-
-        lastName:
-          body.lastName,
-
-        mobile:
-          body.mobile,
-
-        status:
-          body.status,
-      }
+      updateData
     );
+
+  const { password, ...studentData } =
+    updated;
 
   return {
     success: true,
-    data: updated,
+    message: "Student updated successfully",
+    data: studentData,
   };
 };
 
@@ -260,5 +284,135 @@ async (id) => {
     success: true,
     message:
       "Student deleted successfully",
+  };
+};
+
+export const bulkCreateStudents =
+async (
+  students,
+  instituteId
+) => {
+
+  const success = [];
+  const failed = [];
+
+  for (const student of students) {
+
+    try {
+
+      const existing =
+        await InstituteStudentRepository.findByEmail(
+          student.Email
+        );
+
+      if (existing) {
+
+        failed.push({
+          email: student.Email,
+          reason:
+            "Email already exists",
+        });
+
+        continue;
+      }
+
+      const password =
+        crypto
+          .randomBytes(4)
+          .toString("hex");
+
+      const hashedPassword =
+        await bcrypt.hash(
+          password,
+          12
+        );
+
+      const created =
+        await InstituteStudentRepository.createStudent({
+
+          firstName:
+            student["First Name"],
+
+          lastName:
+            student["Last Name"],
+
+          username:
+            student["Username"],
+
+          email:
+            student["Email"],
+
+          mobile:
+            String(
+              student["Mobile"]
+            ),
+
+          gender:
+            student["Gender"],
+
+          country:
+            student["Country"],
+
+          state:
+            student["State"],
+
+          city:
+            student["City"],
+
+          district:
+            student["District"],
+
+          address:
+            student["Address"],
+
+          dataOfBirth:
+            student["DOB"]
+              ? new Date(
+                  student["DOB"]
+                )
+              : null,
+
+          password:
+            hashedPassword,
+
+          instituteId:
+            Number(
+              instituteId
+            ),
+
+          isInstituteStudent:
+            true,
+        });
+
+      success.push(created);
+
+      await sendStudentCredentials(
+        created.email,
+        created.firstName,
+        password
+      );
+
+    } catch (error) {
+
+      failed.push({
+        email:
+          student.Email,
+        reason:
+          error.message,
+      });
+
+    }
+  }
+
+  return {
+    success: true,
+    total:
+      students.length,
+    created:
+      success.length,
+    failed:
+      failed.length,
+    failedRecords:
+      failed,
   };
 };

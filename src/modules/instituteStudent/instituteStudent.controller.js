@@ -6,9 +6,9 @@ import {
   getStudentById,
   updateStudent,
   deleteStudent,
-
+  bulkCreateStudents,
 } from "./instituteStudent.service.js";
-
+import XLSX from "xlsx";
 
 export const createStudentController =
 async (req,res)=>{
@@ -81,6 +81,29 @@ async(req,res)=>{
   const result =
     await deleteStudent(
       req.params.id
+    );
+
+  res.json(result);
+};
+
+export const bulkCreateStudentsController =
+async (req, res) => {
+
+  const workbook =
+    XLSX.readFile(req.file.path);
+
+  const sheet =
+    workbook.Sheets[
+      workbook.SheetNames[0]
+    ];
+
+  const students =
+    XLSX.utils.sheet_to_json(sheet);
+
+  const result =
+    await bulkCreateStudents(
+      students,
+      req.body.instituteId
     );
 
   res.json(result);

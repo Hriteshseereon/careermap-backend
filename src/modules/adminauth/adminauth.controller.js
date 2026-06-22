@@ -52,9 +52,9 @@ export const adminLogout = async (
   req,
   res
 ) => {
-
+  const { refreshToken } = req.body;
   const result =
-    await logoutAdmin();
+    await logoutAdmin( refreshToken);
 
   res.status(200).json(result);
 };

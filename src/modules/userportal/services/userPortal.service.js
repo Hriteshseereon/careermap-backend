@@ -41,6 +41,7 @@ export const getDashboardData = async (userId) => {
       mentors,
       scholarships,
       institutions,
+      plans
     ] = await Promise.all([
       UserPortalRepository.getUserById(userId),
 
@@ -49,6 +50,7 @@ export const getDashboardData = async (userId) => {
       UserPortalRepository.getMentors(),
       UserPortalRepository.getScholarships(),
       UserPortalRepository.getInstitutions(),
+      UserPortalRepository.getPlans(),
     ]);
 
     // Active Subscription
@@ -114,6 +116,7 @@ export const getDashboardData = async (userId) => {
         user,
         modules,
         mentors,
+        plans,
         scholarships,
         institutions,
         subscription,
