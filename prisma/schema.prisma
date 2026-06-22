@@ -36,10 +36,29 @@ model AdminUsers {
   email     String   @unique
   password  String
   role      String   @default("admin")
+   loginAttempts Int      @default(0)
+  lockedUntil   DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+    sessions AdminSession[]
 }
+model AdminSession {
+  id Int @id @default(autoincrement())
 
+  adminId Int
+
+  refreshToken String @unique
+
+  deviceInfo String?
+
+  ipAddress String?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  admin AdminUsers @relation(fields: [adminId],references: [id],onDelete: Cascade)
+}
 model Users {
   id          Int       @id @default(autoincrement())
   firstName   String
@@ -203,6 +222,7 @@ model Secondcategory {
   entranceexam      EntranceExam[]
   scholarships      Scholarship[]
   institutions_list Institutions[]
+  mentor            Mentor[]
 }
 
 model Subcategory {
@@ -271,42 +291,42 @@ model ModuleAccess {
 
 // details scheama design 
 
-model Details {
-  id Int @id @default(autoincrement())
+  model Details {
+    id Int @id @default(autoincrement())
 
-  // Foreign Keys (still single)
-  streamId         Int?
-  categoryId       Int?
-  secondcategoryId Int?
-  subcategoryId    Int?
+    // Foreign Keys (still single)
+    streamId         Int?
+    categoryId       Int?
+    secondcategoryId Int?
+    subcategoryId    Int?
 
-  // Relations (single)
-  stream         Stream?         @relation(fields: [streamId], references: [id])
-  category       Category?       @relation(fields: [categoryId], references: [id])
-  secondcategory Secondcategory? @relation(fields: [secondcategoryId], references: [id])
-  subcategory    Subcategory?    @relation(fields: [subcategoryId], references: [id])
+    // Relations (single)
+    stream         Stream?         @relation(fields: [streamId], references: [id])
+    category       Category?       @relation(fields: [categoryId], references: [id])
+    secondcategory Secondcategory? @relation(fields: [secondcategoryId], references: [id])
+    subcategory    Subcategory?    @relation(fields: [subcategoryId], references: [id])
 
-  // ✅ MANY-TO-MANY RELATIONS
-  careerpaths   CareerPath[]
-  entranceexams EntranceExam[]
-  institutions  Institutions[]
+    // ✅ MANY-TO-MANY RELATIONS
+    careerpaths   CareerPath[]
+    entranceexams EntranceExam[]
+    institutions  Institutions[]
 
-  // Salary
-  salaryRanges SalaryRange[]
+    // Salary
+    salaryRanges SalaryRange[]
 
-  // Array field
-  jobScope String[]
+    // Array field
+    jobScope String[]
+    description String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([streamId, categoryId, secondcategoryId, subcategoryId])
-  // Indexes (optional but recommended)
-  @@index([streamId])
-  @@index([categoryId])
-  @@index([secondcategoryId])
-  @@index([subcategoryId])
-}
+    @@unique([streamId, categoryId, secondcategoryId, subcategoryId])
+    // Indexes (optional but recommended)
+    @@index([streamId])
+    @@index([categoryId])
+    @@index([secondcategoryId])
+    @@index([subcategoryId])
+  }
 
 model SalaryRange {
   id        Int     @id @default(autoincrement())
@@ -395,6 +415,7 @@ model Mentor {
 
   categoryId    Int?
   subCategoryId Int?
+   secondcategoryId Int?
 
   name         String?
   email        String?
@@ -421,6 +442,7 @@ model Mentor {
 
   category    Category?    @relation(fields: [categoryId], references: [id])
   subcategory Subcategory? @relation(fields: [subCategoryId], references: [id])
+  secondcategory Secondcategory? @relation(fields: [secondcategoryId], references: [id])
 
   // 🔥 NEW RELATION
   availability MentorAvailability[]

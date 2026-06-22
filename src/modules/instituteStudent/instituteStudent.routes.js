@@ -3,7 +3,7 @@ import { Router } from "express";
 import {
   protectAdmin,
 } from "../../middlewares/protectAdmin.js";
-
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 import {
 
   createStudentController,
@@ -12,16 +12,17 @@ import {
   getStudentByIdController,
   updateStudentController,
   deleteStudentController,
+    bulkCreateStudentsController
 
 } from "./instituteStudent.controller.js";
-
+import upload from "../../middlewares/upload.js";
 const router = Router();
 
 
 // CREATE
 router.post(
   "/",
-  protectAdmin,
+  protectAdminOrStaff,
   createStudentController
 );
 
@@ -29,7 +30,7 @@ router.post(
 // GET ALL
 router.get(
   "/",
-  protectAdmin,
+ protectAdminOrStaff,
   getStudentsController
 );
 
@@ -37,7 +38,7 @@ router.get(
 // GET BY INSTITUTE
 router.get(
   "/institute/:instituteId",
-  protectAdmin,
+  protectAdminOrStaff,
   getStudentsByInstituteController
 );
 
@@ -45,7 +46,7 @@ router.get(
 // GET BY ID
 router.get(
   "/:id",
-  protectAdmin,
+ protectAdminOrStaff,
   getStudentByIdController
 );
 
@@ -53,7 +54,7 @@ router.get(
 // UPDATE
 router.put(
   "/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   updateStudentController
 );
 
@@ -61,8 +62,14 @@ router.put(
 // DELETE
 router.delete(
   "/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   deleteStudentController
 );
 
+router.post(
+  "/bulk-upload",
+  protectAdminOrStaff,
+  upload.single("file"),
+  bulkCreateStudentsController
+);
 export default router;
