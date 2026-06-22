@@ -222,6 +222,7 @@ model Secondcategory {
   entranceexam      EntranceExam[]
   scholarships      Scholarship[]
   institutions_list Institutions[]
+  mentor            Mentor[]
 }
 
 model Subcategory {
@@ -414,6 +415,7 @@ model Mentor {
 
   categoryId    Int?
   subCategoryId Int?
+   secondcategoryId Int?
 
   name         String?
   email        String?
@@ -440,6 +442,7 @@ model Mentor {
 
   category    Category?    @relation(fields: [categoryId], references: [id])
   subcategory Subcategory? @relation(fields: [subCategoryId], references: [id])
+  secondcategory Secondcategory? @relation(fields: [secondcategoryId], references: [id])
 
   // 🔥 NEW RELATION
   availability MentorAvailability[]

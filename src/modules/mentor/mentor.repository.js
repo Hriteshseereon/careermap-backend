@@ -10,6 +10,7 @@ export const MentorRepository = {
       include: {
         category: true,
         subcategory: true,
+        secondcategory: true,
         availability:true,
       },
     });
