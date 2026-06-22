@@ -291,42 +291,42 @@ model ModuleAccess {
 
 // details scheama design 
 
-model Details {
-  id Int @id @default(autoincrement())
+  model Details {
+    id Int @id @default(autoincrement())
 
-  // Foreign Keys (still single)
-  streamId         Int?
-  categoryId       Int?
-  secondcategoryId Int?
-  subcategoryId    Int?
+    // Foreign Keys (still single)
+    streamId         Int?
+    categoryId       Int?
+    secondcategoryId Int?
+    subcategoryId    Int?
 
-  // Relations (single)
-  stream         Stream?         @relation(fields: [streamId], references: [id])
-  category       Category?       @relation(fields: [categoryId], references: [id])
-  secondcategory Secondcategory? @relation(fields: [secondcategoryId], references: [id])
-  subcategory    Subcategory?    @relation(fields: [subcategoryId], references: [id])
+    // Relations (single)
+    stream         Stream?         @relation(fields: [streamId], references: [id])
+    category       Category?       @relation(fields: [categoryId], references: [id])
+    secondcategory Secondcategory? @relation(fields: [secondcategoryId], references: [id])
+    subcategory    Subcategory?    @relation(fields: [subcategoryId], references: [id])
 
-  // ✅ MANY-TO-MANY RELATIONS
-  careerpaths   CareerPath[]
-  entranceexams EntranceExam[]
-  institutions  Institutions[]
+    // ✅ MANY-TO-MANY RELATIONS
+    careerpaths   CareerPath[]
+    entranceexams EntranceExam[]
+    institutions  Institutions[]
 
-  // Salary
-  salaryRanges SalaryRange[]
+    // Salary
+    salaryRanges SalaryRange[]
 
-  // Array field
-  jobScope String[]
+    // Array field
+    jobScope String[]
+    description String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([streamId, categoryId, secondcategoryId, subcategoryId])
-  // Indexes (optional but recommended)
-  @@index([streamId])
-  @@index([categoryId])
-  @@index([secondcategoryId])
-  @@index([subcategoryId])
-}
+    @@unique([streamId, categoryId, secondcategoryId, subcategoryId])
+    // Indexes (optional but recommended)
+    @@index([streamId])
+    @@index([categoryId])
+    @@index([secondcategoryId])
+    @@index([subcategoryId])
+  }
 
 model SalaryRange {
   id        Int     @id @default(autoincrement())
