@@ -45,29 +45,116 @@ export const adminSignup = async (body) => {
   }
 };
 // 🔹 Login
-export const adminLogin = async (email, password) => {
-  const admin = await AdminAuthRepository.findByEmail(email);
+export const adminLogin = async (
+  email,
+  password
+) => {
+
+  const admin =
+    await AdminAuthRepository.findByEmail(
+      email
+    );
 
   if (!admin) {
-    return { success: false, message: "Admin not found" };
+    return {
+      success: false,
+      message: "Admin not found",
+    };
   }
 
-  const isMatch = await bcrypt.compare(password, admin.password);
+  // Account locked check
+  if (
+    admin.lockedUntil &&
+    admin.lockedUntil > new Date()
+  ) {
+
+    const remainingMinutes =
+      Math.ceil(
+        (admin.lockedUntil - new Date()) /
+        60000
+      );
+
+    return {
+      success: false,
+      message:
+        `Account locked. Try again after ${remainingMinutes} minutes.`,
+    };
+  }
+
+  const isMatch =
+    await bcrypt.compare(
+      password,
+      admin.password
+    );
 
   if (!isMatch) {
-    return { success: false, message: "Invalid credentials" };
+
+    const updated =
+      await AdminAuthRepository.incrementLoginAttempts(
+        admin.id
+      );
+
+    if (
+      updated.loginAttempts >= 5
+    ) {
+
+      await AdminAuthRepository.lockAccount(
+        admin.id
+      );
+
+      return {
+        success: false,
+        message:
+          "Too many failed attempts. Account locked for 60 minutes.",
+      };
+    }
+
+    return {
+      success: false,
+      message:
+        `Invalid credentials. Remaining attempts: ${
+          5 -
+          updated.loginAttempts
+        }`,
+    };
   }
 
-  const tokens = generateAdminTokens(admin);
+  // Success Login
+  await AdminAuthRepository.resetLoginAttempts(
+    admin.id
+  );
+
+   // CHECK MAX 3 DEVICES
+  const activeSessions =
+    await AdminAuthRepository.getActiveSessions(
+      admin.id
+    );
+
+  if (activeSessions >= 3) {
+    return {
+      success: false,
+      message:
+        "Maximum 3 devices already logged in. Please logout from another device first.",
+    };
+  }
+
+  const tokens =
+    generateAdminTokens(admin);
+
+  // SAVE SESSION
+  await AdminAuthRepository.createSession({
+    adminId: admin.id,
+    refreshToken: tokens.refreshToken,
+    isActive: true,
+  });
+
 
   return {
     success: true,
-    message: "Admin login successful",
     admin,
     ...tokens,
   };
 };
-
 export const refreshAdminToken = async (
   refreshToken
 ) => {
@@ -127,7 +214,14 @@ export const refreshAdminToken = async (
   }
 };
 
-export const logoutAdmin = async () => {
+export const logoutAdmin = async (
+  refreshToken
+) => {
+
+  await AdminAuthRepository.deactivateSession(
+    refreshToken
+  );
+
   return {
     success: true,
     message: "Admin logged out successfully",

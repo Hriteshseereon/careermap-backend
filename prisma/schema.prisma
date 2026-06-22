@@ -36,10 +36,29 @@ model AdminUsers {
   email     String   @unique
   password  String
   role      String   @default("admin")
+   loginAttempts Int      @default(0)
+  lockedUntil   DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+    sessions AdminSession[]
 }
+model AdminSession {
+  id Int @id @default(autoincrement())
 
+  adminId Int
+
+  refreshToken String @unique
+
+  deviceInfo String?
+
+  ipAddress String?
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  admin AdminUsers @relation(fields: [adminId],references: [id],onDelete: Cascade)
+}
 model Users {
   id          Int       @id @default(autoincrement())
   firstName   String
