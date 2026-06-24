@@ -61,8 +61,8 @@ model AdminSession {
 }
 model Users {
   id          Int       @id @default(autoincrement())
-  firstName   String
-  lastName    String
+  firstName   String?
+  lastName    String?
   username    String
   email       String    @unique
   password    String
@@ -95,6 +95,7 @@ model Users {
   userloginhistory UserLoginHistory[]
   helpandSupport   HelpAndSupport[]
   moduleAccess     ModuleAccess[]
+   reviews MentorReview[]
 }
 
 model Subscriptions {
@@ -447,6 +448,7 @@ model Mentor {
   // 🔥 NEW RELATION
   availability MentorAvailability[]
   bookings     Mentorbooking[]
+   reviews MentorReview[]
 }
 
 model MentorAvailability {
@@ -486,7 +488,7 @@ model Mentorbooking {
   paymentStatus PaymentStatus @default(pending)
 
   amount Float?
-
+  reviewSubmitted Boolean @default(false)
   createdAt DateTime @default(now())
 
   user   Users  @relation(fields: [userId], references: [id])
@@ -495,6 +497,7 @@ model Mentorbooking {
   payment Mentorpayment? @relation("BookingPayment")
 
   @@unique([mentorId, date, timeSlot])
+   reviews MentorReview[]
 }
 
 model Mentorpayment {
@@ -516,7 +519,27 @@ model Mentorpayment {
   booking Mentorbooking @relation("BookingPayment", fields: [bookingId], references: [id])
   user    Users         @relation(fields: [userId], references: [id])
 }
+model MentorReview {
+  id Int @id @default(autoincrement())
 
+  mentorId Int
+  userId Int
+  bookingId Int @unique
+
+  rating Int // 1-5
+
+  review String?
+
+  createdAt DateTime @default(now())
+
+  mentor Mentor @relation(fields:[mentorId], references:[id], onDelete: Cascade)
+
+  user Users @relation(fields:[userId], references:[id])
+
+  booking Mentorbooking @relation(fields:[bookingId], references:[id])
+
+  @@index([mentorId])
+}
 model Scholarship {
   id               Int             @id @default(autoincrement())
   name             String          @unique

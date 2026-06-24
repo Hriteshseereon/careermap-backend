@@ -12,6 +12,11 @@ export const MentorRepository = {
         subcategory: true,
         secondcategory: true,
         availability:true,
+          reviews: {
+        select: {
+          rating: true,
+        },
+      },
       },
     });
   },
@@ -23,6 +28,16 @@ export const MentorRepository = {
         category: true,
         subcategory: true,
         availability:true,
+         reviews: {
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      },
       },
     });
   },
