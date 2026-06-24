@@ -185,9 +185,23 @@ async (userId) => {
       userId
     );
 
+  const bookings = data.map((item) => ({
+
+    ...item,
+
+    canReview:
+
+      new Date(item.date) < new Date() &&
+
+      item.status === "confirmed" &&
+
+      !item.reviewSubmitted
+
+  }));
+
   return {
     success: true,
-    data,
+    data: bookings,
   };
 };
 

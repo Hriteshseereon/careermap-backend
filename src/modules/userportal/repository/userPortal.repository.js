@@ -21,6 +21,14 @@ export const UserPortalRepository = {
     return prisma.mentor.findMany({
       take: 8,
       where: { status: true },
+        include: {
+      reviews: {
+        select: {
+          rating: true,
+        },
+      },
+    },
+
       orderBy: { createdAt: "desc" },
     });
   },

@@ -8,13 +8,14 @@ import {
   getInstituteByIdController,
   updateInstituteController,
   deleteInstituteController,
+   getInstituteDashboardController
 
 } from "./institute.controller.js";
 
 import {
   protectAdmin
 } from "../../middlewares/protectAdmin.js";
-
+import {protectInstitute} from "../../middlewares/protectInstitute.js"
 const router = Router();
 
 
@@ -33,6 +34,11 @@ router.post(
   createInstituteController
 );
 
+router.get(
+  "/dashboard",
+  protectInstitute,
+  getInstituteDashboardController
+);
 router.get(
   "/",
   protectAdmin,
@@ -56,5 +62,6 @@ router.delete(
   protectAdmin,
   deleteInstituteController
 );
+
 
 export default router;

@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+import prisma from "../../config/db.js";
 import { InstituteRepository }
 from "./institute.repository.js";
 
@@ -204,5 +204,61 @@ async (id) => {
     success: true,
     message:
       "Institute deleted successfully",
+  };
+};
+
+export const getInstituteDashboard =
+async (instituteId) => {
+
+  const institute =
+    await prisma.institutes.findUnique({
+      where: {
+        id: Number(instituteId),
+      },
+    });
+
+  const students =
+    await prisma.users.findMany({
+      where: {
+        instituteId: Number(instituteId),
+      },
+
+      include: {
+        quizattempt: true,
+      },
+    });
+
+  const totalStudents =
+    students.length;
+
+  const attemptedStudents =
+    students.filter(
+      s => s.quizattempt.length > 0
+    ).length;
+
+  const notAttemptedStudents =
+    totalStudents -
+    attemptedStudents;
+
+  return {
+    success: true,
+
+    data: {
+
+      totalStudents,
+
+      studentLimit:
+        institute.limit,
+
+      availableSeats:
+        institute.limit -
+        totalStudents,
+
+      quizAttempted:
+        attemptedStudents,
+
+      quizNotAttempted:
+        notAttemptedStudents,
+    },
   };
 };
