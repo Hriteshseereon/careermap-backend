@@ -48,4 +48,17 @@ export const InstituteRepository = {
       },
     });
   },
+  getDashboardData(instituteId) {
+
+  return prisma.users.findMany({
+    where: {
+      instituteId: Number(instituteId),
+    },
+
+    include: {
+      quizattempt: true,
+    },
+  });
+
+},
 };
