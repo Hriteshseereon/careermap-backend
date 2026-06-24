@@ -6,7 +6,7 @@ import {
   getInstituteById,
   updateInstitute,
   deleteInstitute,
-
+  getInstituteDashboard
 } from "./institute.service.js";
 
 
@@ -87,6 +87,18 @@ async(req,res)=>{
   const result =
     await deleteInstitute(
       req.params.id
+    );
+
+  res.json(result);
+};
+
+
+export const getInstituteDashboardController =
+async (req,res)=>{
+
+  const result =
+    await getInstituteDashboard(
+      req.institute.instituteId
     );
 
   res.json(result);
