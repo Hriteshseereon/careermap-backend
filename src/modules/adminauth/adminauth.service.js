@@ -213,7 +213,62 @@ export const refreshAdminToken = async (
     };
   }
 };
+export const changePassword = async (
+  adminId,
+  oldPassword,
+  newPassword
+) => {
+  const admin =
+    await AdminAuthRepository.findById(
+      adminId
+    );
 
+  if (!admin) {
+    return {
+      success: false,
+      message: "Admin not found",
+    };
+  }
+
+  const isMatch =
+    await bcrypt.compare(
+      oldPassword,
+      admin.password
+    );
+
+  if (!isMatch) {
+    return {
+      success: false,
+      message:
+        "Old password is incorrect",
+    };
+  }
+
+  if (oldPassword === newPassword) {
+    return {
+      success: false,
+      message:
+        "New password must be different from old password",
+    };
+  }
+
+  const hashedPassword =
+    await bcrypt.hash(
+      newPassword,
+      12
+    );
+
+  await AdminAuthRepository.updatePassword(
+    admin.id,
+    hashedPassword
+  );
+
+  return {
+    success: true,
+    message:
+      "Password changed successfully",
+  };
+};
 export const logoutAdmin = async (
   refreshToken
 ) => {

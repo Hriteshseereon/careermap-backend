@@ -79,4 +79,12 @@ deactivateSession(refreshToken) {
     },
   });
 },
+updatePassword(id, hashedPassword) {
+  return prisma.adminUsers.update({
+    where: { id },
+    data: {
+      password: hashedPassword,
+    },
+  });
+},
 };
