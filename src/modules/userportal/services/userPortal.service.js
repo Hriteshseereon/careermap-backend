@@ -109,7 +109,49 @@ export const getDashboardData = async (userId) => {
             : "locked",
       })
     );
+ const pendingMentorReviews =
+  await prisma.mentorbooking.findMany({
+    where: {
+      userId: Number(userId),
 
+      status: "confirmed",
+
+      reviewSubmitted: false,
+
+      date: {
+        lt: new Date(),
+      },
+    },
+
+    include: {
+      mentor: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
+  const reviews =
+  pendingMentorReviews.map(
+    (item) => ({
+      bookingId: item.id,
+
+      mentorId:
+        item.mentor.id,
+
+      mentorName:
+        item.mentor.name,
+
+      date:
+        item.date,
+
+      timeSlot:
+        item.timeSlot,
+
+      canReview: true,
+    })
+  );
     return {
       success: true,
       data: {
@@ -120,6 +162,8 @@ export const getDashboardData = async (userId) => {
         scholarships,
         institutions,
         subscription,
+          pendingMentorReviews:
+      reviews,
       },
     };
 

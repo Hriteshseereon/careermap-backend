@@ -34,6 +34,7 @@ import permissionRoutes from "./modules/permission/permission.routes.js"
 import instituteCreateRoutes from "./modules/institute/institute.routes.js"
 import studentAddRoutes from "./modules/instituteStudent/instituteStudent.routes.js"
 import adminnotificationRoutes from "./modules/adminnotification/adminnotification.routes.js"
+import mentorReviewRoutes from "./modules/mentorreview/mentorReview.routes.js"
 //  user portal routes imported here
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
 import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
@@ -91,6 +92,7 @@ app.use("/api/helpandsupport",helpAndSupportRoute);
 app.use("/api/mentor-booking",mentorBookingRoute);
 app.use("/api/institutcreate",instituteCreateRoutes);
 app.use("/api/student",studentAddRoutes);
+app.use("/api/mentorreview",mentorReviewRoutes)
 app.use(
   "/api/module-access",moduleAccessRoute);
   app.use("/api/admin",adminDashboardRoutes);

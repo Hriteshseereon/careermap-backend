@@ -104,27 +104,103 @@ subCategoryId:
 // 🔹 GET ALL
 export const getMentors = async () => {
   try {
-    const data = await MentorRepository.findAll();
-    return { success: true, data };
+
+    const mentors =
+      await MentorRepository.findAll();
+
+    const data = mentors.map(
+      (mentor) => {
+
+        const totalReviews =
+          mentor.reviews.length;
+
+        const averageRating =
+          totalReviews > 0
+            ? Number(
+                (
+                  mentor.reviews.reduce(
+                    (sum, review) =>
+                      sum + review.rating,
+                    0
+                  ) / totalReviews
+                ).toFixed(1)
+              )
+            : 0;
+
+        return {
+          ...mentor,
+
+          averageRating,
+
+          totalReviews,
+        };
+      }
+    );
+
+    return {
+      success: true,
+      data,
+    };
+
   } catch (error) {
-    console.error("❌ getMentors Error:", error);
-    return { success: false, message: error.message };
+
+    return {
+      success: false,
+      message: error.message,
+    };
   }
 };
 
 // 🔹 GET BY ID
 export const getMentorById = async (id) => {
   try {
-    const mentor = await MentorRepository.findById(Number(id));
+
+    const mentor =
+      await MentorRepository.findById(
+        Number(id)
+      );
 
     if (!mentor) {
-      return { success: false, message: "Mentor not found" };
+      return {
+        success: false,
+        message: "Mentor not found",
+      };
     }
 
-    return { success: true, data: mentor };
+    const totalReviews =
+      mentor.reviews.length;
+
+    const averageRating =
+      totalReviews > 0
+        ? Number(
+            (
+              mentor.reviews.reduce(
+                (sum, review) =>
+                  sum + review.rating,
+                0
+              ) / totalReviews
+            ).toFixed(1)
+          )
+        : 0;
+
+    return {
+      success: true,
+
+      data: {
+        ...mentor,
+
+        averageRating,
+
+        totalReviews,
+      },
+    };
+
   } catch (error) {
-    console.error("❌ getMentorById Error:", error);
-    return { success: false, message: error.message };
+
+    return {
+      success: false,
+      message: error.message,
+    };
   }
 };
 
