@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { signupAdmin, loginAdmin,refreshTokenAdmin,adminLogout,changePasswordAdmin
+import { signupAdmin, loginAdmin,refreshTokenAdmin,adminLogout,changePasswordAdmin,forgotPasswordAdmin,
+  resetPasswordAdmin,
 } from "./adminauth.controller.js";
 
 import { protectAdmin } from "../../middlewares/protectAdmin.js";
@@ -14,5 +15,15 @@ router.post(
   "/change-password",
   protectAdmin, 
   changePasswordAdmin
+);
+
+router.post(
+  "/forgot-password",
+  forgotPasswordAdmin
+);
+
+router.post(
+  "/reset-password",
+  resetPasswordAdmin
 );
 export default router;

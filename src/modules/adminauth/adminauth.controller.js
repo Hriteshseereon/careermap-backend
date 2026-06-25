@@ -1,4 +1,5 @@
-import { adminSignup, adminLogin, refreshAdminToken, logoutAdmin,changePassword } from "./adminauth.service.js";
+import { adminSignup, adminLogin, refreshAdminToken, logoutAdmin,changePassword, forgotPassword,
+  resetPassword, } from "./adminauth.service.js";
 
 // 🔹 Signup
 export const signupAdmin = async (req, res) => {
@@ -89,4 +90,73 @@ export const changePasswordAdmin =
         message: error.message,
       });
     }
+  };
+
+  export const forgotPasswordAdmin =
+  async (req, res) => {
+    try {
+
+      const { email } = req.body;
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          message: "Email is required",
+        });
+      }
+
+      const result =
+        await forgotPassword(email);
+
+      return res.status(
+        result.success ? 200 : 400
+      ).json(result);
+
+    } catch (error) {
+
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+
+    }
+  };
+
+  export const resetPasswordAdmin =
+  async (req, res) => {
+
+    try {
+
+      const {
+        token,
+        password,
+      } = req.body;
+
+      if (!token || !password) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Token and password are required.",
+        });
+      }
+
+      const result =
+        await resetPassword(
+          token,
+          password
+        );
+
+      return res.status(
+        result.success ? 200 : 400
+      ).json(result);
+
+    } catch (error) {
+
+      return res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+
+    }
+
   };
