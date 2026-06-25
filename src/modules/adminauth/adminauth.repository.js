@@ -79,4 +79,41 @@ deactivateSession(refreshToken) {
     },
   });
 },
+updatePassword(id, hashedPassword) {
+  return prisma.adminUsers.update({
+    where: { id },
+    data: {
+      password: hashedPassword,
+    },
+  });
+},
+findByResetToken(token) {
+  return prisma.adminUsers.findFirst({
+    where: {
+      resetToken: token,
+      resetTokenExpiry: {
+        gt: new Date(),
+      },
+    },
+  });
+},
+saveResetToken(id, token, expiry) {
+  return prisma.adminUsers.update({
+    where: { id },
+    data: {
+      resetToken: token,
+      resetTokenExpiry: expiry,
+    },
+  });
+},
+updatePassword(id, password) {
+  return prisma.adminUsers.update({
+    where: { id },
+    data: {
+      password,
+      resetToken: null,
+      resetTokenExpiry: null,
+    },
+  });
+},
 };

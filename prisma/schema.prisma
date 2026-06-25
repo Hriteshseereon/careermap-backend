@@ -38,6 +38,8 @@ model AdminUsers {
   role      String   @default("admin")
    loginAttempts Int      @default(0)
   lockedUntil   DateTime?
+    resetToken String?
+  resetTokenExpiry DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
     sessions AdminSession[]

@@ -1,7 +1,9 @@
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { AdminAuthRepository } from "./adminauth.repository.js";
 import { generateAdminTokens } from "../../utils/helpers.js";
 import jwt from "jsonwebtoken";
+import { sendEmail } from "../../utils/sendEmail.js";
 // 🔹 Signup (optional)
 export const adminSignup = async (body) => {
   try {
@@ -213,7 +215,62 @@ export const refreshAdminToken = async (
     };
   }
 };
+export const changePassword = async (
+  adminId,
+  oldPassword,
+  newPassword
+) => {
+  const admin =
+    await AdminAuthRepository.findById(
+      adminId
+    );
 
+  if (!admin) {
+    return {
+      success: false,
+      message: "Admin not found",
+    };
+  }
+
+  const isMatch =
+    await bcrypt.compare(
+      oldPassword,
+      admin.password
+    );
+
+  if (!isMatch) {
+    return {
+      success: false,
+      message:
+        "Old password is incorrect",
+    };
+  }
+
+  if (oldPassword === newPassword) {
+    return {
+      success: false,
+      message:
+        "New password must be different from old password",
+    };
+  }
+
+  const hashedPassword =
+    await bcrypt.hash(
+      newPassword,
+      12
+    );
+
+  await AdminAuthRepository.updatePassword(
+    admin.id,
+    hashedPassword
+  );
+
+  return {
+    success: true,
+    message:
+      "Password changed successfully",
+  };
+};
 export const logoutAdmin = async (
   refreshToken
 ) => {
@@ -226,4 +283,89 @@ export const logoutAdmin = async (
     success: true,
     message: "Admin logged out successfully",
   };
+};
+
+export const forgotPassword = async (email) => {
+  const admin = await AdminAuthRepository.findByEmail(email);
+
+  if (!admin) {
+    return {
+      success: false,
+      message: "Admin not found",
+    };
+  }
+
+  // Generate Token
+  const token = crypto.randomBytes(32).toString("hex");
+
+  // Expiry 15 Minutes
+  const expiry = new Date(Date.now() + 15 * 60 * 1000);
+
+  // Save Token
+  await AdminAuthRepository.saveResetToken(
+    admin.id,
+    token,
+    expiry
+  );
+
+  // Reset Link
+  const resetLink =
+    `${process.env.FRONTEND_URL}/admin/reset-password?token=${token}`;
+
+  // Send Email
+  await sendEmail(
+    admin.email,
+    "Reset Your Password",
+    `
+      <h2>Password Reset</h2>
+
+      <p>Hello ${admin.firstName || "Admin"},</p>
+
+      <p>Click the link below to reset your password.</p>
+
+      <a href="${resetLink}">
+        Reset Password
+      </a>
+
+      <p>This link will expire in 15 minutes.</p>
+    `
+  );
+
+  return {
+    success: true,
+    message: "Password reset link sent successfully.",
+  };
+};
+
+export const resetPassword = async (
+  token,
+  password
+) => {
+
+  const admin =
+    await AdminAuthRepository.findByResetToken(
+      token
+    );
+
+  if (!admin) {
+    return {
+      success: false,
+      message:
+        "Invalid or expired reset link.",
+    };
+  }
+
+  const hashedPassword =
+    await bcrypt.hash(password, 12);
+
+  await AdminAuthRepository.updatePassword(
+    admin.id,
+    hashedPassword
+  );
+
+  return {
+    success: true,
+    message:
+      "Password reset successfully.",
+    };
 };
