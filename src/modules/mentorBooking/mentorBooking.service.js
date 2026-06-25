@@ -2,7 +2,7 @@ import razorpay from "../../lib/razorpay.js";
 import prisma from "../../config/db.js";
 import crypto from "crypto";
 import { MentorBookingRepository } from "./mentorBooking.repository.js";
-
+import { sendMentorBookingMail } from "../../utils/sendMentorBookingMail.js";
 export const createMentorOrder = async (
   userId,
   body
@@ -106,7 +106,19 @@ async (userId, body) => {
           "paid",
       },
     });
+const user =
+  await MentorBookingRepository.getUser(
+    userId
+  );
 
+
+
+
+await sendMentorBookingMail(
+  user,
+  mentor,
+  booking
+);
   // 🔥 THEN CREATE PAYMENT
   await prisma.mentorpayment.create({
 

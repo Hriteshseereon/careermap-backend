@@ -125,5 +125,20 @@ getUserSubscriptions(userId) {
       createdAt: "desc",
     },
   });
-}
+},
+getUser(userId) {
+  return prisma.users.findUnique({
+    where: {
+      id: Number(userId),
+    },
+  });
+},
+
+getMentor(mentorId) {
+  return prisma.mentor.findUnique({
+    where: {
+      id: Number(mentorId),
+    },
+  });
+},
 };
