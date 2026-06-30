@@ -7,7 +7,7 @@ import {
 } from "./details.service.js";
 
 export const createDetailsController = async (req, res) => {
-  const result = await createDetails(req.body);
+  const result = await createDetails(req.body,req.file);
   res.status(result.success ? 201 : 400).json(result);
 };
 
@@ -22,7 +22,7 @@ export const getDetailsByIdController = async (req, res) => {
 };
 
 export const updateDetailsController = async (req, res) => {
-  const result = await updateDetails(req.params.id, req.body);
+  const result = await updateDetails(req.params.id, req.body,req.file);
   res.status(result.success ? 200 : 400).json(result);
 };
 

@@ -321,6 +321,7 @@ model ModuleAccess {
     jobScope String[]
      specialization   String?     
   important_factor String? 
+   media String?
     description String?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -335,7 +336,7 @@ model ModuleAccess {
 
 model SalaryRange {
   id        Int     @id @default(autoincrement())
-  profession String 
+  profession String?
   minSalary Float
   maxSalary Float
   currency  String  @default("INR")
