@@ -5,6 +5,8 @@ export const createDetails = async (body) => {
     const {
       salaryRanges,
       jobScope,
+       specialization,
+  important_factor,
       careerpathIds,
       entranceexamIds,
       institutionIds,
@@ -30,7 +32,9 @@ export const createDetails = async (body) => {
     const data = {
       ...rest,
       jobScope,
+      specialization,
 
+  important_factor,
       salaryRanges: {
         create: salaryRanges || [],
       },
@@ -113,6 +117,8 @@ export const updateDetails = async (id, body) => {
     const {
       salaryRanges,
       jobScope,
+           specialization,
+  important_factor, 
       careerpathIds,
       entranceexamIds,
       institutionIds,
@@ -123,6 +129,7 @@ export const updateDetails = async (id, body) => {
     const existing = await detailsRepository.findExisting({
       streamId: body.streamId,
       categoryId: body.categoryId,
+      
       secondcategoryId: body.secondcategoryId,
       subcategoryId: body.subcategoryId,
     });
