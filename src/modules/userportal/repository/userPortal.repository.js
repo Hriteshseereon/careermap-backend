@@ -17,21 +17,54 @@ export const UserPortalRepository = {
     });
   },
 
-  getMentors() {
-    return prisma.mentor.findMany({
-      take: 8,
-      where: { status: true },
-        include: {
+  async getMentors() {
+  const mentors = await prisma.mentor.findMany({
+    where: {
+      status: true,
+    },
+    include: {
       reviews: {
         select: {
           rating: true,
         },
       },
     },
+  });
 
-      orderBy: { createdAt: "desc" },
-    });
-  },
+  return mentors
+    .map((mentor) => {
+      const totalReviews = mentor.reviews.length;
+
+      const averageRating =
+        totalReviews > 0
+          ? mentor.reviews.reduce(
+              (sum, review) => sum + review.rating,
+              0
+            ) / totalReviews
+          : 0;
+
+      return {
+        ...mentor,
+        averageRating,
+        totalReviews,
+      };
+    })
+    .sort((a, b) => {
+      // Highest rating first
+      if (b.averageRating !== a.averageRating) {
+        return b.averageRating - a.averageRating;
+      }
+
+      // If ratings are equal, mentor with more reviews first
+      if (b.totalReviews !== a.totalReviews) {
+        return b.totalReviews - a.totalReviews;
+      }
+
+      // If still equal, latest mentor first
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    })
+    .slice(0, 8);
+},
 
   getScholarships() {
     return prisma.scholarship.findMany({

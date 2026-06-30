@@ -6,6 +6,8 @@ create: (data) => {
   return prisma.details.create({
     data: {
       jobScope: data.jobScope,
+        specialization: data.specialization,
+  important_factor: data.important_factor,
       description: data.description,
       // Single relations
       ...(data.streamId && {
@@ -105,6 +107,13 @@ update: (id, data) => {
       ...(data.jobScope !== undefined && {
         jobScope: data.jobScope
       }),
+      ...(data.specialization !== undefined && {
+  specialization: data.specialization
+}),
+
+...(data.important_factor !== undefined && {
+  important_factor: data.important_factor
+}),
         ...(data.description !== undefined && {
     description: data.description
   }),
