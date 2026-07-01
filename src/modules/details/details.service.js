@@ -1,22 +1,52 @@
 import { detailsRepository } from "./details.repository.js";
-
-export const createDetails = async (body) => {
+import { uploadToS3 } from "../../lib/s3Upload.js"
+export const createDetails = async (body, file) => {
   try {
+    // Upload media to S3
+    let media = null;
+
+    if (file) {
+      media = await uploadToS3(file, "details/media");
+    }
+
+    // Parse multipart/form-data JSON fields
+    const salaryRanges = body.salaryRanges
+      ? JSON.parse(body.salaryRanges)
+      : [];
+
+    const jobScope = body.jobScope
+      ? JSON.parse(body.jobScope)
+      : [];
+
+    const careerpathIds = body.careerpathIds
+      ? JSON.parse(body.careerpathIds)
+      : [];
+
+    const entranceexamIds = body.entranceexamIds
+      ? JSON.parse(body.entranceexamIds)
+      : [];
+
+    const institutionIds = body.institutionIds
+      ? JSON.parse(body.institutionIds)
+      : [];
+
     const {
-      salaryRanges,
-      jobScope,
-      careerpathIds,
-      entranceexamIds,
-      institutionIds,
+      specialization,
+      important_factor,
+      description,
+      streamId,
+      categoryId,
+      secondcategoryId,
+      subcategoryId,
       ...rest
     } = body;
 
     // Check duplicate
     const existing = await detailsRepository.findExisting({
-      streamId: body.streamId,
-      categoryId: body.categoryId,
-      secondcategoryId: body.secondcategoryId,
-      subcategoryId: body.subcategoryId,
+      streamId: Number(streamId),
+      categoryId: Number(categoryId),
+      secondcategoryId: Number(secondcategoryId),
+      subcategoryId: Number(subcategoryId),
     });
 
     if (existing) {
@@ -29,27 +59,44 @@ export const createDetails = async (body) => {
 
     const data = {
       ...rest,
+
+      streamId: Number(streamId),
+      categoryId: Number(categoryId),
+      secondcategoryId: Number(secondcategoryId),
+      subcategoryId: Number(subcategoryId),
+
+      description,
+      specialization,
+      important_factor,
+      media,
+
       jobScope,
 
       salaryRanges: {
-        create: salaryRanges || [],
+        create: salaryRanges,
       },
 
-      ...(careerpathIds && {
+      ...(careerpathIds.length > 0 && {
         careerpaths: {
-          connect: careerpathIds.map((id) => ({ id })),
+          connect: careerpathIds.map((id) => ({
+            id: Number(id),
+          })),
         },
       }),
 
-      ...(entranceexamIds && {
+      ...(entranceexamIds.length > 0 && {
         entranceexams: {
-          connect: entranceexamIds.map((id) => ({ id })),
+          connect: entranceexamIds.map((id) => ({
+            id: Number(id),
+          })),
         },
       }),
 
-      ...(institutionIds && {
+      ...(institutionIds.length > 0 && {
         institutions: {
-          connect: institutionIds.map((id) => ({ id })),
+          connect: institutionIds.map((id) => ({
+            id: Number(id),
+          })),
         },
       }),
     };
@@ -62,13 +109,13 @@ export const createDetails = async (body) => {
     };
   } catch (err) {
     console.error("Create Details Error:", err);
+
     return {
       success: false,
       message: err.message,
     };
   }
 };
-
 export const getAllDetails = async () => {
   try {
     const data = await detailsRepository.findAll();
@@ -108,23 +155,53 @@ export const getDetailsById = async (id) => {
   }
 };
 
-export const updateDetails = async (id, body) => {
+export const updateDetails = async (id, body, file) => {
   try {
+    // Upload media if a new file is provided
+    let media;
+
+    if (file) {
+      media = await uploadToS3(file, "details/media");
+    }
+
+    // Parse multipart/form-data JSON fields
+    const salaryRanges = body.salaryRanges
+      ? JSON.parse(body.salaryRanges)
+      : undefined;
+
+    const jobScope = body.jobScope
+      ? JSON.parse(body.jobScope)
+      : undefined;
+
+    const careerpathIds = body.careerpathIds
+      ? JSON.parse(body.careerpathIds)
+      : undefined;
+
+    const entranceexamIds = body.entranceexamIds
+      ? JSON.parse(body.entranceexamIds)
+      : undefined;
+
+    const institutionIds = body.institutionIds
+      ? JSON.parse(body.institutionIds)
+      : undefined;
+
     const {
-      salaryRanges,
-      jobScope,
-      careerpathIds,
-      entranceexamIds,
-      institutionIds,
+      specialization,
+      important_factor,
+      description,
+      streamId,
+      categoryId,
+      secondcategoryId,
+      subcategoryId,
       ...rest
     } = body;
 
     // Check duplicate except current record
     const existing = await detailsRepository.findExisting({
-      streamId: body.streamId,
-      categoryId: body.categoryId,
-      secondcategoryId: body.secondcategoryId,
-      subcategoryId: body.subcategoryId,
+      streamId: Number(streamId),
+      categoryId: Number(categoryId),
+      secondcategoryId: Number(secondcategoryId),
+      subcategoryId: Number(subcategoryId),
     });
 
     if (existing && existing.id !== Number(id)) {
@@ -138,6 +215,27 @@ export const updateDetails = async (id, body) => {
     const data = {
       ...rest,
 
+      streamId: Number(streamId),
+      categoryId: Number(categoryId),
+      secondcategoryId: Number(secondcategoryId),
+      subcategoryId: Number(subcategoryId),
+
+      ...(description !== undefined && {
+        description,
+      }),
+
+      ...(specialization !== undefined && {
+        specialization,
+      }),
+
+      ...(important_factor !== undefined && {
+        important_factor,
+      }),
+
+      ...(media && {
+        media,
+      }),
+
       ...(jobScope !== undefined && {
         jobScope,
       }),
@@ -148,19 +246,25 @@ export const updateDetails = async (id, body) => {
 
       ...(careerpathIds && {
         careerpaths: {
-          set: careerpathIds.map((id) => ({ id })),
+          set: careerpathIds.map((id) => ({
+            id: Number(id),
+          })),
         },
       }),
 
       ...(entranceexamIds && {
         entranceexams: {
-          set: entranceexamIds.map((id) => ({ id })),
+          set: entranceexamIds.map((id) => ({
+            id: Number(id),
+          })),
         },
       }),
 
       ...(institutionIds && {
         institutions: {
-          set: institutionIds.map((id) => ({ id })),
+          set: institutionIds.map((id) => ({
+            id: Number(id),
+          })),
         },
       }),
     };
@@ -180,7 +284,6 @@ export const updateDetails = async (id, body) => {
     };
   }
 };
-
 export const deleteDetails = async (id) => {
   try {
     await detailsRepository.delete(Number(id));

@@ -6,6 +6,9 @@ create: (data) => {
   return prisma.details.create({
     data: {
       jobScope: data.jobScope,
+        media: data.media,
+        specialization: data.specialization,
+  important_factor: data.important_factor,
       description: data.description,
       // Single relations
       ...(data.streamId && {
@@ -72,6 +75,9 @@ create: (data) => {
         stream: true,
         category: true,
         secondcategory: true,
+        media:true,
+        specialization:true,
+        important_factor:true,
         subcategory: true,
          careerpaths: true,
       entranceexams: true,
@@ -87,6 +93,9 @@ create: (data) => {
         salaryRanges: true,
         stream: true,
         category: true,
+         media:true,
+        specialization:true,
+        important_factor:true,
         secondcategory: true,
         subcategory: true,
          careerpaths: true,
@@ -105,6 +114,16 @@ update: (id, data) => {
       ...(data.jobScope !== undefined && {
         jobScope: data.jobScope
       }),
+      ...(data.media !== undefined && {
+  media: data.media,
+}),
+      ...(data.specialization !== undefined && {
+  specialization: data.specialization
+}),
+
+...(data.important_factor !== undefined && {
+  important_factor: data.important_factor
+}),
         ...(data.description !== undefined && {
     description: data.description
   }),

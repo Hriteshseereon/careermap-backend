@@ -132,7 +132,7 @@ export const adminLogin = async (
       admin.id
     );
 
-  if (activeSessions >= 3) {
+  if (activeSessions >= 10) {
     return {
       success: false,
       message:

@@ -108,39 +108,47 @@ export const getMentors = async () => {
     const mentors =
       await MentorRepository.findAll();
 
-    const data = mentors.map(
-      (mentor) => {
+   const data = mentors
+  .map((mentor) => {
+    const totalReviews = mentor.reviews.length;
 
-        const totalReviews =
-          mentor.reviews.length;
-
-        const averageRating =
-          totalReviews > 0
-            ? Number(
-                (
-                  mentor.reviews.reduce(
-                    (sum, review) =>
-                      sum + review.rating,
-                    0
-                  ) / totalReviews
-                ).toFixed(1)
-              )
-            : 0;
-
-        return {
-          ...mentor,
-
-          averageRating,
-
-          totalReviews,
-        };
-      }
-    );
+    const averageRating =
+      totalReviews > 0
+        ? Number(
+            (
+              mentor.reviews.reduce(
+                (sum, review) => sum + review.rating,
+                0
+              ) / totalReviews
+            ).toFixed(1)
+          )
+        : 0;
 
     return {
-      success: true,
-      data,
+      ...mentor,
+      averageRating,
+      totalReviews,
     };
+  })
+  .sort((a, b) => {
+    // Higher rating first
+    if (b.averageRating !== a.averageRating) {
+      return b.averageRating - a.averageRating;
+    }
+
+    // If ratings are same, more reviews first
+    if (b.totalReviews !== a.totalReviews) {
+      return b.totalReviews - a.totalReviews;
+    }
+
+    // Latest mentor first
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
+return {
+  success: true,
+  data,
+};
 
   } catch (error) {
 
