@@ -779,16 +779,43 @@ model HelpAndSupport {
 }
 
 model CounselingForm {
-  id          Int     @id @default(autoincrement())
-  firstName   String?
-  lastName    String?
-  email       String?
-  inquiryFor  String?
-  interest    String?
-  study       String?
-  description String?
-}
+  id                     Int      @id @default(autoincrement())
 
+  // Student Details
+  studentName            String?
+  class                  String?
+  stream                 String?
+  school                 String?
+  counselingDate         DateTime?
+  phoneNumber            String?
+  email                  String?
+
+  // Family Details
+  fatherOccupation       String?
+  motherOccupation       String?
+  siblingCount           Int?
+
+  // Marks (Dynamic)
+  marks                  Json?
+
+  // Career
+  dreamCareerOption1     String?
+  dreamCareerOption2     String?
+  dreamCareerOption3     String?
+
+  parentsExpectation     String?
+
+  category               String?
+
+  observation            String?
+
+  counselorName          String?
+
+  psychometricRecommended Boolean?
+
+  createdAt DateTime @default(now())
+updatedAt DateTime @default(now()) @updatedAt
+}
 model StaffUser {
   id Int @id @default(autoincrement())
 

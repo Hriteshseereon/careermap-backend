@@ -1,33 +1,49 @@
 import { CounselingRepository } from "./CounselingForm.repository.js";
 
 export const createCounseling = async (body) => {
-try {
-const result = await CounselingRepository.create({
-firstName: body.firstName,
-lastName: body.lastName,
-email: body.email,
-inquiryFor: body.inquiryFor,
-interest: body.interest,
-study: body.study,
-description: body.description,
-});
+  try {
+    const result = await CounselingRepository.create({
+      studentName: body.studentName,
+      class: body.class,
+      stream: body.stream,
+      school: body.school,
+      counselingDate: body.counselingDate
+        ? new Date(body.counselingDate)
+        : null,
+      phoneNumber: body.phoneNumber,
+      email: body.email,
 
+      fatherOccupation: body.fatherOccupation,
+      motherOccupation: body.motherOccupation,
+      siblingCount: body.siblingCount,
 
-return {
-  success: true,
-  data: result,
-};
+      marks: body.marks,
 
-} catch (err) {
-console.error("Create Counseling Error:", err);
+      dreamCareerOption1: body.dreamCareerOption1,
+      dreamCareerOption2: body.dreamCareerOption2,
+      dreamCareerOption3: body.dreamCareerOption3,
 
-return {
-  success: false,
-  message: err.message,
-};
+      parentsExpectation: body.parentsExpectation,
 
+      category: body.category,
 
-}
+      observation: body.observation,
+
+      counselorName: body.counselorName,
+
+      psychometricRecommended: body.psychometricRecommended,
+    });
+
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err.message,
+    };
+  }
 };
 
 export const getCounselings = async () => {
@@ -74,31 +90,50 @@ message: err.message,
 };
 
 export const updateCounseling = async (id, body) => {
-try {
-const result = await CounselingRepository.update(
-Number(id),
-body
-);
+  try {
+    const result = await CounselingRepository.update(Number(id), {
+      studentName: body.studentName,
+      class: body.class,
+      stream: body.stream,
+      school: body.school,
+      counselingDate: body.counselingDate
+        ? new Date(body.counselingDate)
+        : null,
+      phoneNumber: body.phoneNumber,
+      email: body.email,
 
-return {
-  success: true,
-  data: result,
+      fatherOccupation: body.fatherOccupation,
+      motherOccupation: body.motherOccupation,
+      siblingCount: body.siblingCount,
+
+      marks: body.marks,
+
+      dreamCareerOption1: body.dreamCareerOption1,
+      dreamCareerOption2: body.dreamCareerOption2,
+      dreamCareerOption3: body.dreamCareerOption3,
+
+      parentsExpectation: body.parentsExpectation,
+
+      category: body.category,
+
+      observation: body.observation,
+
+      counselorName: body.counselorName,
+
+      psychometricRecommended: body.psychometricRecommended,
+    });
+
+    return {
+      success: true,
+      data: result,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      message: err.message,
+    };
+  }
 };
-
-
-} catch (err) {
-console.error("Update Counseling Error:", err);
-
-
-return {
-  success: false,
-  message: err.message,
-};
-
-
-}
-};
-
 export const deleteCounseling = async (id) => {
 try {
 await CounselingRepository.delete(Number(id));
