@@ -561,13 +561,28 @@ model Scholarship {
   categoryId       Int?
   secondcategoryId Int?
   subcategoryId    Int?
+  sections ScholarshipSection[]
   category         Category?       @relation(fields: [categoryId], references: [id])
   secondcategory   Secondcategory? @relation(fields: [secondcategoryId], references: [id])
   subcategory      Subcategory?    @relation(fields: [subcategoryId], references: [id])
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 }
+model ScholarshipSection {
+  id Int @id @default(autoincrement())
 
+  scholarshipId Int
+
+  title String
+
+  description String
+
+  scholarship Scholarship @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
 model Plans {
   id            Int             @id @default(autoincrement())
   name          String          @unique
