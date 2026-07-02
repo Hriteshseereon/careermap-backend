@@ -1,9 +1,14 @@
 import prisma from "../../config/db.js";
 
 export const ScholarshipRepository = {
-  create(data) {
-    return prisma.scholarship.create({ data });
-  },
+ create(data) {
+  return prisma.scholarship.create({
+    data,
+    include: {
+      sections: true,
+    },
+  });
+},
 
   findAll() {
   return prisma.scholarship.findMany({
@@ -11,6 +16,7 @@ export const ScholarshipRepository = {
       category: true,
       secondcategory: true,
       subcategory: true,
+      sections: true,
     },
   });
 },
@@ -22,6 +28,7 @@ export const ScholarshipRepository = {
       category: true,
       secondcategory: true,
       subcategory: true,
+      sections: true,
     },
   });
 },
@@ -37,12 +44,15 @@ export const ScholarshipRepository = {
     });
   },
 
-  update(id, data) {
-    return prisma.scholarship.update({
-      where: { id },
-      data,
-    });
-  },
+ update(id, data) {
+  return prisma.scholarship.update({
+    where: { id },
+    data,
+    include: {
+      sections: true,
+    },
+  });
+},
 
   delete(id) {
     return prisma.scholarship.delete({
