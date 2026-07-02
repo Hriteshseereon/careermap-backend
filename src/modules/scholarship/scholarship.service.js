@@ -18,7 +18,10 @@ export const createScholarship = async (body, file) => {
     if (file) {
       imageUrl = await uploadToS3(file, "scholarships");
     }
-
+    let sections = [];
+    if (body.sections) {
+  sections = JSON.parse(body.sections);
+}
     const data = await ScholarshipRepository.create({
       categoryId: body.categoryId
     ? Number(body.categoryId)
@@ -45,6 +48,9 @@ export const createScholarship = async (body, file) => {
       description: body.description,
 
       ...(imageUrl && { image: imageUrl }),
+     sections: {
+    create: sections,
+  },
     });
 
     return { success: true, data };
@@ -87,7 +93,11 @@ export const updateScholarship = async (id, body, file) => {
     if (file) {
       imageUrl = await uploadToS3(file, "scholarships");
     }
+    let sections = [];
 
+if (body.sections) {
+  sections = JSON.parse(body.sections);
+}
     const updated = await ScholarshipRepository.update(Number(id), {
        categoryId:
         body.categoryId !== undefined
@@ -117,6 +127,11 @@ export const updateScholarship = async (id, body, file) => {
       description: body.description,
 
       ...(imageUrl && { image: imageUrl }),
+   
+  sections: {
+    deleteMany: {},     // Purane sections delete
+    create: sections,   // Naye sections add
+  },
     });
 
     return { success: true, data: updated };
