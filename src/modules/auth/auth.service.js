@@ -6,6 +6,23 @@ import bcrypt from "bcryptjs";
 import {generateTokens,generateTempToken} from "../../utils/helpers.js";
 import { UserRepository } from "../user/user.repository.js";
 
+
+
+// helper for profile update check
+const isProfileComplete = (user) => {
+  return !!(
+    user.firstName &&
+    user.lastName &&
+    user.mobile &&
+    user.gender &&
+    user.country &&
+    user.state &&
+    user.city &&
+    user.address &&
+    user.dataOfBirth &&
+    user.image
+  );
+};
 export const otpService = async (mobile,type) => {
   try {
     if (!mobile) {
@@ -98,6 +115,8 @@ export const loginWithEmailPassword = async (email, password) => {
     if (!isMatch) {
       throw new Error("Invalid credentials");
     }
+    const profileIncomplete = user.isInstituteStudent && !isProfileComplete(user);
+
     const tokens = generateTokens(user);
     return { success: true, message: "Login successful",
          user: {
@@ -110,7 +129,7 @@ export const loginWithEmailPassword = async (email, password) => {
     isInstituteStudent: user.isInstituteStudent,
     instituteId: user.instituteId,
   },
-      
+       profileIncomplete, 
       ...tokens };
   } catch (error) {
     return { success: false, message: error.message };
