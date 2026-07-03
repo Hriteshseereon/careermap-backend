@@ -32,14 +32,9 @@ const result = await deleteCounseling(req.params.id);
 res.status(result.success ? 200 : 400).json(result);
 };
 
-export const downloadCounselingReportController = async (
-  req,
-  res
-) => {
+export const downloadCounselingReportController = async (req, res) => {
   try {
-    const result = await generateCounselingReport(
-      req.params.id
-    );
+    const result = await generateCounselingReport(req.params.id);
 
     if (!result.success) {
       return res.status(404).json(result);
@@ -49,162 +44,238 @@ export const downloadCounselingReportController = async (
 
     const doc = new PDFDocument({
       size: "A4",
-      margin: 50,
+      margin: 40,
     });
 
-    const fileName = `Counseling_Report_${data.id}.pdf`;
-
-    res.setHeader(
-      "Content-Type",
-      "application/pdf"
-    );
-
+    res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=${fileName}`
+      `attachment; filename=Counseling_Report_${data.id}.pdf`
     );
 
     doc.pipe(res);
 
-    // =========================
+    // ===========================
+    // COLORS
+    // ===========================
+
+    const BLUE = "#2563eb";
+    const LIGHT = "#eff6ff";
+    const BORDER = "#d1d5db";
+    const TEXT = "#374151";
+
+    // ===========================
     // HEADER
-    // =========================
+    // ===========================
+
+    doc.rect(0, 0, doc.page.width, 80).fill(BLUE);
 
     doc
+      .fillColor("white")
       .fontSize(24)
-      .fillColor("#1e40af")
-      .text("CAREER COUNSELING REPORT", {
+      .font("Helvetica-Bold")
+      .text("CAREER COUNSELING REPORT", 0, 28, {
         align: "center",
       });
 
+    doc
+      .fontSize(10)
+      .text(`Generated : ${new Date().toLocaleDateString()}`, {
+        align: "center",
+      });
+
+    doc.moveDown(3);
+
+    // ===========================
+    // Helper Functions
+    // ===========================
+
+    const section = (title) => {
+      doc.moveDown();
+
+      doc
+        .fillColor(LIGHT)
+        .roundedRect(40, doc.y, 515, 24, 5)
+        .fill();
+
+      doc
+        .fillColor(BLUE)
+        .font("Helvetica-Bold")
+        .fontSize(13)
+        .text(title, 50, doc.y + 6);
+
+      doc.moveDown(1.8);
+    };
+
+    const row = (label, value) => {
+      doc
+        .font("Helvetica-Bold")
+        .fillColor("black")
+        .fontSize(11)
+        .text(label, 50, doc.y, {
+          continued: true,
+        });
+
+      doc
+        .font("Helvetica")
+        .fillColor(TEXT)
+        .text(value || "-");
+
+      doc.moveDown(0.2);
+    };
+
+    // ===========================
+    // Student Information
+    // ===========================
+
+    section("Student Information");
+
+    row("Student Name : ", data.studentName);
+    row("Class : ", data.class);
+    row("Stream : ", data.stream);
+    row("School : ", data.school);
+    row(
+      "Counseling Date : ",
+      data.counselingDate
+        ? new Date(data.counselingDate).toLocaleDateString()
+        : "-"
+    );
+    row("Phone : ", data.phoneNumber);
+    row("Email : ", data.email);
+
+    // ===========================
+    // Family Information
+    // ===========================
+
+    section("Family Information");
+
+    row("Father Occupation : ", data.fatherOccupation);
+    row("Mother Occupation : ", data.motherOccupation);
+    row("No. of Siblings : ", data.siblingCount);
+
+    // ===========================
+    // Academic Performance
+    // ===========================
+
+    section("Academic Performance");
+
+    const marks = data.marks || {};
+
+    doc
+      .fillColor(BLUE)
+      .font("Helvetica-Bold")
+      .fontSize(11);
+
+    doc.text("Subject", 60, doc.y);
+    doc.text("Marks", 420, doc.y);
+
     doc.moveDown(0.5);
 
     doc
-      .fontSize(10)
-      .fillColor("gray")
+      .strokeColor(BORDER)
+      .moveTo(50, doc.y)
+      .lineTo(550, doc.y)
+      .stroke();
+
+    doc.moveDown(0.5);
+
+    Object.entries(marks).forEach(([subject, mark]) => {
+      doc
+        .fillColor("black")
+        .font("Helvetica")
+        .text(subject, 60, doc.y);
+
+      doc.text(String(mark), 430, doc.y);
+
+      doc.moveDown(0.3);
+    });
+
+    // ===========================
+    // Career Goals
+    // ===========================
+
+    section("Career Aspirations");
+
+    row("Option 1 : ", data.dreamCareerOption1);
+    row("Option 2 : ", data.dreamCareerOption2);
+    row("Option 3 : ", data.dreamCareerOption3);
+
+    row("Parents Expectation : ", data.parentsExpectation);
+
+    // ===========================
+    // Counseling Details
+    // ===========================
+
+    section("Counseling Details");
+
+    row("Category : ", data.category);
+
+    row(
+      "Psychometric Test : ",
+      data.psychometricRecommended ? "Recommended" : "Not Recommended"
+    );
+
+    // ===========================
+    // Observation
+    // ===========================
+
+    section("Observation & Recommendation");
+
+    doc
+      .roundedRect(45, doc.y, 505, 100, 5)
+      .fillAndStroke("#f9fafb", BORDER);
+
+    doc
+      .fillColor(TEXT)
+      .font("Helvetica")
+      .fontSize(11)
       .text(
-        `Generated On: ${new Date().toLocaleDateString()}`,
+        data.observation || "No Observation Available",
+        60,
+        doc.y + 15,
         {
-          align: "right",
+          width: 470,
+          align: "justify",
         }
       );
+
+    doc.moveDown(7);
+
+    // ===========================
+    // Counselor
+    // ===========================
+
+    section("Counselor");
+
+    row("Counselor Name : ", data.counselorName);
 
     doc.moveDown(2);
 
-    // =========================
-    // PERSONAL DETAILS
-    // =========================
-
     doc
-      .fontSize(18)
-      .fillColor("#111827")
-      .text("Personal Information");
-
-    doc.moveDown(0.5);
-
-    doc
-      .strokeColor("#d1d5db")
-      .lineWidth(1)
-      .rect(doc.x, doc.y, 500, 130)
+      .strokeColor("#999")
+      .moveTo(380, doc.y)
+      .lineTo(540, doc.y)
       .stroke();
-
-    let startY = doc.y + 15;
-
-    doc
-      .fontSize(12)
-      .fillColor("black")
-      .text(
-        `Full Name : ${data.firstName || ""} ${
-          data.lastName || ""
-        }`,
-        60,
-        startY
-      )
-      .text(
-        `Email : ${data.email || "-"}`,
-        60,
-        startY + 25
-      )
-      .text(
-        `Inquiry For : ${data.inquiryFor || "-"}`,
-        60,
-        startY + 50
-      )
-      .text(
-        `Study Level : ${data.study || "-"}`,
-        60,
-        startY + 75
-      )
-      .text(
-        `Interest : ${data.interest || "-"}`,
-        60,
-        startY + 100
-      );
-
-    doc.moveDown(9);
-
-    // =========================
-    // DESCRIPTION
-    // =========================
-
-    doc
-      .fontSize(18)
-      .fillColor("#111827")
-      .text("Student Description");
-
-    doc.moveDown(0.5);
-
-    doc
-      .strokeColor("#d1d5db")
-      .rect(doc.x, doc.y, 500, 150)
-      .stroke();
-
-    doc.text(
-      data.description ||
-        "No description provided.",
-      60,
-      doc.y + 15,
-      {
-        width: 460,
-        align: "justify",
-      }
-    );
-
-    doc.moveDown(12);
-
-    // =========================
-    // RECOMMENDATION
-    // =========================
-
-    doc
-      .fontSize(18)
-      .fillColor("#111827")
-      .text("Counselor Notes");
-
-    doc.moveDown();
-
-    doc
-      .fontSize(12)
-      .fillColor("#374151")
-      .text(
-        "This report contains the submitted counseling inquiry details. Counselors may review the candidate profile and provide appropriate career guidance, course recommendations, and further consultation."
-      );
-
-    // =========================
-    // FOOTER
-    // =========================
-
-    doc.moveDown(4);
 
     doc
       .fontSize(10)
       .fillColor("gray")
-      .text(
-        "Generated by Career Counseling Management System",
-        {
-          align: "center",
-        }
-      );
+      .text("Authorized Signature", 405, doc.y + 5);
+
+    // ===========================
+    // Footer
+    // ===========================
+
+    doc.fontSize(9).fillColor("gray");
+
+    doc.text(
+      "Generated by Career Counseling Management System",
+      0,
+      780,
+      {
+        align: "center",
+      }
+    );
 
     doc.end();
   } catch (error) {
