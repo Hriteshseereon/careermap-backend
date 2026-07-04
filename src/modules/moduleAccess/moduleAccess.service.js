@@ -89,7 +89,12 @@ const getCategoryIdForPage = async (pageType, pageId) => {
 export const isCareerLibraryPagePreviewEligible = async (pageType, pageId) => {
   const categoryId = await getCategoryIdForPage(pageType, pageId);
 
+  console.log("pageType =", pageType);
+  console.log("pageId =", pageId);
+  console.log("categoryId =", categoryId);
+
   if (!categoryId) {
+    console.log("categoryId not found");
     return false;
   }
 
@@ -97,6 +102,8 @@ export const isCareerLibraryPagePreviewEligible = async (pageType, pageId) => {
     where: { id: categoryId },
     select: { category_access: true },
   });
+
+  console.log("category =", category);
 
   return Boolean(category?.category_access);
 };

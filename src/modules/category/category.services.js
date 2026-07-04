@@ -146,3 +146,31 @@ export const getCategoriesByStreamId = async (
     };
   }
 };
+
+export const updateCategoryPreviewAccess = async (
+  id,
+  category_access
+) => {
+  try {
+    const updated =
+      await CategoryRepository.updatePreviewAccess(
+        id,
+        category_access
+      );
+
+    return {
+      success: true,
+      data: updated,
+    };
+  } catch (error) {
+    console.error(
+      "❌ updateCategoryPreviewAccess Error:",
+      error
+    );
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};

@@ -5,6 +5,7 @@ import {
   updateCategory,
   deleteCategory,
   getCategoriesByStreamId,
+  updateCategoryPreviewAccess,
 } from "./category.services.js";
 
 // CREATE
@@ -69,3 +70,15 @@ async (req, res) => {
     result.success ? 200 : 400
   ).json(result);
 };
+export const updateCategoryPreviewAccessController =
+  async (req, res) => {
+    const { category_access } = req.body;
+
+    const result =
+      await updateCategoryPreviewAccess(
+        req.params.id,
+        category_access
+      );
+
+    res.status(result.success ? 200 : 400).json(result);
+  };

@@ -9,6 +9,7 @@ import {
   updateCategoryController,
   deleteCategoryController,
   getCategoriesByStreamIdController,
+  updateCategoryPreviewAccessController,
 } from "./category.controller.js";
 
 const router = Router();
@@ -28,5 +29,9 @@ router.put("/:id", protectAdmin, upload.fields([
   { name: "file", maxCount: 1 }
 ]), updateCategoryController);
 router.delete("/:id", protectAdmin, deleteCategoryController);
-
+router.patch(
+  "/:id/preview-access",
+  protectAdmin,
+  updateCategoryPreviewAccessController
+);
 export default router;
