@@ -79,18 +79,7 @@ export const getDashboardData = async (userId) => {
         (m) => m.id
       ) || [];
 
-    // Preview usage
-    const accesses =
-      await UserPortalRepository.getModuleAccess(
-        userId
-      );
-
-    const usedPreviewIds =
-      accesses.map(
-        (item) => item.moduleId
-      );
-
-    // Final module status
+    // Final module status — repeatable 15s preview until purchase
     const modules = allModules.map(
       (mod) => ({
         ...mod,
@@ -101,12 +90,11 @@ export const getDashboardData = async (userId) => {
             mod.id
           )
             ? "unlocked"
-            : mod.freePreview &&
-              !usedPreviewIds.includes(
-                mod.id
-              )
+            : mod.freePreview
             ? "preview"
             : "locked",
+
+        previewDurationSeconds: mod.freePreview ? 15 : null,
       })
     );
  const pendingMentorReviews =

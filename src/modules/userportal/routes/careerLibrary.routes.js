@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { optionalAuth } from "../../../middlewares/optionalAuth.js";
 import {
   getCategoriesController,
   getSecondCategoriesController,
@@ -9,7 +10,7 @@ import {
 
 const router = Router();
 
-// 🔥 Career Library APIs
+router.use(optionalAuth);
 
 router.get("/categories", getCategoriesController);
 

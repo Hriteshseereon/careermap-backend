@@ -17,8 +17,8 @@ export const getScholarshipsController = async (req, res) => {
 };
 
 export const getScholarshipByIdController = async (req, res) => {
-  const result = await getScholarshipById(req.params.id);
-  res.status(result.success ? 200 : 404).json(result);
+  const result = await getScholarshipById(req.params.id, req);
+  res.status(result.success ? 200 : 403).json(result);
 };
 
 export const updateScholarshipController = async (req, res) => {

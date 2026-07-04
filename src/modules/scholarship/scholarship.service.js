@@ -1,5 +1,20 @@
 import { uploadToS3 } from "../../lib/s3Upload.js";
 import { ScholarshipRepository } from "./scholarship.repository.js";
+import {
+  getScholarshipPreviewFlags,
+  resolveContentAccess,
+} from "../moduleAccess/moduleAccess.service.js";
+import { PREVIEW_PAGE_TYPES } from "../../constants/previewAccess.js";
+
+const getPreviewSessionId = (req) =>
+  req?.headers?.["x-preview-session"] ||
+  req?.query?.previewSessionId ||
+  req?.body?.previewSessionId;
+
+const getModuleId = (req) =>
+  req?.headers?.["x-module-id"] ||
+  req?.query?.moduleId ||
+  req?.body?.moduleId;
 
 // 🔹 CREATE
 export const createScholarship = async (body, file) => {
@@ -64,14 +79,20 @@ export const createScholarship = async (body, file) => {
 export const getScholarships = async () => {
   try {
     const data = await ScholarshipRepository.findAll();
-    return { success: true, data };
+    const scholarships = await getScholarshipPreviewFlags(data);
+
+    return {
+      success: true,
+      data: scholarships,
+      previewDurationSeconds: 15,
+    };
   } catch (error) {
     return { success: false, message: error.message };
   }
 };
 
 // 🔹 GET BY ID
-export const getScholarshipById = async (id) => {
+export const getScholarshipById = async (id, req) => {
   try {
     const data = await ScholarshipRepository.findById(Number(id));
 
@@ -79,7 +100,59 @@ export const getScholarshipById = async (id) => {
       return { success: false, message: "Not found" };
     }
 
-    return { success: true, data };
+    const moduleId = getModuleId(req);
+    const previewSessionId = getPreviewSessionId(req);
+    const userId = req?.user?.id;
+
+    if (!moduleId) {
+      return {
+        success: true,
+        data: {
+          ...data,
+          previewEligible: Boolean(data.is_free),
+          accessTier: data.is_free ? "preview" : "locked",
+        },
+        previewDurationSeconds: 15,
+      };
+    }
+
+    const access = await resolveContentAccess(userId, {
+      moduleId,
+      pageType: PREVIEW_PAGE_TYPES.SCHOLARSHIP,
+      pageId: id,
+      previewSessionId,
+    });
+
+    if (!access.allowed) {
+      return {
+        success: false,
+        message: access.message,
+        access: {
+          mode: access.mode,
+          allowed: access.allowed,
+          remainingSeconds: access.remainingSeconds ?? null,
+          expiresAt: access.expiresAt ?? null,
+          previewDurationSeconds: access.previewDurationSeconds ?? null,
+          message: access.message ?? null,
+        },
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        ...data,
+        previewEligible: Boolean(data.is_free),
+        accessTier: data.is_free ? "preview" : "locked",
+      },
+      access: {
+        mode: access.mode,
+        allowed: access.allowed,
+        remainingSeconds: access.remainingSeconds ?? null,
+        expiresAt: access.expiresAt ?? null,
+        previewDurationSeconds: access.previewDurationSeconds ?? null,
+      },
+    };
   } catch (error) {
     return { success: false, message: error.message };
   }

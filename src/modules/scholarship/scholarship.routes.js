@@ -1,6 +1,7 @@
 import { Router } from "express";
 import upload from "../../middlewares/upload.js";
 import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { optionalAuth } from "../../middlewares/optionalAuth.js";
 
 import {
   createScholarshipController,
@@ -20,7 +21,7 @@ router.post(
 );
 
 router.get("/", getScholarshipsController);
-router.get("/:id", getScholarshipByIdController);
+router.get("/:id", optionalAuth, getScholarshipByIdController);
 
 router.put(
   "/:id",
