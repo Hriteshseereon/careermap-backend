@@ -62,9 +62,11 @@ export const getCategoriesByStreamIdController =
 async (req, res) => {
 
   const result =
-    await getCategoriesByStreamId(
-      req.params.streamId
-    );
+   await getCategoriesByStreamId(
+  req.user.id,
+  req.params.streamId,
+  Number(req.headers["x-module-id"])
+);
 
   res.status(
     result.success ? 200 : 400

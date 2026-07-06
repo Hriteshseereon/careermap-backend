@@ -1,7 +1,7 @@
 import { Router } from "express";
 import upload from "../../middlewares/upload.js";
 import { protectAdmin } from "../../middlewares/protectAdmin.js";
-
+import { protectAuth } from "../../middlewares/protectAuth.js";
 import {
   createCategoryController,
   getCategoriesController,
@@ -21,7 +21,7 @@ router.post("/", protectAdmin, upload.fields([
 ]), createCategoryController);
 
 router.get(
-  "/stream/:streamId",getCategoriesByStreamIdController);
+  "/stream/:streamId",protectAuth, getCategoriesByStreamIdController);
 router.get("/", getCategoriesController);
 router.get("/:id", getCategoryByIdController);
 router.put("/:id", protectAdmin, upload.fields([

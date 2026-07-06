@@ -1,6 +1,6 @@
 import { uploadToS3 } from "../../lib/s3Upload.js";
 import { CategoryRepository } from "./category.repository.js";
-
+import {getCategoryPreviewFlags} from "../moduleAccess/moduleAccess.service.js";
 // 🔹 CREATE
 export const createCategory = async (body, files) => {
   try {
@@ -119,14 +119,22 @@ export const deleteCategory = async (id) => {
 };
 
 export const getCategoriesByStreamId = async (
-  streamId
+  userId,
+  streamId,
+  moduleId
 ) => {
   try {
 
-    const data =
+    let data =
       await CategoryRepository.getByStreamId(
         streamId
       );
+
+    data = await getCategoryPreviewFlags(
+      userId,
+      moduleId,
+      data
+    );
 
     return {
       success: true,

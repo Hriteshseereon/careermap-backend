@@ -327,12 +327,33 @@ export const resolveContentAccess = async (
   };
 };
 
-export const getCategoryPreviewFlags = async (categories) =>
-  categories.map((category) => ({
+export const getCategoryPreviewFlags = async (
+  userId,
+  moduleId,
+  categories
+) => {
+
+  const fullAccess = await hasFullModuleAccess(
+    userId,
+    moduleId
+  );
+
+  return categories.map((category) => ({
     ...category,
-    previewEligible: Boolean(category.category_access),
-    accessTier: category.category_access ? "preview" : "locked",
+
+    previewEligible:
+      fullAccess.allowed
+        ? true
+        : Boolean(category.category_access),
+
+    accessTier:
+      fullAccess.allowed
+        ? "full"
+        : category.category_access
+        ? "preview"
+        : "locked",
   }));
+};
 
 export const getScholarshipPreviewFlags = async (scholarships) =>
   scholarships.map((scholarship) => ({
