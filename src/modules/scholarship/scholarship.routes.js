@@ -9,6 +9,7 @@ import {
   getScholarshipByIdController,
   updateScholarshipController,
   deleteScholarshipController,
+  updateScholarshipFreeStatusController,
 } from "./scholarship.controller.js";
 
 const router = Router();
@@ -31,5 +32,9 @@ router.put(
 );
 
 router.delete("/:id", protectAdmin, deleteScholarshipController);
-
+router.patch(
+  "/:id/free-status",
+  protectAdmin,
+  updateScholarshipFreeStatusController
+);
 export default router;

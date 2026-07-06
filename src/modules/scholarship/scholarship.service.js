@@ -222,3 +222,25 @@ export const deleteScholarship = async (id) => {
     return { success: false, message: error.message };
   }
 };
+export const updateScholarshipFreeStatus = async (
+  id,
+  is_free
+) => {
+  try {
+    const updated =
+      await ScholarshipRepository.updateFreeStatus(
+        id,
+        is_free
+      );
+
+    return {
+      success: true,
+      data: updated,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
