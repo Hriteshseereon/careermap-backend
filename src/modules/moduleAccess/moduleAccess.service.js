@@ -6,7 +6,7 @@ import {
 import { ModuleAccessRepository } from "./moduleAccess.repository.js";
 
 const getActiveSubscription = async (userId) =>
-  prisma.subscriptions.findFirst({
+  prisma.subscriptions.findMany({
     where: {
       userId: Number(userId),
       status: "active",
@@ -23,34 +23,52 @@ const getActiveSubscription = async (userId) =>
     },
   });
 
-export const hasFullModuleAccess = async (userId, moduleId) => {
+export const hasFullModuleAccess = async (
+  userId,
+  moduleId
+) => {
   const module = await prisma.module.findUnique({
-    where: { id: Number(moduleId) },
+    where: {
+      id: Number(moduleId),
+    },
   });
 
   if (!module) {
     throw new Error("Module not found");
   }
 
+  // Free module
   if (module.markas_free) {
-    return { allowed: true, module };
+    return {
+      allowed: true,
+      module,
+    };
   }
 
-  const subscription = await getActiveSubscription(userId);
+  // Get all active subscriptions
+  const subscriptions =
+    await getActiveSubscription(userId);
 
-  if (subscription) {
-    const hasAccess = subscription.plan.modules.some(
-      (item) => item.id === Number(moduleId)
+  const hasAccess =
+    subscriptions.some((subscription) =>
+      subscription.plan.modules.some(
+        (item) =>
+          item.id === Number(moduleId)
+      )
     );
 
-    if (hasAccess) {
-      return { allowed: true, module };
-    }
+  if (hasAccess) {
+    return {
+      allowed: true,
+      module,
+    };
   }
 
-  return { allowed: false, module };
+  return {
+    allowed: false,
+    module,
+  };
 };
-
 const getCategoryIdForPage = async (pageType, pageId) => {
   if (pageType === PREVIEW_PAGE_TYPES.CATEGORY) {
     return Number(pageId);

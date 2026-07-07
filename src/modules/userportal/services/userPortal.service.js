@@ -54,31 +54,55 @@ export const getDashboardData = async (userId) => {
     ]);
 
     // Active Subscription
-    const subscription =
-      await prisma.subscriptions.findFirst({
-        where: {
-          userId: Number(userId),
-          status: "active",
-          endDate: {
-            gte: new Date(),
-          },
-        },
+    // const subscription =
+    //   await prisma.subscriptions.findFirst({
+    //     where: {
+    //       userId: Number(userId),
+    //       status: "active",
+    //       endDate: {
+    //         gte: new Date(),
+    //       },
+    //     },
 
+    //     include: {
+    //       plan: {
+    //         include: {
+    //           modules: true,
+    //         },
+    //       },
+    //     },
+    //   });
+const subscriptions =
+  await prisma.subscriptions.findMany({
+    where: {
+      userId: Number(userId),
+      status: "active",
+      endDate: {
+        gte: new Date(),
+      },
+    },
+    include: {
+      plan: {
         include: {
-          plan: {
-            include: {
-              modules: true,
-            },
-          },
+          modules: true,
         },
-      });
-
+      },
+    },
+  });
     // Subscription se unlocked modules
-    const unlockedModuleIds =
-      subscription?.plan?.modules?.map(
-        (m) => m.id
-      ) || [];
-
+    // const unlockedModuleIds =
+    //   subscription?.plan?.modules?.map(
+    //     (m) => m.id
+    //   ) || [];
+const unlockedModuleIds = [
+  ...new Set(
+    subscriptions.flatMap((subscription) =>
+      subscription.plan.modules.map(
+        (module) => module.id
+      )
+    )
+  ),
+];
     // Final module status — repeatable 15s preview until purchase
     const modules = allModules.map(
       (mod) => ({
@@ -149,7 +173,7 @@ export const getDashboardData = async (userId) => {
         plans,
         scholarships,
         institutions,
-        subscription,
+        subscriptions,
           pendingMentorReviews:
       reviews,
       },
