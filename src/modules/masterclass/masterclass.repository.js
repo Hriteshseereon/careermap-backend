@@ -29,4 +29,10 @@ export const MasterClassRepository = {
       where: { id },
     });
   },
+updateFreeStatus(id, is_free) {
+  return prisma.masterClass.update({
+    where: { id: Number(id) },
+    data: { is_free },
+  });
+},
 };

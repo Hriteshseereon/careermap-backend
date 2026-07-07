@@ -6,4 +6,5 @@ export const PREVIEW_PAGE_TYPES = {
   SUB: "sub",
   DETAILS: "details",
   SCHOLARSHIP: "scholarship",
+   MASTERCLASS: "masterclass",
 };

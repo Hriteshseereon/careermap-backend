@@ -188,7 +188,15 @@ export const startPagePreview = async (
 
   if (pageType === PREVIEW_PAGE_TYPES.SCHOLARSHIP) {
     previewEligible = await isScholarshipPreviewEligible(pageId);
-  } else {
+  } else if (
+   pageType === PREVIEW_PAGE_TYPES.MASTERCLASS
+) {
+
+   previewEligible =
+      await isMasterClassPreviewEligible(pageId);
+
+}
+   else {
     previewEligible = await isCareerLibraryPagePreviewEligible(
       pageType,
       pageId
@@ -361,3 +369,39 @@ export const getScholarshipPreviewFlags = async (scholarships) =>
     previewEligible: Boolean(scholarship.is_free),
     accessTier: scholarship.is_free ? "preview" : "locked",
   }));
+
+  export const isMasterClassPreviewEligible = async (id) => {
+  const item = await prisma.masterClass.findUnique({
+    where: { id: Number(id) },
+    select: {
+      is_free: true,
+    },
+  });
+
+  return Boolean(item?.is_free);
+};
+
+export const getMasterClassPreviewFlags = async (
+  userId,
+  moduleId,
+  classes
+) => {
+  const fullAccess = await hasFullModuleAccess(
+    userId,
+    moduleId
+  );
+
+  return classes.map((item) => ({
+    ...item,
+
+    previewEligible: fullAccess.allowed
+      ? true
+      : Boolean(item.is_free),
+
+    accessTier: fullAccess.allowed
+      ? "full"
+      : item.is_free
+      ? "preview"
+      : "locked",
+  }));
+};
