@@ -1,7 +1,6 @@
 import prisma from "../../config/db.js";
 
 export const ModuleAccessRepository = {
-
   findAccess(userId, moduleId) {
     return prisma.moduleAccess.findUnique({
       where: {
@@ -23,4 +22,31 @@ export const ModuleAccessRepository = {
     });
   },
 
+  createPreviewSession({ userId, moduleId, pageType, pageId, expiresAt }) {
+    return prisma.previewSession.create({
+      data: {
+        userId: Number(userId),
+        moduleId: Number(moduleId),
+        pageType,
+        pageId: Number(pageId),
+        expiresAt,
+      },
+    });
+  },
+
+  findPreviewSessionById(sessionId) {
+    return prisma.previewSession.findUnique({
+      where: { id: Number(sessionId) },
+    });
+  },
+
+  deleteExpiredSessions(before = new Date()) {
+    return prisma.previewSession.deleteMany({
+      where: {
+        expiresAt: {
+          lt: before,
+        },
+      },
+    });
+  },
 };
