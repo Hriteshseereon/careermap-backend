@@ -72,15 +72,15 @@ endDate.setDate(
 );
 
 // 4 Expire old plans
-await prisma.subscriptions.updateMany({
-  where: {
-    userId: Number(userId),
-    status: "active",
-  },
-  data: {
-    status: "expired",
-  },
-});
+// await prisma.subscriptions.updateMany({
+//   where: {
+//     userId: Number(userId),
+//     status: "active",
+//   },
+//   data: {
+//     status: "expired",
+//   },
+// });
 
 // 🔥 create subscription
 await prisma.subscriptions.create({

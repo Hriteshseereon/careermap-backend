@@ -4,6 +4,7 @@ import {
   getMasterClassById,
   updateMasterClass,
   deleteMasterClass,
+  updateMasterClassFreeStatus,
 } from "./masterclass.service.js";
 
 // CREATE
@@ -13,14 +14,29 @@ export const createMasterClassController = async (req, res) => {
 };
 
 // GET ALL
-export const getMasterClassesController = async (req, res) => {
-  const result = await getMasterClasses();
+export const getMasterClassesController = async (
+  req,
+  res
+) => {
+  const userId = req.user?.id || null;
+
+  const moduleId = req.headers["x-module-id"]
+    ? Number(req.headers["x-module-id"])
+    : null;
+
+  const result = await getMasterClasses(
+    userId,
+    moduleId
+  );
+
   res.status(200).json(result);
 };
-
 // GET BY ID
 export const getMasterClassByIdController = async (req, res) => {
-  const result = await getMasterClassById(req.params.id);
+  const result = await getMasterClassById(
+  req.params.id,
+  req
+);
   res.status(result.success ? 200 : 404).json(result);
 };
 
@@ -35,3 +51,16 @@ export const deleteMasterClassController = async (req, res) => {
   const result = await deleteMasterClass(req.params.id);
   res.status(result.success ? 200 : 400).json(result);
 };
+
+export const updateMasterClassFreeStatusController =
+  async (req, res) => {
+    const result =
+      await updateMasterClassFreeStatus(
+        req.params.id,
+        req.body.is_free
+      );
+
+    res
+      .status(result.success ? 200 : 400)
+      .json(result);
+  };
