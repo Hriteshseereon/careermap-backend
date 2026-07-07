@@ -1,7 +1,7 @@
 import { Router } from "express";
 import upload from "../../middlewares/upload.js";
 import { protectAdmin } from "../../middlewares/protectAdmin.js";
-
+import { protectAuth } from "../../middlewares/protectAuth.js";
 import {
   createCategoryController,
   getCategoriesController,
@@ -9,6 +9,7 @@ import {
   updateCategoryController,
   deleteCategoryController,
   getCategoriesByStreamIdController,
+  updateCategoryPreviewAccessController,
 } from "./category.controller.js";
 
 const router = Router();
@@ -20,7 +21,7 @@ router.post("/", protectAdmin, upload.fields([
 ]), createCategoryController);
 
 router.get(
-  "/stream/:streamId",getCategoriesByStreamIdController);
+  "/stream/:streamId",protectAuth, getCategoriesByStreamIdController);
 router.get("/", getCategoriesController);
 router.get("/:id", getCategoryByIdController);
 router.put("/:id", protectAdmin, upload.fields([
@@ -28,5 +29,9 @@ router.put("/:id", protectAdmin, upload.fields([
   { name: "file", maxCount: 1 }
 ]), updateCategoryController);
 router.delete("/:id", protectAdmin, deleteCategoryController);
-
+router.patch(
+  "/:id/preview-access",
+  protectAdmin,
+  updateCategoryPreviewAccessController
+);
 export default router;

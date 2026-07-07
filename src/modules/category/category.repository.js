@@ -52,4 +52,12 @@ export const CategoryRepository = {
     },
   });
 },
+updatePreviewAccess(id, category_access) {
+  return prisma.category.update({
+    where: { id: Number(id) },
+    data: {
+      category_access,
+    },
+  });
+},
 };

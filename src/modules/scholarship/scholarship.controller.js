@@ -4,6 +4,7 @@ import {
   getScholarshipById,
   updateScholarship,
   deleteScholarship,
+  updateScholarshipFreeStatus,
 } from "./scholarship.service.js";
 
 export const createScholarshipController = async (req, res) => {
@@ -17,8 +18,8 @@ export const getScholarshipsController = async (req, res) => {
 };
 
 export const getScholarshipByIdController = async (req, res) => {
-  const result = await getScholarshipById(req.params.id);
-  res.status(result.success ? 200 : 404).json(result);
+  const result = await getScholarshipById(req.params.id, req);
+  res.status(result.success ? 200 : 403).json(result);
 };
 
 export const updateScholarshipController = async (req, res) => {
@@ -34,3 +35,15 @@ export const deleteScholarshipController = async (req, res) => {
   const result = await deleteScholarship(req.params.id);
   res.status(result.success ? 200 : 400).json(result);
 };
+export const updateScholarshipFreeStatusController =
+  async (req, res) => {
+    const { is_free } = req.body;
+
+    const result =
+      await updateScholarshipFreeStatus(
+        req.params.id,
+        is_free
+      );
+
+    res.status(result.success ? 200 : 400).json(result);
+  };

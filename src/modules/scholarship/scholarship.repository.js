@@ -59,4 +59,14 @@ export const ScholarshipRepository = {
       where: { id },
     });
   },
+  updateFreeStatus(id, is_free) {
+  return prisma.scholarship.update({
+    where: {
+      id: Number(id),
+    },
+    data: {
+      is_free,
+    },
+  });
+},
 };

@@ -97,6 +97,7 @@ model Users {
   userloginhistory UserLoginHistory[]
   helpandSupport   HelpAndSupport[]
   moduleAccess     ModuleAccess[]
+  previewSessions  PreviewSession[]
    reviews MentorReview[]
 }
 
@@ -271,8 +272,9 @@ model Module {
   updatedAt    DateTime       @updatedAt
   careerpath   CareerPath[]
   entranceexam EntranceExam[]
-  plans        Plans[]
-  moduleAccess ModuleAccess[]
+  plans           Plans[]
+  moduleAccess    ModuleAccess[]
+  previewSessions PreviewSession[]
 }
 
 model ModuleAccess {
@@ -290,6 +292,22 @@ model ModuleAccess {
   createdAt DateTime @default(now())
 
   @@unique([userId, moduleId])
+}
+
+model PreviewSession {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  moduleId  Int
+  pageType  String
+  pageId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user   Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@index([userId, moduleId, pageType, pageId])
+  @@index([expiresAt])
 }
 
 // details scheama design 
@@ -678,6 +696,7 @@ model MasterClass {
   time      DateTime?
   views     String?
   is_active Boolean   @default(false)
+  is_free   Boolean @default(false)
   video_url String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
