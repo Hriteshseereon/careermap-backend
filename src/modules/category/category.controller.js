@@ -61,9 +61,8 @@ export const deleteCategoryController = async (req, res) => {
 export const getCategoriesByStreamIdController =
 async (req, res) => {
 
-  const result =
-   await getCategoriesByStreamId(
-  req.user.id,
+const result = await getCategoriesByStreamId(
+  req.user?.id || null,
   req.params.streamId,
   Number(req.headers["x-module-id"])
 );
