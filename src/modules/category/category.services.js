@@ -130,12 +130,13 @@ export const getCategoriesByStreamId = async (
         streamId
       );
 
-    data = await getCategoryPreviewFlags(
-      userId,
-      moduleId,
-      data
-    );
-
+     if (userId && moduleId) {
+      data = await getCategoryPreviewFlags(
+        userId,
+        moduleId,
+        data
+      );
+    }
     return {
       success: true,
       data,
