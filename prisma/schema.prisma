@@ -99,6 +99,7 @@ model Users {
   moduleAccess     ModuleAccess[]
   previewSessions  PreviewSession[]
    reviews MentorReview[]
+   psychometricAssessments PsychometricAssessment[]
 }
 
 model Subscriptions {
@@ -912,4 +913,32 @@ model Institutes {
 
   updatedAt DateTime @updatedAt
   users     Users[]
+}
+
+model PsychometricAssessment {
+  id Int @id @default(autoincrement())
+
+  userId Int
+
+  studentName String
+
+  className String
+
+  school String?
+
+  testVersion String?
+
+  answers Json
+
+  report Json
+
+  completedAt DateTime
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
