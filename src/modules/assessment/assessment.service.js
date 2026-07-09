@@ -1,6 +1,30 @@
+import prisma from "../../config/db.js";
+import { canAccessAssessment } from "../../constants/assessmentAccess.js";
 import { AssessmentRepository } from "./assessment.repository.js";
 
+const ensureInstituteAssessmentAccess = async (userId) => {
+  const user = await prisma.users.findUnique({
+    where: { id: Number(userId) },
+    select: { isInstituteStudent: true },
+  });
+
+  if (!canAccessAssessment(user)) {
+    return {
+      success: false,
+      status: 403,
+      message: "Assessment is only available for institute students.",
+    };
+  }
+
+  return null;
+};
+
 export const submitAssessment = async (userId, data) => {
+  const accessError = await ensureInstituteAssessmentAccess(userId);
+  if (accessError) {
+    return accessError;
+  }
+
   const {
     studentName,
     className,
@@ -56,6 +80,11 @@ export const submitAssessment = async (userId, data) => {
 };
 
 export const getMyAssessment = async (userId) => {
+  const accessError = await ensureInstituteAssessmentAccess(userId);
+  if (accessError) {
+    return accessError;
+  }
+
   const assessment =
     await AssessmentRepository.getLatestAssessmentByUserId(userId);
 
@@ -74,7 +103,12 @@ export const getMyAssessment = async (userId) => {
   };
 };
 
-export const getAssessmentById = async (id) => {
+export const getAssessmentById = async (userId, id) => {
+  const accessError = await ensureInstituteAssessmentAccess(userId);
+  if (accessError) {
+    return accessError;
+  }
+
   const assessment =
     await AssessmentRepository.getAssessmentById(Number(id));
 
@@ -93,7 +127,12 @@ export const getAssessmentById = async (id) => {
   };
 };
 
-export const deleteAssessment = async (id) => {
+export const deleteAssessment = async (userId, id) => {
+  const accessError = await ensureInstituteAssessmentAccess(userId);
+  if (accessError) {
+    return accessError;
+  }
+
   const assessment =
     await AssessmentRepository.getAssessmentById(Number(id));
 
