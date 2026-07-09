@@ -1,5 +1,8 @@
 import prisma from "../../../config/db.js";
-
+import {
+  canAccessAssessment,
+  isAssessmentModule,
+} from "../../../constants/assessmentAccess.js";
 import { UserPortalRepository } from "../repository/userPortal.repository.js";
 
 // export const getDashboardData = async (userId) => {
@@ -103,24 +106,29 @@ const unlockedModuleIds = [
     )
   ),
 ];
-    // Final module status — repeatable 15s preview until purchase
-    const modules = allModules.map(
-      (mod) => ({
-        ...mod,
+    const instituteHasAssessmentAccess = canAccessAssessment(user);
 
+    // Final module status — repeatable 15s preview until purchase
+    const modules = allModules.map((mod) => {
+      if (isAssessmentModule(mod)) {
+        return {
+          ...mod,
+          accessStatus: instituteHasAssessmentAccess ? "unlocked" : "locked",
+          previewDurationSeconds: null,
+        };
+      }
+
+      return {
+        ...mod,
         accessStatus:
-          mod.markas_free ||
-          unlockedModuleIds.includes(
-            mod.id
-          )
+          mod.markas_free || unlockedModuleIds.includes(mod.id)
             ? "unlocked"
             : mod.freePreview
             ? "preview"
             : "locked",
-
         previewDurationSeconds: mod.freePreview ? 15 : null,
-      })
-    );
+      };
+    });
  const pendingMentorReviews =
   await prisma.mentorbooking.findMany({
     where: {

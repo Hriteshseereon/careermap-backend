@@ -1,5 +1,9 @@
 import prisma from "../../config/db.js";
 import {
+  canAccessAssessment,
+  isAssessmentModule,
+} from "../../constants/assessmentAccess.js";
+import {
   PREVIEW_DURATION_SECONDS,
   PREVIEW_PAGE_TYPES,
 } from "../../constants/previewAccess.js";
@@ -35,6 +39,18 @@ export const hasFullModuleAccess = async (
 
   if (!module) {
     throw new Error("Module not found");
+  }
+
+  if (isAssessmentModule(module)) {
+    const user = await prisma.users.findUnique({
+      where: { id: Number(userId) },
+      select: { isInstituteStudent: true },
+    });
+
+    return {
+      allowed: canAccessAssessment(user),
+      module,
+    };
   }
 
   // Free module
