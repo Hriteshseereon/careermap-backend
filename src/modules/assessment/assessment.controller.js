@@ -45,7 +45,7 @@ export const getMyAssessmentController = async (req, res) => {
 
 export const getAssessmentByIdController = async (req, res) => {
   try {
-    const result = await getAssessmentById(req.params.id);
+    const result = await getAssessmentById(req.user.id, req.params.id);
 
     return res.status(result.status).json({
       success: result.success,
@@ -64,7 +64,7 @@ export const getAssessmentByIdController = async (req, res) => {
 
 export const deleteAssessmentController = async (req, res) => {
   try {
-    const result = await deleteAssessment(req.params.id);
+    const result = await deleteAssessment(req.user.id, req.params.id);
 
     return res.status(result.status).json({
       success: result.success,
