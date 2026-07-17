@@ -53,4 +53,55 @@ export const AdminDashboardRepository = {
       },
     });
   },
+
+  getAllTransactions() {
+    return prisma.payment.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            email: true,
+          },
+        },
+        plan: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  },
+
+  getAllMentorBookings() {
+    return prisma.mentorbooking.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            email: true,
+          },
+        },
+        mentor: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        payment: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  },
 };
