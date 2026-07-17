@@ -22,12 +22,23 @@ export const MentorRepository = {
   },
 
   findById(id) {
+    const today = new Date();
+  today.setHours(0, 0, 0, 0); 
     return prisma.mentor.findUnique({
+
       where: { id },
       include: {
         category: true,
-        subcategory: true,
-        availability:true,
+       availability: {
+        where: {
+          date: {
+            gte: today,
+          },
+        },
+        orderBy: {
+          date: "asc",
+        },
+      },
          reviews: {
         include: {
           user: {
