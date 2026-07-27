@@ -7,6 +7,12 @@ deleteCounseling,
  generateCounselingReport
 } from "./counseling.services.js";
 import PDFDocument from "pdfkit";
+
+
+const LEFT_LOGO_URL =
+  "https://res.cloudinary.com/dfm1xhhwx/image/upload/v1784782926/logo_white_pkzdz0.png";
+const RIGHT_LOGO_URL =
+  "https://res.cloudinary.com/dfm1xhhwx/image/upload/v1784783276/logo_ulbkag.png";
 export const createCounselingController = async (req, res) => {
 const result = await createCounseling(req.body);
 res.status(result.success ? 201 : 400).json(result);
@@ -35,252 +41,384 @@ res.status(result.success ? 200 : 400).json(result);
 export const downloadCounselingReportController = async (req, res) => {
   try {
     const result = await generateCounselingReport(req.params.id);
-
+ 
     if (!result.success) {
       return res.status(404).json(result);
     }
-
+ 
     const data = result.data;
-
-    const doc = new PDFDocument({
-      size: "A4",
-      margin: 40,
-    });
-
+ 
+    // Fetch the two logos (requires Node 18+ for global fetch, or swap in axios/node-fetch)
+    let leftLogoBuf = null;
+    let rightLogoBuf = null;
+    try {
+      const [l, r] = await Promise.all([
+        fetch(LEFT_LOGO_URL).then((r) => r.arrayBuffer()),
+        fetch(RIGHT_LOGO_URL).then((r) => r.arrayBuffer()),
+      ]);
+      leftLogoBuf = Buffer.from(l);
+      rightLogoBuf = Buffer.from(r);
+    } catch (e) {
+      console.error("Logo fetch failed:", e.message);
+    }
+ 
+    const doc = new PDFDocument({ size: "A4", margin: 40 });
+ 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
       `attachment; filename=Counseling_Report_${data.id}.pdf`
     );
-
+ 
     doc.pipe(res);
-
+ 
     // ===========================
-    // COLORS
+    // LAYOUT CONSTANTS
     // ===========================
-
-    const BLUE = "#2563eb";
-    const LIGHT = "#eff6ff";
-    const BORDER = "#d1d5db";
-    const TEXT = "#374151";
-
+ 
+    const MARGIN = 40;
+    const PAGE_WIDTH = doc.page.width;
+    const PAGE_HEIGHT = doc.page.height;
+    const TABLE_WIDTH = PAGE_WIDTH - MARGIN * 2; // 515
+    const LEFT = MARGIN;
+    const RIGHT = MARGIN + TABLE_WIDTH;
+ 
+    const BLACK = "#000000";
+    const GRAY = "#666666";
+    const HIGHLIGHT = "#1d4ed8";
+ 
+    const checkPageBreak = (needed) => {
+      if (doc.y + needed > PAGE_HEIGHT - MARGIN - 20) {
+        doc.addPage();
+        doc.y = MARGIN;
+      }
+    };
+ 
     // ===========================
-    // HEADER
+    // HEADER (logos + title)
     // ===========================
-
-    doc.rect(0, 0, doc.page.width, 80).fill(BLUE);
-
+ 
+    if (leftLogoBuf) {
+      try {
+        doc.image(leftLogoBuf, LEFT, 20, { width: 70 });
+      } catch (e) {}
+    }
+    if (rightLogoBuf) {
+      try {
+        doc.image(rightLogoBuf, RIGHT - 70, 20, { width: 70 });
+      } catch (e) {}
+    }
+ 
     doc
-      .fillColor("white")
-      .fontSize(24)
+      .fillColor(BLACK)
       .font("Helvetica-Bold")
-      .text("CAREER COUNSELING REPORT", 0, 28, {
+      .fontSize(14)
+      .text("MINI \u2013 CAREER COUNSELING", LEFT, 60, {
+        width: TABLE_WIDTH,
         align: "center",
       });
-
-    doc
-      .fontSize(10)
-      .text(`Generated : ${new Date().toLocaleDateString()}`, {
-        align: "center",
-      });
-
-    doc.moveDown(3);
-
+ 
+    doc.y = 105;
+ 
     // ===========================
-    // Helper Functions
+    // Generic two-column bordered row
     // ===========================
-
-    const section = (title) => {
-      doc.moveDown();
-
+ 
+    const twoColRow = (label, value, labelWidth, opts = {}) => {
+      const valueWidth = TABLE_WIDTH - labelWidth;
+      const labelFont = opts.labelFont || "Helvetica-Bold";
+      const valueFont = opts.valueFont || "Helvetica";
+      const fontSize = opts.fontSize || 10;
+ 
+      doc.font(labelFont).fontSize(fontSize);
+      const labelHeight = doc.heightOfString(label, { width: labelWidth - 10 });
+      doc.font(valueFont).fontSize(fontSize);
+      const valueHeight = value
+        ? doc.heightOfString(String(value), { width: valueWidth - 10 })
+        : fontSize;
+ 
+      const rowHeight =
+        Math.max(labelHeight, valueHeight, opts.minHeight || 20) + 10;
+ 
+      checkPageBreak(rowHeight);
+ 
+      const y = doc.y;
+ 
+      doc.rect(LEFT, y, labelWidth, rowHeight).stroke();
+      doc.rect(LEFT + labelWidth, y, valueWidth, rowHeight).stroke();
+ 
       doc
-        .fillColor(LIGHT)
-        .roundedRect(40, doc.y, 515, 24, 5)
-        .fill();
-
+        .font(labelFont)
+        .fontSize(fontSize)
+        .fillColor(BLACK)
+        .text(label, LEFT + 5, y + 5, { width: labelWidth - 10 });
+ 
       doc
-        .fillColor(BLUE)
-        .font("Helvetica-Bold")
-        .fontSize(13)
-        .text(title, 50, doc.y + 6);
-
-      doc.moveDown(1.8);
-    };
-
-    const row = (label, value) => {
-      doc
-        .font("Helvetica-Bold")
-        .fillColor("black")
-        .fontSize(11)
-        .text(label, 50, doc.y, {
-          continued: true,
+        .font(valueFont)
+        .fontSize(fontSize)
+        .fillColor(BLACK)
+        .text(value ? String(value) : "-", LEFT + labelWidth + 5, y + 5, {
+          width: valueWidth - 10,
         });
-
-      doc
-        .font("Helvetica")
-        .fillColor(TEXT)
-        .text(value || "-");
-
-      doc.moveDown(0.2);
+ 
+      doc.y = y + rowHeight;
     };
-
+ 
     // ===========================
-    // Student Information
+    // Student Information table
     // ===========================
-
-    section("Student Information");
-
-    row("Student Name : ", data.studentName);
-    row("Class : ", data.class);
-    row("Stream : ", data.stream);
-    row("School : ", data.school);
-    row(
-      "Counseling Date : ",
+ 
+    const LABEL_W1 = 160;
+ 
+    twoColRow("Name of the Counselee", data.studentName, LABEL_W1);
+    twoColRow("Class", data.class, LABEL_W1);
+    twoColRow("Stream (if 11th / 12th)", data.stream, LABEL_W1);
+    twoColRow("School", data.school, LABEL_W1);
+    twoColRow(
+      "Date",
       data.counselingDate
         ? new Date(data.counselingDate).toLocaleDateString()
-        : "-"
+        : "-",
+      LABEL_W1
     );
-    row("Phone : ", data.phoneNumber);
-    row("Email : ", data.email);
-
+    twoColRow("Phone number", data.phoneNumber, LABEL_W1);
+    twoColRow("Gmail Id", data.email, LABEL_W1);
+ 
+    doc.y += 12;
+ 
     // ===========================
-    // Family Information
+    // PROBING STATEMENTS / RESPONSE table
     // ===========================
-
-    section("Family Information");
-
-    row("Father Occupation : ", data.fatherOccupation);
-    row("Mother Occupation : ", data.motherOccupation);
-    row("No. of Siblings : ", data.siblingCount);
-
-    // ===========================
-    // Academic Performance
-    // ===========================
-
-    section("Academic Performance");
-
-    const marks = data.marks || {};
-
-    doc
-      .fillColor(BLUE)
-      .font("Helvetica-Bold")
-      .fontSize(11);
-
-    doc.text("Subject", 60, doc.y);
-    doc.text("Marks", 420, doc.y);
-
-    doc.moveDown(0.5);
-
-    doc
-      .strokeColor(BORDER)
-      .moveTo(50, doc.y)
-      .lineTo(550, doc.y)
-      .stroke();
-
-    doc.moveDown(0.5);
-
-    Object.entries(marks).forEach(([subject, mark]) => {
+ 
+    const LABEL_W2 = 200;
+ 
+    checkPageBreak(24);
+    {
+      const y = doc.y;
+      const rowH = 22;
+      doc.rect(LEFT, y, LABEL_W2, rowH).stroke();
+      doc.rect(LEFT + LABEL_W2, y, TABLE_WIDTH - LABEL_W2, rowH).stroke();
       doc
-        .fillColor("black")
-        .font("Helvetica")
-        .text(subject, 60, doc.y);
-
-      doc.text(String(mark), 430, doc.y);
-
-      doc.moveDown(0.3);
-    });
-
-    // ===========================
-    // Career Goals
-    // ===========================
-
-    section("Career Aspirations");
-
-    row("Option 1 : ", data.dreamCareerOption1);
-    row("Option 2 : ", data.dreamCareerOption2);
-    row("Option 3 : ", data.dreamCareerOption3);
-
-    row("Parents Expectation : ", data.parentsExpectation);
-
-    // ===========================
-    // Counseling Details
-    // ===========================
-
-    section("Counseling Details");
-
-    row("Category : ", data.category);
-
-    row(
-      "Psychometric Test : ",
-      data.psychometricRecommended ? "Recommended" : "Not Recommended"
+        .font("Helvetica-Bold")
+        .fontSize(11)
+        .fillColor(BLACK)
+        .text("PROBING STATEMENTS", LEFT + 5, y + 6, {
+          width: LABEL_W2 - 10,
+        });
+      doc.text("RESPONSE", LEFT + LABEL_W2 + 5, y + 6, {
+        width: TABLE_WIDTH - LABEL_W2 - 10,
+      });
+      doc.y = y + rowH;
+    }
+ 
+    twoColRow("Occupation of Father", data.fatherOccupation, LABEL_W2);
+    twoColRow("Occupation of Mother", data.motherOccupation, LABEL_W2);
+    twoColRow(
+      "No. of Sibling",
+      data.siblingCount !== undefined && data.siblingCount !== null
+        ? String(data.siblingCount)
+        : "-",
+      LABEL_W2
     );
-
-    // ===========================
-    // Observation
-    // ===========================
-
-    section("Observation & Recommendation");
-
-    doc
-      .roundedRect(45, doc.y, 505, 100, 5)
-      .fillAndStroke("#f9fafb", BORDER);
-
-    doc
-      .fillColor(TEXT)
-      .font("Helvetica")
-      .fontSize(11)
-      .text(
-        data.observation || "No Observation Available",
-        60,
-        doc.y + 15,
-        {
-          width: 470,
+ 
+    // Marks
+    const marks = data.marks || {};
+    const markEntries = Object.entries(marks);
+    const marksText =
+      markEntries.length > 0
+        ? markEntries.map(([subject, mark]) => `${subject} - ${mark}`).join("\n")
+        : "-";
+    twoColRow("Latest Score (if 11th / 12th) SCIENCE", marksText, LABEL_W2);
+ 
+    // Dream career
+    const careerText = [
+      `Option 1 - ${data.dreamCareerOption1 || ""}`,
+      `Option 2 - ${data.dreamCareerOption2 || ""}`,
+      `Option 3 - ${data.dreamCareerOption3 || ""}`,
+    ].join("\n");
+    twoColRow("Student's Dream Career", careerText, LABEL_W2);
+ 
+    twoColRow(
+      "What do your parents want you to become?",
+      data.parentsExpectation,
+      LABEL_W2
+    );
+ 
+    // Category row with A-E options, selected one highlighted
+    const categoryOptions = [
+      "(A) Absolutely clear about future career options, need only the right direction and route",
+      "(B) Confused between two/three career options",
+      "(C) Parents and the student differ on career options",
+      "(D) Changing career options quite frequently",
+      "(E) Vague knowledge about Career options",
+    ];
+    const selectedCategory = (data.category || "").toString().trim().toUpperCase();
+ 
+    {
+      const label = "Which category does your counselee belong to?";
+      const labelWidth = LABEL_W2;
+      const valueWidth = TABLE_WIDTH - labelWidth;
+ 
+      doc.font("Helvetica-Bold").fontSize(10);
+      const labelHeight = doc.heightOfString(label, { width: labelWidth - 10 });
+ 
+      doc.font("Helvetica").fontSize(9);
+      let valueHeight = 0;
+      categoryOptions.forEach((opt) => {
+        valueHeight += doc.heightOfString(opt, { width: valueWidth - 10 }) + 2;
+      });
+ 
+      const rowHeight = Math.max(labelHeight, valueHeight, 20) + 10;
+      checkPageBreak(rowHeight);
+ 
+      const y = doc.y;
+      doc.rect(LEFT, y, labelWidth, rowHeight).stroke();
+      doc.rect(LEFT + labelWidth, y, valueWidth, rowHeight).stroke();
+ 
+      doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .fillColor(BLACK)
+        .text(label, LEFT + 5, y + 5, { width: labelWidth - 10 });
+ 
+      let optY = y + 5;
+      categoryOptions.forEach((opt, idx) => {
+        const letter = String.fromCharCode(65 + idx); // A, B, C, D, E
+        const isSelected =
+          selectedCategory === letter ||
+          selectedCategory.startsWith(`(${letter})`) ||
+          selectedCategory.startsWith(letter + ")");
+        doc
+          .font(isSelected ? "Helvetica-Bold" : "Helvetica")
+          .fontSize(9)
+          .fillColor(isSelected ? HIGHLIGHT : BLACK)
+          .text(opt, LEFT + labelWidth + 5, optY, { width: valueWidth - 10 });
+        optY += doc.heightOfString(opt, { width: valueWidth - 10 }) + 2;
+      });
+ 
+      doc.y = y + rowHeight;
+    }
+ 
+    // Observation & Recommendation
+    {
+      const label = "Observation & Recommendation/ Suggestion";
+      const labelWidth = LABEL_W2;
+      const valueWidth = TABLE_WIDTH - labelWidth;
+      const text = data.observation || "No Observation Available";
+ 
+      doc.font("Helvetica-Bold").fontSize(10);
+      const labelHeight = doc.heightOfString(label, { width: labelWidth - 10 });
+      doc.font("Helvetica").fontSize(10);
+      const textHeight = doc.heightOfString(text, { width: valueWidth - 10 });
+ 
+      const rowHeight = Math.max(labelHeight, textHeight, 80) + 10;
+      checkPageBreak(rowHeight);
+ 
+      const y = doc.y;
+      doc.rect(LEFT, y, labelWidth, rowHeight).stroke();
+      doc.rect(LEFT + labelWidth, y, valueWidth, rowHeight).stroke();
+ 
+      doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .fillColor(BLACK)
+        .text(label, LEFT + 5, y + 5, { width: labelWidth - 10 });
+ 
+      doc
+        .font("Helvetica")
+        .fontSize(10)
+        .fillColor(BLACK)
+        .text(text, LEFT + labelWidth + 5, y + 5, {
+          width: valueWidth - 10,
           align: "justify",
-        }
-      );
-
-    doc.moveDown(7);
-
+        });
+ 
+      doc.y = y + rowHeight;
+    }
+ 
+    doc.y += 15;
+ 
     // ===========================
-    // Counselor
+    // Counselor / Psychometric footer table
     // ===========================
-
-    section("Counselor");
-
-    row("Counselor Name : ", data.counselorName);
-
-    doc.moveDown(2);
-
+ 
+    twoColRow("Name of the CC", data.counselorName, LABEL_W1);
+ 
+    {
+      const col1 = 160;
+      const col2 = (TABLE_WIDTH - col1) / 2;
+      const col3 = TABLE_WIDTH - col1 - col2;
+      const rowH = 26;
+      checkPageBreak(rowH);
+      const y = doc.y;
+ 
+      doc.rect(LEFT, y, col1, rowH).stroke();
+      doc.rect(LEFT + col1, y, col2, rowH).stroke();
+      doc.rect(LEFT + col1 + col2, y, col3, rowH).stroke();
+ 
+      doc
+        .font("Helvetica-Bold")
+        .fontSize(10)
+        .fillColor(BLACK)
+        .text("Psychometric Test", LEFT + 5, y + 8, { width: col1 - 10 });
+ 
+      const isRecommended = !!data.psychometricRecommended;
+ 
+      doc
+        .font(isRecommended ? "Helvetica-Bold" : "Helvetica")
+        .fillColor(isRecommended ? HIGHLIGHT : BLACK)
+        .text(
+          `${isRecommended ? "\u2611" : "\u2610"} Recommended`,
+          LEFT + col1 + 5,
+          y + 8,
+          { width: col2 - 10 }
+        );
+ 
+      doc
+        .font(!isRecommended ? "Helvetica-Bold" : "Helvetica")
+        .fillColor(!isRecommended ? HIGHLIGHT : BLACK)
+        .text(
+          `${!isRecommended ? "\u2611" : "\u2610"} Not Recommended`,
+          LEFT + col1 + col2 + 5,
+          y + 8,
+          { width: col3 - 10 }
+        );
+ 
+      doc.y = y + rowH;
+    }
+ 
+    doc.y += 30;
+ 
+    // Signature line
+    checkPageBreak(30);
     doc
       .strokeColor("#999")
-      .moveTo(380, doc.y)
-      .lineTo(540, doc.y)
+      .moveTo(RIGHT - 160, doc.y)
+      .lineTo(RIGHT, doc.y)
       .stroke();
-
     doc
-      .fontSize(10)
-      .fillColor("gray")
-      .text("Authorized Signature", 405, doc.y + 5);
-
-    // ===========================
-    // Footer
-    // ===========================
-
-    doc.fontSize(9).fillColor("gray");
-
-    doc.text(
-      "Generated by Career Counseling Management System",
-      0,
-      780,
-      {
+      .fontSize(9)
+      .fillColor(GRAY)
+      .text("Authorized Signature", RIGHT - 160, doc.y + 5, {
+        width: 160,
         align: "center",
-      }
-    );
-
+      });
+ 
+    // Footer
+    doc
+      .fontSize(8)
+      .fillColor(GRAY)
+      .text(
+        "Generated by Career Counseling Management System",
+        LEFT,
+        PAGE_HEIGHT - 30,
+        { width: TABLE_WIDTH, align: "center" }
+      );
+ 
     doc.end();
   } catch (error) {
     console.error(error);
-
+ 
     return res.status(500).json({
       success: false,
       message: error.message,
