@@ -10,5 +10,6 @@ export const isAssessmentModule = (module) => {
   );
 };
 
+/** Institute students get assessment free without a plan. */
 export const canAccessAssessment = (user) =>
   Boolean(user?.isInstituteStudent);
