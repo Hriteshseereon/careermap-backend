@@ -41,14 +41,27 @@ export const hasFullModuleAccess = async (
     throw new Error("Module not found");
   }
 
+  // Assessment: free for institute students; otherwise require plan purchase
   if (isAssessmentModule(module)) {
     const user = await prisma.users.findUnique({
       where: { id: Number(userId) },
       select: { isInstituteStudent: true },
     });
 
+    if (canAccessAssessment(user)) {
+      return {
+        allowed: true,
+        module,
+      };
+    }
+
+    const subscriptions = await getActiveSubscription(userId);
+    const hasPlanAccess = subscriptions.some((subscription) =>
+      subscription.plan.modules.some((item) => item.id === Number(moduleId))
+    );
+
     return {
-      allowed: canAccessAssessment(user),
+      allowed: hasPlanAccess,
       module,
     };
   }

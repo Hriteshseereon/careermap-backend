@@ -1,18 +1,45 @@
 import prisma from "../../config/db.js";
-import { canAccessAssessment } from "../../constants/assessmentAccess.js";
+import {
+  canAccessAssessment,
+  isAssessmentModule,
+} from "../../constants/assessmentAccess.js";
 import { AssessmentRepository } from "./assessment.repository.js";
 
-const ensureInstituteAssessmentAccess = async (userId) => {
+const ensureAssessmentAccess = async (userId) => {
   const user = await prisma.users.findUnique({
     where: { id: Number(userId) },
     select: { isInstituteStudent: true },
   });
 
-  if (!canAccessAssessment(user)) {
+  // Institute students: free access
+  if (canAccessAssessment(user)) {
+    return null;
+  }
+
+  // Normal users: unlock only if an active plan includes assessment
+  const subscriptions = await prisma.subscriptions.findMany({
+    where: {
+      userId: Number(userId),
+      status: "active",
+      endDate: { gte: new Date() },
+    },
+    include: {
+      plan: {
+        include: { modules: true },
+      },
+    },
+  });
+
+  const hasPlanAccess = subscriptions.some((subscription) =>
+    subscription.plan.modules.some((mod) => isAssessmentModule(mod))
+  );
+
+  if (!hasPlanAccess) {
     return {
       success: false,
       status: 403,
-      message: "Assessment is only available for institute students.",
+      message:
+        "Assessment is locked. Please purchase a plan to unlock access.",
     };
   }
 
@@ -20,7 +47,7 @@ const ensureInstituteAssessmentAccess = async (userId) => {
 };
 
 export const submitAssessment = async (userId, data) => {
-  const accessError = await ensureInstituteAssessmentAccess(userId);
+  const accessError = await ensureAssessmentAccess(userId);
   if (accessError) {
     return accessError;
   }
@@ -80,7 +107,7 @@ export const submitAssessment = async (userId, data) => {
 };
 
 export const getMyAssessment = async (userId) => {
-  const accessError = await ensureInstituteAssessmentAccess(userId);
+  const accessError = await ensureAssessmentAccess(userId);
   if (accessError) {
     return accessError;
   }
@@ -104,7 +131,7 @@ export const getMyAssessment = async (userId) => {
 };
 
 export const getAssessmentById = async (userId, id) => {
-  const accessError = await ensureInstituteAssessmentAccess(userId);
+  const accessError = await ensureAssessmentAccess(userId);
   if (accessError) {
     return accessError;
   }
@@ -128,7 +155,7 @@ export const getAssessmentById = async (userId, id) => {
 };
 
 export const deleteAssessment = async (userId, id) => {
-  const accessError = await ensureInstituteAssessmentAccess(userId);
+  const accessError = await ensureAssessmentAccess(userId);
   if (accessError) {
     return accessError;
   }
