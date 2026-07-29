@@ -72,7 +72,14 @@ export const UserPortalRepository = {
       orderBy: { createdAt: "desc" },
     });
   },
-
+getEntranceExams() {
+  return prisma.entranceExam.findMany({
+    take: 8,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+},
   getInstitutions() {
     return prisma.institutions.findMany({
       take: 8,
