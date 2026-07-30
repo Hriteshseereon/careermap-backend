@@ -111,11 +111,18 @@ const unlockedModuleIds = [
     const instituteHasAssessmentAccess = canAccessAssessment(user);
 
     // Final module status — repeatable 15s preview until purchase
+    // Assessment: free for institute students; locked for normal users
+    // until they purchase a plan that includes it.
     const modules = allModules.map((mod) => {
       if (isAssessmentModule(mod)) {
+        const unlockedViaPlan = unlockedModuleIds.includes(mod.id);
+
         return {
           ...mod,
-          accessStatus: instituteHasAssessmentAccess ? "unlocked" : "locked",
+          accessStatus:
+            instituteHasAssessmentAccess || unlockedViaPlan
+              ? "unlocked"
+              : "locked",
           previewDurationSeconds: null,
         };
       }
