@@ -132,11 +132,11 @@ export const adminLogin = async (
       admin.id
     );
 
-  if (activeSessions >= 10) {
+  if (activeSessions >= 15) {
     return {
       success: false,
       message:
-        "Maximum 3 devices already logged in. Please logout from another device first.",
+        "Maximum 5 devices already logged in. Please logout from another device first.",
     };
   }
 
