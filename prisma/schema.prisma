@@ -179,7 +179,7 @@ model Category {
   id       Int @id @default(autoincrement())
   streamId Int
 
-  title            String
+  title            String @unique
   path             String?
   file             String?
   coverImage       String?

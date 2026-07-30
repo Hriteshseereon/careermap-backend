@@ -60,4 +60,14 @@ updatePreviewAccess(id, category_access) {
     },
   });
 },
+  findByTitle(title) {
+    return prisma.category.findFirst({
+      where: {
+        title: {
+          equals: title,
+          mode: "insensitive", // Case-insensitive search
+        },
+      },
+    });
+  },
 };

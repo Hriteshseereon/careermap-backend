@@ -4,6 +4,16 @@ import {getCategoryPreviewFlags} from "../moduleAccess/moduleAccess.service.js";
 // 🔹 CREATE
 export const createCategory = async (body, files) => {
   try {
+     const existingCategory = await CategoryRepository.findByTitle(
+      body.title.trim()
+    );
+
+    if (existingCategory) {
+      return {
+        success: false,
+        message: "Category title already exists.",
+      };
+    }
     let coverImageUrl;
     let fileUrl;
 
