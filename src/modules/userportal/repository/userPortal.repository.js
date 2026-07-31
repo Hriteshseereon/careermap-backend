@@ -160,7 +160,11 @@ getBookings(mentorId) {
           path: true,
         },
       },
-
+      descriptions: {
+  orderBy: {
+    sortOrder: "asc",
+  },
+},
       entranceexams: true,
     },
   });
@@ -182,7 +186,11 @@ getBookings(mentorId) {
       category: true,
 
       institutions: true,
-
+      descriptions: {
+  orderBy: {
+    sortOrder: "asc",
+  },
+},
       careerpaths: {
         include: {
           module: true,
@@ -211,7 +219,11 @@ getDetailsBySecond(secondcategoryId) {
       secondcategory: true,
 
       institutions: true,
-
+      descriptions: {
+  orderBy: {
+    sortOrder: "asc",
+  },
+},
       careerpaths: {
         include: {
           module: true,

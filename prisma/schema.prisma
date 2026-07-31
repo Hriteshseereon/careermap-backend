@@ -957,3 +957,18 @@ model PsychometricAssessment {
 
   @@index([userId])
 }
+
+
+
+model Careernewsletter{
+  id Int @id @default(autoincrement())
+
+  title String @unique
+  image String
+  description String
+  url String
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+}
