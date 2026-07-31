@@ -342,6 +342,7 @@ model PreviewSession {
   important_factor String? 
    media String?
     description String?
+    descriptions DetailDescription[]
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
@@ -353,6 +354,20 @@ model PreviewSession {
     @@index([subcategoryId])
   }
 
+model DetailDescription {
+  id          Int      @id @default(autoincrement())
+  detailsId   Int
+  title       String
+  description String
+  sortOrder   Int      @default(0)
+
+  details Details @relation(fields: [detailsId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([detailsId])
+}
 model SalaryRange {
   id        Int     @id @default(autoincrement())
   profession String?
