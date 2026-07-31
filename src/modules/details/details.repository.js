@@ -10,6 +10,10 @@ create: (data) => {
         specialization: data.specialization,
   important_factor: data.important_factor,
       description: data.description,
+
+      ...(data.descriptions && {
+  descriptions: data.descriptions,
+}),
       // Single relations
       ...(data.streamId && {
         stream: {
@@ -59,7 +63,7 @@ create: (data) => {
       category: true,
       secondcategory: true,
       subcategory: true,
-
+       descriptions: true,
       // ✅ INCLUDE THESE
       careerpaths: true,
       entranceexams: true,
@@ -77,6 +81,7 @@ create: (data) => {
         secondcategory: true,
         subcategory: true,
          careerpaths: true,
+          descriptions: true,
       entranceexams: true,
       institutions: true
       }
@@ -93,6 +98,7 @@ create: (data) => {
         secondcategory: true,
         subcategory: true,
          careerpaths: true,
+          descriptions: true,
       entranceexams: true,
       institutions: true
       }
@@ -121,6 +127,13 @@ update: (id, data) => {
         ...(data.description !== undefined && {
     description: data.description
   }),
+
+  ...(data.descriptions && {
+  descriptions: {
+    deleteMany: {},
+    create: data.descriptions,
+  },
+}),
       ...(data.streamId && {
         stream: {
           connect: { id: data.streamId }
