@@ -36,6 +36,7 @@ import studentAddRoutes from "./modules/instituteStudent/instituteStudent.routes
 import adminnotificationRoutes from "./modules/adminnotification/adminnotification.routes.js"
 import mentorReviewRoutes from "./modules/mentorreview/mentorReview.routes.js"
 import assessmentRoutes from "./modules/assessment/assessment.routes.js"
+import newsleeterRoutes from "./modules/careernewsletter/careernewsletter.routes.js"
 //  user portal routes imported here
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
 import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
@@ -103,6 +104,7 @@ app.use(
   app.use('/api/permissions',permissionRoutes);
 app.use('/api/adminnotification',adminnotificationRoutes);
 app.use("/api/assessment", assessmentRoutes);
+app.use("/api/newsletter",newsleeterRoutes);
 // user portal api 
 app.use("/api/user",userportalRoutes);
 app.use("/api/user/payment",paymentRoutes);
