@@ -21,7 +21,9 @@ export const createDetails = async (body, file) => {
     const careerpathIds = body.careerpathIds
       ? JSON.parse(body.careerpathIds)
       : [];
-
+const descriptionSections = body.descriptionSections
+  ? JSON.parse(body.descriptionSections)
+  : [];
     const entranceexamIds = body.entranceexamIds
       ? JSON.parse(body.entranceexamIds)
       : [];
@@ -66,12 +68,19 @@ export const createDetails = async (body, file) => {
       subcategoryId: Number(subcategoryId),
 
       description,
+      
       specialization,
       important_factor,
       media,
 
       jobScope,
-
+descriptions: {
+  create: descriptionSections.map((item, index) => ({
+    title: item.title,
+    description: item.description,
+    sortOrder: item.sortOrder ?? index,
+  })),
+},
       salaryRanges: {
         create: salaryRanges,
       },
@@ -184,7 +193,9 @@ export const updateDetails = async (id, body, file) => {
     const institutionIds = body.institutionIds
       ? JSON.parse(body.institutionIds)
       : undefined;
-
+const descriptionSections = body.descriptionSections
+  ? JSON.parse(body.descriptionSections)
+  : undefined;
     const {
       specialization,
       important_factor,
@@ -243,7 +254,9 @@ export const updateDetails = async (id, body, file) => {
       ...(salaryRanges && {
         salaryRanges,
       }),
-
+...(descriptionSections !== undefined && {
+  descriptions: descriptionSections,
+}),
       ...(careerpathIds && {
         careerpaths: {
           set: careerpathIds.map((id) => ({
