@@ -89,17 +89,17 @@ export const updateInstitution = async (id, body, file) => {
         categoryId:
         body.categoryId !== undefined
           ? Number(body.categoryId)
-          : undefined,
+          : null,
 
       secondcategoryId:
         body.secondcategoryId !== undefined
           ? Number(body.secondcategoryId)
-          : undefined,
+          : null,
 
       subcategoryId:
         body.subcategoryId !== undefined
           ? Number(body.subcategoryId)
-          : undefined,
+          : null,
       name: body.name,
       address: body.address,
       admission_process: body.admission_process,
