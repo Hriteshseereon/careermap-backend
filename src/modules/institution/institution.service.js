@@ -70,23 +70,52 @@ export const getInstitutions = async () => {
 // 🔹 Update
 export const updateInstitution = async (id, body, file) => {
   try {
+    console.log("========== UPDATE INSTITUTION START ==========");
+    console.log("Institution ID:", id);
+
+    console.log("RAW BODY:");
+    console.log(body);
+
+    console.log("CATEGORY VALUES:");
+    console.log("categoryId:", body.categoryId);
+    console.log("secondcategoryId:", body.secondcategoryId);
+    console.log("subcategoryId:", body.subcategoryId);
+
     let logoUrl;
 
     if (file) {
+      console.log("Uploading new logo...");
       logoUrl = await uploadToS3(file, "institutions");
+      console.log("Logo uploaded:", logoUrl);
     }
 
     let course_offered;
+
     if (body.course_offered !== undefined) {
+      console.log(
+        "Raw course_offered:",
+        body.course_offered
+      );
+
       try {
         course_offered = JSON.parse(body.course_offered);
-      } catch {
+
+        console.log(
+          "Parsed course_offered:",
+          course_offered
+        );
+      } catch (error) {
+        console.log(
+          "course_offered JSON parse failed:",
+          error.message
+        );
+
         course_offered = [body.course_offered];
       }
     }
 
-    const updated = await InstitutionRepository.update(Number(id), {
-        categoryId:
+    const updateData = {
+      categoryId:
         body.categoryId !== undefined
           ? Number(body.categoryId)
           : null,
@@ -97,9 +126,10 @@ export const updateInstitution = async (id, body, file) => {
           : null,
 
       subcategoryId:
-        body.subcategoryId !== undefined
+        body.subcategoryId
           ? Number(body.subcategoryId)
           : null,
+
       name: body.name,
       address: body.address,
       admission_process: body.admission_process,
@@ -110,23 +140,76 @@ export const updateInstitution = async (id, body, file) => {
       state: body.state,
       city: body.city,
       district: body.district,
-
       about: body.about,
 
-      ...(course_offered !== undefined && { course_offered }),
+      ...(course_offered !== undefined && {
+        course_offered,
+      }),
 
       is_top:
         body.is_top !== undefined
-          ? body.is_top === "true" || body.is_top === true
+          ? body.is_top === "true" ||
+            body.is_top === true
           : undefined,
 
-      ...(logoUrl && { logo: logoUrl }),
-    });
+      ...(logoUrl && {
+        logo: logoUrl,
+      }),
+    };
 
-    return { success: true, data: updated };
+    console.log("========== DATA SENT TO PRISMA ==========");
+    console.log(updateData);
+
+    console.log(
+      "categoryId type:",
+      typeof updateData.categoryId
+    );
+
+    console.log(
+      "secondcategoryId type:",
+      typeof updateData.secondcategoryId
+    );
+
+    console.log(
+      "subcategoryId:",
+      updateData.subcategoryId
+    );
+
+    console.log("Calling InstitutionRepository.update...");
+
+    const updated =
+      await InstitutionRepository.update(
+        Number(id),
+        updateData
+      );
+
+    console.log(
+      "========== UPDATE SUCCESS =========="
+    );
+
+    console.log("Updated institution:", updated);
+
+    return {
+      success: true,
+      data: updated,
+    };
 
   } catch (error) {
-    return { success: false, message: error.message };
+
+    console.error(
+      "========== UPDATE INSTITUTION ERROR =========="
+    );
+
+    console.error("Error name:", error.name);
+    console.error("Error message:", error.message);
+    console.error("Error code:", error.code);
+    console.error("Error meta:", error.meta);
+    console.error("Full error:", error);
+
+    return {
+      success: false,
+      message: error.message,
+    };
   }
 };
 
