@@ -23,13 +23,17 @@ async findById(id) {
     },
   });
 },
-  async update(id, data) {
-    return prisma.institutions.update({ 
+async update(id, data) {
+  try {
+    return await prisma.institutions.update({
       where: { id },
       data,
     });
-  },
-
+  } catch (error) {
+    console.error("Prisma Institution Update Error:", error);
+    throw error;
+  }
+},
   async delete(id) {    
     return prisma.institutions.delete({
       where: { id },
