@@ -172,20 +172,26 @@ if (body.sections) {
   sections = JSON.parse(body.sections);
 }
     const updated = await ScholarshipRepository.update(Number(id), {
-       categoryId:
-        body.categoryId !== undefined
-          ? Number(body.categoryId)
-          : undefined,
+    categoryId:
+  body.categoryId !== undefined
+    ? body.categoryId === ""
+      ? null
+      : Number(body.categoryId)
+    : undefined,
 
-      secondcategoryId:
-        body.secondcategoryId !== undefined
-          ? Number(body.secondcategoryId)
-          : undefined,
+secondcategoryId:
+  body.secondcategoryId !== undefined
+    ? body.secondcategoryId === ""
+      ? null
+      : Number(body.secondcategoryId)
+    : undefined,
 
-      subcategoryId:
-        body.subcategoryId !== undefined
-          ? Number(body.subcategoryId)
-          : undefined,
+subcategoryId:
+  body.subcategoryId !== undefined
+    ? body.subcategoryId === ""
+      ? null
+      : Number(body.subcategoryId)
+    : undefined,
       name: body.name,
       type: body.type,
       url: body.url,
