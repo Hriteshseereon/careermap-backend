@@ -67,6 +67,53 @@ export const getInstitutions = async () => {
   }
 };
 
+// 🔹 Get Institutions - Paginated for User Portal
+export const getPaginatedInstitutions = async (
+  page = 1,
+  limit = 30
+) => {
+  try {
+    page = Math.max(Number(page) || 1, 1);
+
+    // Maximum 100 records per request
+    limit = Math.min(
+      Math.max(Number(limit) || 30, 1),
+      100
+    );
+
+    const { data, total } =
+      await InstitutionRepository.findPaginated(
+        page,
+        limit
+      );
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      success: true,
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  } catch (error) {
+    console.error(
+      "❌ getPaginatedInstitutions Error:",
+      error
+    );
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
+
 // 🔹 Update
 export const updateInstitution = async (id, body, file) => {
   try {
