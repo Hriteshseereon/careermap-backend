@@ -52,7 +52,7 @@ async update(id, data) {
         subcategory: true,
       },
       orderBy: {
-        id: "asc",
+         name: "asc",
       },
     }),
 
