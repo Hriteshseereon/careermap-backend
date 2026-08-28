@@ -1,5 +1,49 @@
 import { entranceExamRepository } from "./entranceexam.repository.js";
 
+
+const PRIORITY_EXAMS = [
+  "NEET-UG",
+  "NEET-PG",
+  "JEE Main",
+  "JEE Advance",
+  "NEET-SS",
+  "NEST",
+  "IAT",
+  "INI CET",
+  "AIIMS Paramedical Exam",
+  "JEE Main Paper 2 (B.Planning)",
+  "NATA",
+  "AAT",
+  "GATE",
+  "IIT-JAM",
+  "JEST",
+  "CUET-UG",
+  "CUET PG",
+  "NDA",
+  "ICAR AIEEA (PG)",
+  "OUAT",
+  "GAT-B (DBT)",
+  "CLAT",
+  "IPMAT",
+  "CAT",
+  "NIFT (National Institute of Fashion Technology)",
+  "NID DAT",
+  "UCEED",
+  "CEED (Common Entrance Examination for Design)",
+  "NIPER JEE",
+  "GPAT",
+  "NCHM JEE (IHMs)",
+  "CSIR-UGC NET (Science subjects)",
+  "UGC NET/JRF",
+  "CPPNET",
+];
+
+const priorityMap = new Map(
+  PRIORITY_EXAMS.map((name, index) => [
+    name.toLowerCase(),
+    index,
+  ])
+);
 export const createExam = async (body) => {
   try {
     const existing = await entranceExamRepository.findByExamName(body.examname);
@@ -52,9 +96,51 @@ export const createExam = async (body) => {
 export const getAllExam = async () => {
   try {
     const data = await entranceExamRepository.findAll();
-    return { success: true, data };
+
+    data.sort((a, b) => {
+      const aPriority = priorityMap.get(
+        a.examname.toLowerCase()
+      );
+
+      const bPriority = priorityMap.get(
+        b.examname.toLowerCase()
+      );
+
+      // Both are priority exams
+      if (
+        aPriority !== undefined &&
+        bPriority !== undefined
+      ) {
+        return aPriority - bPriority;
+      }
+
+      // Only A is priority
+      if (aPriority !== undefined) {
+        return -1;
+      }
+
+      // Only B is priority
+      if (bPriority !== undefined) {
+        return 1;
+      }
+
+      // Remaining exams → alphabetical
+      return a.examname.localeCompare(
+        b.examname,
+        undefined,
+        { sensitivity: "base" }
+      );
+    });
+
+    return {
+      success: true,
+      data,
+    };
   } catch (err) {
-    return { success: false, message: err.message };
+    return {
+      success: false,
+      message: err.message,
+    };
   }
 };
 

@@ -66,4 +66,4 @@ async update(id, data) {
 },
 };
 
-export { InstitutionRepository };
+export { InstitutionRepository }; 
