@@ -37,4 +37,4 @@ async findById(id) {
   } 
 };
 
-export { InstitutionRepository };
+export { InstitutionRepository }; 

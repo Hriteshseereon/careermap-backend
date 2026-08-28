@@ -1,7 +1,8 @@
 import prisma from "../../config/db.js";
 
 export const entranceExamRepository = {
-  create: (data) => prisma.entranceExam.create({ data }),
+  create: (data) =>
+    prisma.entranceExam.create({ data }),
 
   findAll: () =>
     prisma.entranceExam.findMany({
@@ -13,7 +14,6 @@ export const entranceExamRepository = {
         subcategory: true,
         details: true,
       },
-      orderBy: { createdAt: "desc" },
     }),
 
   findById: (id) =>
@@ -28,10 +28,12 @@ export const entranceExamRepository = {
         details: true,
       },
     }),
-findByExamName: (examname) =>
-  prisma.entranceExam.findUnique({
-    where: { examname },
-  }),
+
+  findByExamName: (examname) =>
+    prisma.entranceExam.findUnique({
+      where: { examname },
+    }),
+
   update: (id, data) =>
     prisma.entranceExam.update({
       where: { id },
