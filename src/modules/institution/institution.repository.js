@@ -38,7 +38,32 @@ async update(id, data) {
     return prisma.institutions.delete({
       where: { id },
     });
-  } 
+  },
+  async findPaginated(page = 1, limit = 30) {
+  const skip = (page - 1) * limit;
+
+  const [data, total] = await Promise.all([
+    prisma.institutions.findMany({
+      skip,
+      take: limit,
+      include: {
+        category: true,
+        secondcategory: true,
+        subcategory: true,
+      },
+      orderBy: {
+         name: "asc",
+      },
+    }),
+
+    prisma.institutions.count(),
+  ]);
+
+  return {
+    data,
+    total,
+  };
+},
 };
 
-export { InstitutionRepository };
+export { InstitutionRepository }; 
