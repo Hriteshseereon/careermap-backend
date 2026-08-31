@@ -16,7 +16,7 @@ const PRIORITY_EXAMS = [
   "AAT",
   "GATE",
   "IIT-JAM",
-  "JEST",
+  "JEST (Joint Entrance Screening Test)",
   "CUET-UG",
   "CUET PG",
   "NDA",
@@ -33,7 +33,7 @@ const PRIORITY_EXAMS = [
   "NIPER JEE",
   "GPAT",
   "NCHM JEE (IHMs)",
-  "CSIR-UGC NET (Science subjects)",
+  "CSIR-UGC NET ",
   "UGC NET/JRF",
   "CPPNET",
 ];
