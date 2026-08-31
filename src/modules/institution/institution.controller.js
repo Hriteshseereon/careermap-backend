@@ -42,12 +42,34 @@ export const getPaginatedInstitutionsController = async (
   req,
   res
 ) => {
-  const { page = 1, limit = 30 } = req.query;
+  try {
+    const {
+      page = 1,
+      limit = 30,
+      country = "",
+      state = "",
+      type = "",
+    } = req.query;
 
-  const result = await getPaginatedInstitutions(
-    page,
-    limit
-  );
+    const result = await getPaginatedInstitutions(
+      page,
+      limit,
+      country,
+      state,
+      type
+    );
 
-  res.status(200).json(result);
+    return res.status(result.success ? 200 : 400).json(result);
+
+  } catch (error) {
+    console.error(
+      "❌ getPaginatedInstitutionsController Error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
