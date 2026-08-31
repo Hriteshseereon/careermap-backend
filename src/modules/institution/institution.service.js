@@ -70,12 +70,14 @@ export const getInstitutions = async () => {
 // 🔹 Get Institutions - Paginated for User Portal
 export const getPaginatedInstitutions = async (
   page = 1,
-  limit = 30
+  limit = 30,
+  country = "",
+  state = "",
+  type = ""
 ) => {
   try {
     page = Math.max(Number(page) || 1, 1);
 
-    // Maximum 100 records per request
     limit = Math.min(
       Math.max(Number(limit) || 30, 1),
       100
@@ -84,7 +86,10 @@ export const getPaginatedInstitutions = async (
     const { data, total } =
       await InstitutionRepository.findPaginated(
         page,
-        limit
+        limit,
+        country,
+        state,
+        type
       );
 
     const totalPages = Math.ceil(total / limit);
@@ -113,7 +118,6 @@ export const getPaginatedInstitutions = async (
     };
   }
 };
-
 // 🔹 Update
 export const updateInstitution = async (id, body, file) => {
   try {

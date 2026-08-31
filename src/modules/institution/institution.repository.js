@@ -39,11 +39,41 @@ async update(id, data) {
       where: { id },
     });
   },
-  async findPaginated(page = 1, limit = 30) {
+async findPaginated(
+  page = 1,
+  limit = 30,
+  country = "",
+  state = "",
+  type = ""
+) {
   const skip = (page - 1) * limit;
+
+  const where = {};
+
+  if (country) {
+    where.countruy = {
+      equals: country,
+      mode: "insensitive",
+    };
+  }
+
+  if (state) {
+    where.state = {
+      equals: state,
+      mode: "insensitive",
+    };
+  }
+
+  if (type) {
+    where.institute_type = {
+      equals: type,
+      mode: "insensitive",
+    };
+  }
 
   const [data, total] = await Promise.all([
     prisma.institutions.findMany({
+      where,
       skip,
       take: limit,
       include: {
@@ -52,11 +82,13 @@ async update(id, data) {
         subcategory: true,
       },
       orderBy: {
-         name: "asc",
+        name: "asc",
       },
     }),
 
-    prisma.institutions.count(),
+    prisma.institutions.count({
+      where,
+    }),
   ]);
 
   return {
