@@ -8,7 +8,7 @@ const PRIORITY_EXAMS = [
   "JEE Advance",
   "NEET-SS",
   "NEST",
-  "IAT",
+  "IISc IAT",
   "INI CET",
   "AIIMS Paramedical Exam",
   "JEE Main Paper 2 (B.Planning)",
@@ -33,7 +33,7 @@ const PRIORITY_EXAMS = [
   "NIPER JEE",
   "GPAT",
   "NCHM JEE (IHMs)",
-  "CSIR-UGC NET ",
+  "CSIR‑UGC NET",
   "UGC NET/JRF",
   "CPPNET",
 ];
