@@ -42,15 +42,17 @@ async update(id, data) {
 async findPaginated(
   page = 1,
   limit = 30,
+   categoryId = "",
   country = "",
   state = "",
-  type = "",
-  categoryId = ""
+  type = ""
 ) {
   const skip = (page - 1) * limit;
 
   const where = {};
-
+if (categoryId) {
+  where.categoryId = Number(categoryId);
+}
   if (country) {
     where.countruy = {
       equals: country,
@@ -70,10 +72,6 @@ async findPaginated(
       equals: type,
       mode: "insensitive",
     };
-  }
-
-  if (categoryId) {
-    where.categoryId = Number(categoryId);
   }
 
   const [data, total] = await Promise.all([
@@ -100,7 +98,7 @@ async findPaginated(
     data,
     total,
   };
-}
+},
 };
 
 export { InstitutionRepository }; 
