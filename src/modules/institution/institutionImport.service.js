@@ -12,7 +12,7 @@ import {
   normalizeValue,
 } from "../../utils/excel/institutionExcel.validator.js";
 
-const BATCH_SIZE = 500;
+const BATCH_SIZE = 200;
 
 export const uploadInstitutionExcel = async (
   file
@@ -85,16 +85,23 @@ const processInstitutionRows = async (
      * --------------------------------
      */
 
-    const [
-      categories,
-      secondCategories,
-      subcategories,
-    ] = await Promise.all([
-      prisma.category.findMany(),
-      prisma.secondcategory.findMany(),
-      prisma.subcategory.findMany(),
-    ]);
+    // const [
+    //   categories,
+    //   secondCategories,
+    //   subcategories,
+    // ] = await Promise.all([
+    //   prisma.category.findMany(),
+    //   prisma.secondcategory.findMany(),
+    //   prisma.subcategory.findMany(),
+    // ]);
+    const categories =
+  await prisma.category.findMany();
 
+const secondCategories =
+  await prisma.secondcategory.findMany();
+
+const subcategories =
+  await prisma.subcategory.findMany();
     /**
      * --------------------------------
      * 2. Create lookup maps
@@ -307,22 +314,36 @@ const processInstitutionRows = async (
           i,
           i + BATCH_SIZE
         );
-        console.log("========== INSERTING INSTITUTIONS ==========");
-console.log("BATCH:", batch);
-console.log("BATCH LENGTH:", batch.length);
-      const result =
-        await prisma.institutions.createMany({
-          data: batch,
-          skipDuplicates: true,
-        });
-        console.log("========== CREATE MANY RESULT ==========");
-console.log(result);
-const count = await prisma.institutions.count();
+//         console.log("========== INSERTING INSTITUTIONS ==========");
+// console.log("BATCH:", batch);
+// console.log("BATCH LENGTH:", batch.length);
+//       const result =
+//         await prisma.institutions.createMany({
+//           data: batch,
+//           skipDuplicates: true,
+//         });
+//         console.log("========== CREATE MANY RESULT ==========");
+// console.log(result);
+// const count = await prisma.institutions.count();
+
+// console.log(
+//   "TOTAL INSTITUTIONS IN DB:",
+//   count
+// );
 
 console.log(
-  "TOTAL INSTITUTIONS IN DB:",
-  count
+  `========== INSERTING BATCH ==========
+Batch start: ${i}
+Batch size: ${batch.length}`
 );
+
+const result =
+  await prisma.institutions.createMany({
+    data: batch,
+    skipDuplicates: true,
+  });
+
+console.log("Inserted:", result.count);
       successful += result.count;
 
       await InstitutionImportRepository.update(
