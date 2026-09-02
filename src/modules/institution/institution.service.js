@@ -73,7 +73,8 @@ export const getPaginatedInstitutions = async (
   limit = 30,
   country = "",
   state = "",
-  type = ""
+  type = "",
+  category = ""
 ) => {
   try {
     page = Math.max(Number(page) || 1, 1);
@@ -89,7 +90,8 @@ export const getPaginatedInstitutions = async (
         limit,
         country,
         state,
-        type
+        type,
+        category
       );
 
     const totalPages = Math.ceil(total / limit);

@@ -49,6 +49,8 @@ export const getPaginatedInstitutionsController = async (
       country = "",
       state = "",
       type = "",
+      category = "",
+      categoryId = "",
     } = req.query;
 
     const result = await getPaginatedInstitutions(
@@ -56,7 +58,8 @@ export const getPaginatedInstitutionsController = async (
       limit,
       country,
       state,
-      type
+      type,
+      category || categoryId
     );
 
     return res.status(result.success ? 200 : 400).json(result);

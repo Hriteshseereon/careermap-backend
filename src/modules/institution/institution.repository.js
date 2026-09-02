@@ -44,31 +44,46 @@ async findPaginated(
   limit = 30,
   country = "",
   state = "",
-  type = ""
+  type = "",
+  category = ""
 ) {
   const skip = (page - 1) * limit;
 
   const where = {};
 
-  if (country) {
+  if (country && String(country).trim().toLowerCase() !== "all") {
     where.countruy = {
-      equals: country,
+      equals: String(country).trim(),
       mode: "insensitive",
     };
   }
 
-  if (state) {
+  if (state && String(state).trim().toLowerCase() !== "all") {
     where.state = {
-      equals: state,
+      equals: String(state).trim(),
       mode: "insensitive",
     };
   }
 
-  if (type) {
+  if (type && String(type).trim().toLowerCase() !== "all") {
     where.institute_type = {
-      equals: type,
+      equals: String(type).trim(),
       mode: "insensitive",
     };
+  }
+
+  if (category && String(category).trim().toLowerCase() !== "all") {
+    const trimmedCategory = String(category).trim();
+    if (/^\d+$/.test(trimmedCategory)) {
+      where.categoryId = Number(trimmedCategory);
+    } else {
+      where.category = {
+        title: {
+          equals: trimmedCategory,
+          mode: "insensitive",
+        },
+      };
+    }
   }
 
   const [data, total] = await Promise.all([
