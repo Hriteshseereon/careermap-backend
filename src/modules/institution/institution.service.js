@@ -71,7 +71,6 @@ export const getInstitutions = async () => {
 export const getPaginatedInstitutions = async (
   page = 1,
   limit = 30,
-  categoryId = "",
   country = "",
   state = "",
   type = ""
@@ -88,7 +87,6 @@ export const getPaginatedInstitutions = async (
       await InstitutionRepository.findPaginated(
         page,
         limit,
-         categoryId,
         country,
         state,
         type
