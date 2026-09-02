@@ -71,10 +71,10 @@ export const getInstitutions = async () => {
 export const getPaginatedInstitutions = async (
   page = 1,
   limit = 30,
-  categoryId = "",
   country = "",
   state = "",
-  type = ""
+  type = "",
+  categoryId = ""
 ) => {
   try {
     page = Math.max(Number(page) || 1, 1);
@@ -88,10 +88,10 @@ export const getPaginatedInstitutions = async (
       await InstitutionRepository.findPaginated(
         page,
         limit,
-         categoryId,
         country,
         state,
-        type
+        type,
+        categoryId
       );
 
     const totalPages = Math.ceil(total / limit);
