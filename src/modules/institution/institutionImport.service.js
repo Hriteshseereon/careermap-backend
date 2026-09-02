@@ -12,7 +12,7 @@ import {
   normalizeValue,
 } from "../../utils/excel/institutionExcel.validator.js";
 
-const BATCH_SIZE = 200;
+const BATCH_SIZE = 100;
 
 export const uploadInstitutionExcel = async (
   file
