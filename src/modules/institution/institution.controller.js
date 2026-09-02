@@ -46,6 +46,7 @@ export const getPaginatedInstitutionsController = async (
     const {
       page = 1,
       limit = 30,
+      categoryId = "",
       country = "",
       state = "",
       type = "",
@@ -54,6 +55,7 @@ export const getPaginatedInstitutionsController = async (
     const result = await getPaginatedInstitutions(
       page,
       limit,
+      categoryId = "",
       country,
       state,
       type
