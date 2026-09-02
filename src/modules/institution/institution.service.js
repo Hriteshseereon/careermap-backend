@@ -67,6 +67,59 @@ export const getInstitutions = async () => {
   }
 };
 
+// 🔹 Get Institutions - Paginated for User Portal
+export const getPaginatedInstitutions = async (
+  page = 1,
+  limit = 30,
+  country = "",
+  state = "",
+  type = "",
+  categoryId = ""
+) => {
+  try {
+    page = Math.max(Number(page) || 1, 1);
+
+    limit = Math.min(
+      Math.max(Number(limit) || 30, 1),
+      100
+    );
+
+    const { data, total } =
+      await InstitutionRepository.findPaginated(
+        page,
+        limit,
+        country,
+        state,
+        type,
+        categoryId
+      );
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      success: true,
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
+      },
+    };
+  } catch (error) {
+    console.error(
+      "❌ getPaginatedInstitutions Error:",
+      error
+    );
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+};
 // 🔹 Update
 export const updateInstitution = async (id, body, file) => {
   try {
@@ -77,6 +130,7 @@ export const updateInstitution = async (id, body, file) => {
     }
 
     let course_offered;
+
     if (body.course_offered !== undefined) {
       try {
         course_offered = JSON.parse(body.course_offered);
@@ -85,48 +139,60 @@ export const updateInstitution = async (id, body, file) => {
       }
     }
 
-    const updated = await InstitutionRepository.update(Number(id), {
-        categoryId:
-        body.categoryId !== undefined
+    const updated = await InstitutionRepository.update(
+      Number(id),
+      {
+        categoryId: body.categoryId
           ? Number(body.categoryId)
           : null,
 
-      secondcategoryId:
-        body.secondcategoryId !== undefined
+        secondcategoryId: body.secondcategoryId
           ? Number(body.secondcategoryId)
           : null,
 
-      subcategoryId:
-        body.subcategoryId !== undefined
+        subcategoryId: body.subcategoryId
           ? Number(body.subcategoryId)
           : null,
-      name: body.name,
-      address: body.address,
-      admission_process: body.admission_process,
-      tentative_date: body.tentative_date,
-      institute_type: body.institute_type,
-      url: body.url,
-      countruy: body.countruy,
-      state: body.state,
-      city: body.city,
-      district: body.district,
 
-      about: body.about,
+        name: body.name,
+        address: body.address,
+        admission_process: body.admission_process,
+        tentative_date: body.tentative_date,
+        institute_type: body.institute_type,
+        url: body.url,
+        countruy: body.countruy,
+        state: body.state,
+        city: body.city,
+        district: body.district,
+        about: body.about,
 
-      ...(course_offered !== undefined && { course_offered }),
+        ...(course_offered !== undefined && {
+          course_offered,
+        }),
 
-      is_top:
-        body.is_top !== undefined
-          ? body.is_top === "true" || body.is_top === true
-          : undefined,
+        is_top:
+          body.is_top !== undefined
+            ? body.is_top === "true" ||
+              body.is_top === true
+            : undefined,
 
-      ...(logoUrl && { logo: logoUrl }),
-    });
+        ...(logoUrl && {
+          logo: logoUrl,
+        }),
+      }
+    );
 
-    return { success: true, data: updated };
-
+    return {
+      success: true,
+      data: updated,
+    };
   } catch (error) {
-    return { success: false, message: error.message };
+    console.error("Update Institution Error:", error);
+
+    return {
+      success: false,
+      message: error.message,
+    };
   }
 };
 

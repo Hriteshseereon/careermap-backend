@@ -1,4 +1,4 @@
-import { createInstitution,updateInstitution,getInstitutions,deleteInstitution,getInstitutionById } from "./institution.service.js";
+import { createInstitution,updateInstitution,getInstitutions,deleteInstitution,getInstitutionById,  getPaginatedInstitutions, } from "./institution.service.js";
 
 export const createInstitutionController = async (req, res) => {
   const result = await createInstitution(req.body, req.file);
@@ -36,4 +36,42 @@ export const updateInstitutionController = async (req, res) => {
 export const deleteInstitutionController = async (req, res) => {
   const result = await deleteInstitution(req.params.id);
   res.status(result.success ? 200 : 400).json(result);
+};
+
+export const getPaginatedInstitutionsController = async (
+  req,
+  res
+) => {
+  try {
+    const {
+      page = 1,
+      limit = 30,
+      categoryId = "",
+      country = "",
+      state = "",
+      type = "",
+    } = req.query;
+
+    const result = await getPaginatedInstitutions(
+      page,
+      limit,
+      categoryId,
+      country,
+      state,
+      type
+    );
+
+    return res.status(result.success ? 200 : 400).json(result);
+
+  } catch (error) {
+    console.error(
+      "❌ getPaginatedInstitutionsController Error:",
+      error
+    );
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
