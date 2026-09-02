@@ -36,6 +36,11 @@ export const createScholarship = async (body, file) => {
     let sections = [];
     if (body.sections) {
   sections = JSON.parse(body.sections);
+    sections = sections.map((section, index) => ({
+    title: section.title,
+    description: section.description,
+    sortOrder: index,
+  }));
 }
     const data = await ScholarshipRepository.create({
       categoryId: body.categoryId
@@ -170,6 +175,12 @@ export const updateScholarship = async (id, body, file) => {
 
 if (body.sections) {
   sections = JSON.parse(body.sections);
+
+    sections = sections.map((section, index) => ({
+    title: section.title,
+    description: section.description,
+    sortOrder: index,
+  }));
 }
     const updated = await ScholarshipRepository.update(Number(id), {
     categoryId:
