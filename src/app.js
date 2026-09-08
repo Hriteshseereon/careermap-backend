@@ -38,6 +38,7 @@ import institutionImportRoutes from "./modules/institution/institutionImport.rou
 import mentorReviewRoutes from "./modules/mentorreview/mentorReview.routes.js"
 import assessmentRoutes from "./modules/assessment/assessment.routes.js"
 import newsleeterRoutes from "./modules/careernewsletter/careernewsletter.routes.js"
+import searchRoutes from "./modules/search/search.routes.js"
 //  user portal routes imported here
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
 import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
@@ -111,6 +112,8 @@ app.use(
   institutionImportRoutes
 );
 // user portal api 
+app.use("/api/search", searchRoutes);
+app.use("/api/user/search", searchRoutes);
 app.use("/api/user",userportalRoutes);
 app.use("/api/user/payment",paymentRoutes);
 app.use("/api/mentor",mentoravailabilityRoute);

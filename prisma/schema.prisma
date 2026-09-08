@@ -610,7 +610,7 @@ model ScholarshipSection {
   title String
 
   description String
-
+   sortOrder Int @default(0)
   scholarship Scholarship @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
