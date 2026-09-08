@@ -14,26 +14,46 @@ const getModuleId = (req) =>
   req?.query?.moduleId ||
   req?.body?.moduleId;
 // 🔹 CREATE
-export const createMasterClass = async (body) => {
+export const createMasterClass = async (body, file) => {
   try {
+    let image = body.image || null;
+
+    if (file) {
+      image = await uploadToS3(file, "master-class");
+    }
+
     const data = await MasterClassRepository.create({
       category: body.category,
-      image: body.image,
+      image,
       title: body.title,
       name: body.name,
-      time: body.time ? new Date(body.time) : null,
+
+      time: body.time
+        ? new Date(body.time)
+        : null,
+
       is_free:
-  body.is_free === "true" ||
-  body.is_free === true,
+        body.is_free === "true" ||
+        body.is_free === true,
+
       views: body.views,
+
       is_active:
-        body.is_active === "true" || body.is_active === true,
+        body.is_active === "true" ||
+        body.is_active === true,
+
       video_url: body.video_url,
     });
 
-    return { success: true, data };
+    return {
+      success: true,
+      data,
+    };
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: error.message,
+    };
   }
 };
 
@@ -141,35 +161,65 @@ export const getMasterClassById = async (id, req) => {
   }
 };
 // 🔹 UPDATE
-export const updateMasterClass = async (id, body) => {
+export const updateMasterClass = async (
+  id,
+  body,
+  file
+) => {
   try {
-    const updated = await MasterClassRepository.update(Number(id), {
-      category: body.category,
-      image: body.image,
-      title: body.title,
-      name: body.name,
-      time:
-        body.time !== undefined
-          ? body.time
-            ? new Date(body.time)
-            : null
-          : undefined,
-      views: body.views,
-      is_active:
-        body.is_active !== undefined
-          ? body.is_active === "true" || body.is_active === true
-          : undefined,
-          is_free:
-  body.is_free !== undefined
-    ? body.is_free === "true" ||
-      body.is_free === true
-    : undefined,
-      video_url: body.video_url,
-    });
+    let image;
 
-    return { success: true, data: updated };
+    if (file) {
+      image = await uploadToS3(
+        file,
+        "master-class"
+      );
+    }
+
+    const updated =
+      await MasterClassRepository.update(
+        Number(id),
+        {
+          category: body.category,
+          ...(image && { image }),
+
+          title: body.title,
+          name: body.name,
+
+          time:
+            body.time !== undefined
+              ? body.time
+                ? new Date(body.time)
+                : null
+              : undefined,
+
+          views: body.views,
+
+          is_active:
+            body.is_active !== undefined
+              ? body.is_active === "true" ||
+                body.is_active === true
+              : undefined,
+
+          is_free:
+            body.is_free !== undefined
+              ? body.is_free === "true" ||
+                body.is_free === true
+              : undefined,
+
+          video_url: body.video_url,
+        }
+      );
+
+    return {
+      success: true,
+      data: updated,
+    };
   } catch (error) {
-    return { success: false, message: error.message };
+    return {
+      success: false,
+      message: error.message,
+    };
   }
 };
 
