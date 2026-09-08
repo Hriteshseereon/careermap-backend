@@ -10,9 +10,10 @@ import {
 import { optionalAuth } from "../../middlewares/optionalAuth.js";
 import { protectAdmin } from "../../middlewares/protectAdmin.js";
 import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
+import upload from "../../middlewares/upload.js";
 const router = Router();
 
-router.post("/", protectAdminOrStaff, createMasterClassController);
+router.post("/", protectAdminOrStaff, upload.single("image"), createMasterClassController);
 // Admin
 router.get(
   "/admin",
@@ -27,7 +28,7 @@ router.get(
   getMasterClassesController
 );
 router.get("/:id",optionalAuth,protectAdminOrStaff, getMasterClassByIdController);
-router.put("/:id", protectAdminOrStaff, updateMasterClassController);
+router.put("/:id", protectAdminOrStaff, upload.single("image"), updateMasterClassController);
 router.delete("/:id", protectAdminOrStaff, deleteMasterClassController);
 router.patch(
   "/:id/free-status",
