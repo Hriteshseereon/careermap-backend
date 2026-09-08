@@ -3,7 +3,7 @@ import { getMasterClassPreviewFlags,resolveContentAccess, } from "../moduleAcces
 import {
   PREVIEW_PAGE_TYPES,
 } from "../../constants/previewAccess.js";
-
+import { uploadToS3 } from "../../lib/s3Upload.js";
 const getPreviewSessionId = (req) =>
   req?.headers?.["x-preview-session"] ||
   req?.query?.previewSessionId ||
