@@ -739,24 +739,115 @@ model StudyAbroad {
 model StudyAbroadConsult {
   id Int @id @default(autoincrement())
 
+  // =========================
+  // USER / STUDY ABROAD
+  // =========================
   userId        Int
   studyAbroadId Int
 
-  preferredCountry String?
-  courseInterest   String?
-  budgetRange      String?
-  preferredIntake  String?
+  // =========================
+  // 1. STUDENT BASIC DETAILS
+  // =========================
+  fullName           String?
+  dateOfBirth        DateTime?
+  gender             String?
+  email              String?
+  mobileNumber       String?
+  whatsappNumber     String?
+  currentCityState   String?
+  countryOfCitizenship String?
 
+  // =========================
+  // 2. PARENT / GUARDIAN DETAILS
+  // =========================
+  parentGuardianName   String?
+  parentRelationship   String?
+  parentMobileNumber   String?
+  parentEmail          String?
+  parentOccupation     String?
+
+  // Multiple possible funding sources
+  primaryFundingSource String[] @default([])
+
+  // =========================
+  // 3. ACADEMIC DETAILS
+  // =========================
+  highestQualification String?
+  schoolCollegeUniversity String?
+  boardUniversity      String?
+  passingYear          String?
+  class10PercentageCGPA String?
+  class12PercentageCGPA String?
+
+  // =========================
+  // 4. FOREIGN EDUCATION PREFERENCES
+  // =========================
+  intendedStudyLevel String?
+  preferredIntake    String?
+
+  // Multiple countries
+  preferredCountries String[] @default([])
+
+  preferredCourseProgramme String?
+  preferredSpecialization  String?
+  preferredUniversities    String?
+  openToAlternativeUniversities Boolean?
+
+  // =========================
+  // 5. ENGLISH & ENTRANCE EXAMS
+  // =========================
+  englishTest String?
+  englishTestScoreDate String?
+
+  // Multiple entrance exams
+  otherEntranceExams String[] @default([])
+
+  entranceExamScoreDate String?
+
+  // =========================
+  // 6. CAREER & BUDGET PREFERENCES
+  // =========================
+ preferredCareerDomain String?
+  reasonToStudyAbroad  String?
+
+  // Multiple priorities
+  topPriorities String[] @default([])
+
+  annualTuitionBudget String?
+  totalEducationBudget String?
+
+  scholarshipRequired String?
+  educationLoanRequired String?
+
+  // =========================
+  // 7. PASSPORT & DOCUMENTS
+  // =========================
+  passportStatus String?
+  passportExpiryDate DateTime?
+
+  // Multiple available documents
+  documentsAvailable String[] @default([])
+
+  // =========================
+  // 9. SERVICES REQUIRED
+  // =========================
+  servicesRequired String[] @default([])
+
+  // =========================
+  // SYSTEM
+  // =========================
   message String?
-  status  String  @default("pending")
+  status  String @default("pending")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // =========================
+  // RELATIONS
+  // =========================
+  user Users @relation( fields: [userId], references: [id], onDelete: Cascade)
 
-  studyAbroad StudyAbroad @relation(fields: [studyAbroadId], references: [id], onDelete: Cascade)
+  studyAbroad StudyAbroad @relation( fields: [studyAbroadId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([studyAbroadId])
