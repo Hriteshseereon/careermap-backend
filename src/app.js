@@ -39,6 +39,7 @@ import mentorReviewRoutes from "./modules/mentorreview/mentorReview.routes.js"
 import assessmentRoutes from "./modules/assessment/assessment.routes.js"
 import newsleeterRoutes from "./modules/careernewsletter/careernewsletter.routes.js"
 import searchRoutes from "./modules/search/search.routes.js"
+import psychometricAssessmentRoutes from "./modules/psychometricassesment/psychoassesment.routes.js"
 //  user portal routes imported here
 import userportalRoutes from "./modules/userportal/routes/userPortal.routes.js"
 import paymentRoutes from "./modules/userportal/routes/payment.routes.js"
@@ -111,6 +112,7 @@ app.use(
   "/api/institutions/import",
   institutionImportRoutes
 );
+app.use("/api/psychometric-assessment", psychometricAssessmentRoutes);
 // user portal api 
 app.use("/api/search", searchRoutes);
 app.use("/api/user/search", searchRoutes);
