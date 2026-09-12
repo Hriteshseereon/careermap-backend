@@ -38,91 +38,88 @@ async function migrateInstitutions() {
     console.log("\nCurrent PostgreSQL Records :", count);
 
     // ==========================
-    // Delete Existing Data
+    // Safe Migration (Upsert)
     // ==========================
+    // NOTE: deleteMany() ko remove kar diya hai taaki existing data aur relations delete na hon
 
-    if (count > 0) {
-      await prisma.institutions.deleteMany();
+    console.log("\n🚀 Starting Migration (Safe Upsert Mode)...");
 
-      console.log("Old Institutions Deleted.");
-    }
-
-    // ==========================
-    // Test Migration
-    // ==========================
-
-    console.log("\n🚀 Starting Test Migration (10 Records)...");
-
-    let success = 0;
+    let createdCount = 0;
+    let updatedCount = 0;
     let failed = 0;
 
     for (const row of rows) {
+      if (!row.name || !row.name.trim()) {
+        continue;
+      }
+
+      const instituteName = row.name.trim();
+
       try {
-        await prisma.institutions.create({
-          data: {
-            name: row.name,
-
-            logo:  null,
-
+        const result = await prisma.institutions.upsert({
+          where: {
+            name: instituteName,
+          },
+          update: {
             address: row.address || null,
-
-            admission_process:
-              row.admission_process || null,
-
-            tentative_date:
-              row.tentative_date || null,
-
+            admission_process: row.admission_process || null,
+            tentative_date: row.tentative_date || null,
             institute_type:
-              instituteTypeMap[row.institute_type] ??
-              null,
-
+              instituteTypeMap[row.institute_type] ?? null,
             url: row.url || null,
-
-            countruy:
-              countryMap[row.country_id] ?? null,
-
-            state:
-              stateMap[row.state_id] ?? null,
-
-            district:
-              districtMap[row.dist_id] ?? null,
-
-            categoryId: null,
-
-            secondcategoryId: null,
-
-            subcategoryId: null,
-
-            about: null,
-
-            course_offered: [],
-
+            countruy: countryMap[row.country_id] ?? null,
+            state: stateMap[row.state_id] ?? null,
+            district: districtMap[row.dist_id] ?? null,
             is_top: Boolean(row.is_top),
-
-            createdAt: row.created_at,
-
-            updatedAt: row.updated_at,
+            updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(),
+          },
+          create: {
+            name: instituteName,
+            logo: null,
+            address: row.address || null,
+            admission_process: row.admission_process || null,
+            tentative_date: row.tentative_date || null,
+            institute_type:
+              instituteTypeMap[row.institute_type] ?? null,
+            url: row.url || null,
+            countruy: countryMap[row.country_id] ?? null,
+            state: stateMap[row.state_id] ?? null,
+            district: districtMap[row.dist_id] ?? null,
+            categoryId: null,
+            secondcategoryId: null,
+            subcategoryId: null,
+            about: null,
+            course_offered: [],
+            is_top: Boolean(row.is_top),
+            createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+            updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(),
           },
         });
 
-        success++;
+        // Check if created or updated
+        if (result.createdAt.getTime() === result.updatedAt.getTime()) {
+          createdCount++;
+        } else {
+          updatedCount++;
+        }
 
-       if (success % 50 === 0) {
-  console.log(`✅ ${success} Institutions Migrated...`);
-}
+        const totalProcessed = createdCount + updatedCount;
+        if (totalProcessed % 50 === 0) {
+          console.log(`✅ Processed ${totalProcessed} Institutions...`);
+        }
       } catch (err) {
         failed++;
-
         console.log(`❌ Failed : ${row.name}`);
         console.log(err.message);
       }
     }
 
     console.log("\n========================================");
-    console.log("Migration Completed");
+    console.log("Migration Completed Successfully");
     console.log("========================================");
-    console.log("Success :", success);
-    console.log("Failed  :", failed);
+    console.log("New Inserted :", createdCount);
+    console.log("Updated/Kept :", updatedCount);
+    console.log("Failed       :", failed);
   } catch (error) {
     console.error(error);
   } finally {
