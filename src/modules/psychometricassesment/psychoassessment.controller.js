@@ -132,6 +132,21 @@ export const assessmentController = {
     }
   },
 
+  getAllSections: async (req, res) => {
+    try {
+      const result = await assessmentService.getAllSections(req.query);
+      return res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
   getSectionsByAssessment: async (req, res) => {
     try {
       const result = await assessmentService.getSectionsByAssessment(req.params.assessmentId);
