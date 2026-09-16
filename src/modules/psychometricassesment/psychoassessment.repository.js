@@ -231,6 +231,77 @@ export const assessmentRepository = {
     });
   },
 
+  findAllSections: ({ assessmentId, search, skip = 0, take = 50 } = {}) => {
+    const where = {};
+
+    if (assessmentId) {
+      where.assessmentId = Number(assessmentId);
+    }
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { code: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } }
+      ];
+    }
+
+    return prisma.assessmentSection.findMany({
+      where,
+      skip: Number(skip),
+      take: Number(take),
+      orderBy: [
+        { assessmentId: "asc" },
+        { order: "asc" }
+      ],
+      include: {
+        assessment: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            status: true
+          }
+        },
+        _count: {
+          select: {
+            questions: true
+          }
+        },
+        questions: {
+          orderBy: {
+            order: "asc"
+          },
+          include: {
+            options: {
+              orderBy: {
+                optionIndex: "asc"
+              }
+            }
+          }
+        }
+      }
+    });
+  },
+
+  countSections: ({ assessmentId, search } = {}) => {
+    const where = {};
+
+    if (assessmentId) {
+      where.assessmentId = Number(assessmentId);
+    }
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: "insensitive" } },
+        { code: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } }
+      ];
+    }
+
+    return prisma.assessmentSection.count({ where });
+  },
+
   findSectionsByAssessmentId: (assessmentId) => {
     return prisma.assessmentSection.findMany({
       where: {
@@ -387,6 +458,14 @@ export const assessmentRepository = {
             optionIndex: "asc"
           }
         }
+      }
+    });
+  },
+
+  countQuestionsBySectionId: (sectionId) => {
+    return prisma.assessmentQuestion.count({
+      where: {
+        sectionId: Number(sectionId)
       }
     });
   },
