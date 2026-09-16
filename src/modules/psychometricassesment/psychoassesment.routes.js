@@ -62,6 +62,12 @@ router.post(
 );
 
 router.get(
+  "/admin/sections",
+  protectAdmin,
+  assessmentController.getAllSections
+);
+
+router.get(
   "/admin/assessments/:assessmentId/sections",
   protectAdmin,
   assessmentController.getSectionsByAssessment

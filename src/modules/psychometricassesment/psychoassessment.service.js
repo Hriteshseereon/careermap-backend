@@ -11,6 +11,21 @@ import {
 } from "./psychoassessment.engine.js";
 
 
+function generateQuestionItemId(sectionCode, facet, count = 1) {
+  const code = normalizeSectionCode(sectionCode || "");
+  let prefix = "Q";
+  if (code === "interest") prefix = "INT";
+  else if (code === "personality") prefix = "PER";
+  else if (code === "values") prefix = "VAL";
+  else if (code === "learning_style") prefix = "VARK";
+  else if (code === "goal_orientation") prefix = "GOAL";
+  else if (code === "aptitude") prefix = "APT";
+
+  const facetPart = facet ? `_${String(facet).toUpperCase().replace(/[^A-Z0-9]/g, "")}` : "";
+  const numPart = String(count).padStart(2, "0");
+  return `${prefix}${facetPart}_${numPart}`;
+}
+
 export const assessmentService = {
 
   // =========================================================
@@ -154,6 +169,34 @@ export const assessmentService = {
     });
   },
 
+  getAllSections: async (query = {}) => {
+    const { assessmentId, search, page = 1, limit = 50 } = query;
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [sections, total] = await Promise.all([
+      assessmentRepository.findAllSections({
+        assessmentId: assessmentId ? Number(assessmentId) : undefined,
+        search,
+        skip,
+        take: Number(limit)
+      }),
+      assessmentRepository.countSections({
+        assessmentId: assessmentId ? Number(assessmentId) : undefined,
+        search
+      })
+    ]);
+
+    return {
+      sections,
+      pagination: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / Number(limit))
+      }
+    };
+  },
+
   getSectionsByAssessment: async (assessmentId) => {
     const assessment = await assessmentRepository.findAssessmentById(assessmentId);
     if (!assessment) {
@@ -206,10 +249,6 @@ export const assessmentService = {
       throw new Error("Section not found");
     }
 
-    if (!body.itemId) {
-      throw new Error("itemId is required (e.g. 'INT_01', 'APT_MECH_01')");
-    }
-
     if (!body.text) {
       throw new Error("Question text is required");
     }
@@ -218,14 +257,29 @@ export const assessmentService = {
       throw new Error("Question type is required ('likert5' or 'mcq')");
     }
 
-    const existingQuestion = await assessmentRepository.findQuestionByItemId(sectionId, body.itemId);
-    if (existingQuestion) {
-      throw new Error(`Question with itemId "${body.itemId}" already exists in this section`);
+    // Auto-generate item code (itemId) if not manually supplied
+    let itemId = body.itemId ? String(body.itemId).trim() : null;
+    if (!itemId) {
+      const questionsCount = await assessmentRepository.countQuestionsBySectionId(sectionId);
+      itemId = generateQuestionItemId(section.code, body.facet, questionsCount + 1);
+
+      let counter = questionsCount + 1;
+      let existingQuestion = await assessmentRepository.findQuestionByItemId(sectionId, itemId);
+      while (existingQuestion) {
+        counter += 1;
+        itemId = generateQuestionItemId(section.code, body.facet, counter);
+        existingQuestion = await assessmentRepository.findQuestionByItemId(sectionId, itemId);
+      }
+    } else {
+      const existingQuestion = await assessmentRepository.findQuestionByItemId(sectionId, itemId);
+      if (existingQuestion) {
+        throw new Error(`Question with itemId "${itemId}" already exists in this section`);
+      }
     }
 
     const question = await assessmentRepository.createQuestion({
       sectionId: Number(sectionId),
-      itemId: body.itemId,
+      itemId,
       text: body.text,
       type: body.type,
       facet: body.facet || null,
