@@ -121,6 +121,12 @@ router.get(
 );
 
 router.get(
+  "/admin/questions",
+  protectAdmin,
+  assessmentController.getAllQuestions
+);
+
+router.get(
   "/admin/questions/:questionId",
   protectAdmin,
   assessmentController.getQuestionById

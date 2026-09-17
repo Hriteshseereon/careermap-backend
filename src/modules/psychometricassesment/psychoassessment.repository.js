@@ -388,6 +388,116 @@ export const assessmentRepository = {
     });
   },
 
+  findAllQuestions: ({
+    assessmentId,
+    sectionId,
+    search,
+    type,
+    facet,
+    skip = 0,
+    take = 50
+  } = {}) => {
+    const where = {};
+
+    if (sectionId) {
+      where.sectionId = Number(sectionId);
+    }
+
+    if (assessmentId) {
+      where.section = {
+        ...(where.section || {}),
+        assessmentId: Number(assessmentId)
+      };
+    }
+
+    if (type) {
+      where.type = type;
+    }
+
+    if (facet) {
+      where.facet = {
+        equals: facet,
+        mode: "insensitive"
+      };
+    }
+
+    if (search) {
+      where.OR = [
+        { text: { contains: search, mode: "insensitive" } },
+        { itemId: { contains: search, mode: "insensitive" } },
+        { facet: { contains: search, mode: "insensitive" } },
+        { note: { contains: search, mode: "insensitive" } }
+      ];
+    }
+
+    return prisma.assessmentQuestion.findMany({
+      where,
+      skip: Number(skip),
+      take: Number(take),
+      orderBy: [
+        { sectionId: "asc" },
+        { order: "asc" },
+        { id: "asc" }
+      ],
+      include: {
+        section: {
+          include: {
+            assessment: {
+              select: {
+                id: true,
+                title: true,
+                slug: true,
+                status: true
+              }
+            }
+          }
+        },
+        options: {
+          orderBy: {
+            optionIndex: "asc"
+          }
+        }
+      }
+    });
+  },
+
+  countQuestions: ({ assessmentId, sectionId, search, type, facet } = {}) => {
+    const where = {};
+
+    if (sectionId) {
+      where.sectionId = Number(sectionId);
+    }
+
+    if (assessmentId) {
+      where.section = {
+        ...(where.section || {}),
+        assessmentId: Number(assessmentId)
+      };
+    }
+
+    if (type) {
+      where.type = type;
+    }
+
+    if (facet) {
+      where.facet = {
+        equals: facet,
+        mode: "insensitive"
+      };
+    }
+
+    if (search) {
+      where.OR = [
+        { text: { contains: search, mode: "insensitive" } },
+        { itemId: { contains: search, mode: "insensitive" } },
+        { facet: { contains: search, mode: "insensitive" } },
+        { note: { contains: search, mode: "insensitive" } }
+      ];
+    }
+
+    return prisma.assessmentQuestion.count({ where });
+  },
+
   findQuestionsBySectionId: (sectionId) => {
     return prisma.assessmentQuestion.findMany({
       where: {

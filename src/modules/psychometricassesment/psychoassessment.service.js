@@ -298,6 +298,49 @@ export const assessmentService = {
     return question;
   },
 
+  getAllQuestions: async (query = {}) => {
+    const {
+      assessmentId,
+      sectionId,
+      search,
+      type,
+      facet,
+      page = 1,
+      limit = 50
+    } = query;
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [questions, total] = await Promise.all([
+      assessmentRepository.findAllQuestions({
+        assessmentId: assessmentId ? Number(assessmentId) : undefined,
+        sectionId: sectionId ? Number(sectionId) : undefined,
+        search,
+        type,
+        facet,
+        skip,
+        take: Number(limit)
+      }),
+      assessmentRepository.countQuestions({
+        assessmentId: assessmentId ? Number(assessmentId) : undefined,
+        sectionId: sectionId ? Number(sectionId) : undefined,
+        search,
+        type,
+        facet
+      })
+    ]);
+
+    return {
+      questions,
+      pagination: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / Number(limit))
+      }
+    };
+  },
+
   getQuestionsBySection: async (sectionId) => {
     const section = await assessmentRepository.findSectionById(sectionId);
     if (!section) {
