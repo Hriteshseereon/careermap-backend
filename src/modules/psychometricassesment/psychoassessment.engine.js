@@ -315,6 +315,10 @@ export const calculateClusterMatches = (scores, clusters) => {
       for (const w of cluster.weights) {
         weights[w.facet] = Number(w.weight);
       }
+    } else if (cluster.weights && typeof cluster.weights === "object") {
+      for (const [k, v] of Object.entries(cluster.weights)) {
+        weights[k] = Number(v);
+      }
     }
 
     const fitI = weightedComponent(weights, scores, INTEREST_FACETS);
