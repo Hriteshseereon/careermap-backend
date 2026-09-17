@@ -15,6 +15,18 @@ const router = express.Router();
 // ============================================================
 
 router.post(
+  "/admin/assessments/seed-defaults",
+  protectAdmin,
+  assessmentController.seedDefaultAssessmentAndQuestions
+);
+
+router.post(
+  "/admin/questions/seed-defaults",
+  protectAdmin,
+  assessmentController.seedDefaultAssessmentAndQuestions
+);
+
+router.post(
   "/admin/assessments",
   protectAdmin,
   assessmentController.createAssessment
@@ -121,6 +133,12 @@ router.get(
 );
 
 router.get(
+  "/admin/questions",
+  protectAdmin,
+  assessmentController.getAllQuestions
+);
+
+router.get(
   "/admin/questions/:questionId",
   protectAdmin,
   assessmentController.getQuestionById
@@ -177,6 +195,18 @@ router.delete(
 // ============================================================
 // ADMIN: CAREER CLUSTERS & WEIGHTS
 // ============================================================
+
+router.post(
+  "/admin/career-clusters/seed-defaults",
+  protectAdmin,
+  assessmentController.seedDefaultCareerClusters
+);
+
+router.post(
+  "/admin/career-clusters/bulk-import",
+  protectAdmin,
+  assessmentController.bulkImportCareerClusters
+);
 
 router.post(
   "/admin/career-clusters",

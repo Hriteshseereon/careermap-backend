@@ -30,6 +30,23 @@ export const assessmentController = {
     }
   },
 
+  seedDefaultAssessmentAndQuestions: async (req, res) => {
+    try {
+      const assessmentId = req.body?.assessmentId || req.params?.assessmentId || null;
+      const result = await assessmentService.seedDefaultAssessmentAndQuestions(assessmentId);
+      return res.status(200).json({
+        success: true,
+        message: "Default assessment, 6 sections, and 163 questions seeded successfully",
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
   getAllAssessments: async (req, res) => {
     try {
       const result = await assessmentService.getAllAssessments(req.query);
@@ -232,6 +249,21 @@ export const assessmentController = {
     }
   },
 
+  getAllQuestions: async (req, res) => {
+    try {
+      const result = await assessmentService.getAllQuestions(req.query);
+      return res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
   getQuestionsBySection: async (req, res) => {
     try {
       const result = await assessmentService.getQuestionsBySection(req.params.sectionId);
@@ -423,6 +455,41 @@ export const assessmentController = {
       const result = await assessmentService.getAllCareerClusters();
       return res.status(200).json({
         success: true,
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
+  seedDefaultCareerClusters: async (req, res) => {
+    try {
+      const result = await assessmentService.seedDefaultCareerClusters();
+      return res.status(200).json({
+        success: true,
+        message: "Default 18 career clusters and weights seeded successfully",
+        count: result.length,
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
+  bulkImportCareerClusters: async (req, res) => {
+    try {
+      const clusters = Array.isArray(req.body) ? req.body : req.body.clusters;
+      const result = await assessmentService.bulkImportCareerClusters(clusters);
+      return res.status(200).json({
+        success: true,
+        message: "Career clusters imported successfully",
+        count: result.length,
         data: result
       });
     } catch (error) {
