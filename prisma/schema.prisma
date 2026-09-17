@@ -42,7 +42,7 @@ model AdminUsers {
   resetTokenExpiry DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-    sessions AdminSession[]
+ sessions AdminSession[]
 }
 model AdminSession {
   id Int @id @default(autoincrement())
@@ -610,7 +610,7 @@ model ScholarshipSection {
   title String
 
   description String
-
+   sortOrder Int @default(0)
   scholarship Scholarship @relation(fields: [scholarshipId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
@@ -739,24 +739,115 @@ model StudyAbroad {
 model StudyAbroadConsult {
   id Int @id @default(autoincrement())
 
+  // =========================
+  // USER / STUDY ABROAD
+  // =========================
   userId        Int
   studyAbroadId Int
 
-  preferredCountry String?
-  courseInterest   String?
-  budgetRange      String?
-  preferredIntake  String?
+  // =========================
+  // 1. STUDENT BASIC DETAILS
+  // =========================
+  fullName           String?
+  dateOfBirth        DateTime?
+  gender             String?
+  email              String?
+  mobileNumber       String?
+  whatsappNumber     String?
+  currentCityState   String?
+  countryOfCitizenship String?
 
+  // =========================
+  // 2. PARENT / GUARDIAN DETAILS
+  // =========================
+  parentGuardianName   String?
+  parentRelationship   String?
+  parentMobileNumber   String?
+  parentEmail          String?
+  parentOccupation     String?
+
+  // Multiple possible funding sources
+  primaryFundingSource String[] @default([])
+
+  // =========================
+  // 3. ACADEMIC DETAILS
+  // =========================
+  highestQualification String?
+  schoolCollegeUniversity String?
+  boardUniversity      String?
+  passingYear          String?
+  class10PercentageCGPA String?
+  class12PercentageCGPA String?
+
+  // =========================
+  // 4. FOREIGN EDUCATION PREFERENCES
+  // =========================
+  intendedStudyLevel String?
+  preferredIntake    String?
+
+  // Multiple countries
+  preferredCountries String[] @default([])
+
+  preferredCourseProgramme String?
+  preferredSpecialization  String?
+  preferredUniversities    String?
+  openToAlternativeUniversities Boolean?
+
+  // =========================
+  // 5. ENGLISH & ENTRANCE EXAMS
+  // =========================
+  englishTest String?
+  englishTestScoreDate String?
+
+  // Multiple entrance exams
+  otherEntranceExams String[] @default([])
+
+  entranceExamScoreDate String?
+
+  // =========================
+  // 6. CAREER & BUDGET PREFERENCES
+  // =========================
+ preferredCareerDomain String?
+  reasonToStudyAbroad  String?
+
+  // Multiple priorities
+  topPriorities String[] @default([])
+
+  annualTuitionBudget String?
+  totalEducationBudget String?
+
+  scholarshipRequired String?
+  educationLoanRequired String?
+
+  // =========================
+  // 7. PASSPORT & DOCUMENTS
+  // =========================
+  passportStatus String?
+  passportExpiryDate DateTime?
+
+  // Multiple available documents
+  documentsAvailable String[] @default([])
+
+  // =========================
+  // 9. SERVICES REQUIRED
+  // =========================
+  servicesRequired String[] @default([])
+
+  // =========================
+  // SYSTEM
+  // =========================
   message String?
-  status  String  @default("pending")
+  status  String @default("pending")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // =========================
+  // RELATIONS
+  // =========================
+  user Users @relation( fields: [userId], references: [id], onDelete: Cascade)
 
-  studyAbroad StudyAbroad @relation(fields: [studyAbroadId], references: [id], onDelete: Cascade)
+  studyAbroad StudyAbroad @relation( fields: [studyAbroadId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([studyAbroadId])
@@ -967,8 +1058,193 @@ model Careernewsletter{
   image String
   description String
   url String
+  type String?
 
   createdAt DateTime @default(now())
 
   updatedAt DateTime @updatedAt
+}
+
+model InstitutionImport {
+  id          Int      @id @default(autoincrement())
+
+  fileName    String
+
+  totalRows   Int      @default(0)
+  processed   Int      @default(0)
+  successful  Int      @default(0)
+  failed      Int      @default(0)
+  skipped     Int      @default(0)
+
+  status      String   @default("pending")
+
+  errorFile   String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+//  psychometric assessment model 
+model Assessment {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  description String?
+  version     String   @default("1.0")
+  status      String   @default("draft")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sections    AssessmentSection[]
+  attempts    AssessmentAttempt[]
+}
+model AssessmentSection {
+  id           Int      @id @default(autoincrement())
+
+  assessmentId Int
+  assessment   Assessment @relation(fields: [assessmentId],references: [id],onDelete: Cascade)
+
+  code         String
+  title        String
+  description  String?
+  order        Int
+
+  questions    AssessmentQuestion[]
+
+  @@unique([assessmentId, code])
+  @@index([assessmentId])
+}
+
+model AssessmentQuestion {
+  id          Int      @id @default(autoincrement())
+
+  sectionId   Int
+  section     AssessmentSection @relation(fields: [sectionId],references: [id],onDelete: Cascade)
+
+  itemId      String
+  text        String
+  type        String
+
+  facet       String?
+  reverse     Boolean  @default(false)
+
+  image       String?
+  note        String?
+
+  order       Int
+
+  options     AssessmentOption[]
+  answers     AssessmentAnswer[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([sectionId, itemId])
+  @@index([sectionId])
+  @@index([facet])
+}
+model AssessmentOption {
+  id          Int      @id @default(autoincrement())
+
+  questionId  Int
+  question    AssessmentQuestion @relation(fields: [questionId],references: [id],onDelete: Cascade)
+
+  optionText  String
+  optionIndex Int
+  isCorrect   Boolean  @default(false)
+
+  image       String?
+
+  createdAt   DateTime @default(now())
+
+  answers     AssessmentAnswer[]
+
+  @@unique([questionId, optionIndex])
+  @@index([questionId])
+}
+
+model AssessmentAttempt {
+  id           Int      @id @default(autoincrement())
+
+  assessmentId Int
+  assessment   Assessment @relation(fields: [assessmentId],references: [id])
+
+  userId       Int
+
+  startedAt    DateTime @default(now())
+  completedAt  DateTime?
+
+  status       String   @default("in_progress")
+
+  answers      AssessmentAnswer[]
+  result       AssessmentResult?
+
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([assessmentId])
+}
+
+model AssessmentAnswer {
+  id                Int      @id @default(autoincrement())
+
+  attemptId         Int
+  attempt           AssessmentAttempt @relation( fields: [attemptId], references: [id], onDelete: Cascade)
+
+  questionId        Int
+  question          AssessmentQuestion @relation( fields: [questionId], references: [id])
+
+  selectedOptionId  Int?
+  selectedOption    AssessmentOption? @relation(fields: [selectedOptionId], references: [id])
+
+  likertValue       Int?
+
+  answeredAt        DateTime @default(now())
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+}
+
+model AssessmentResult {
+  id                Int      @id @default(autoincrement())
+
+  attemptId         Int      @unique
+
+  attempt           AssessmentAttempt @relation( fields: [attemptId], references: [id], onDelete: Cascade)
+
+  hollandCode       String?
+  topCareerCluster  String?
+  topCareerMatch    Float?
+  scores            Json
+  top5Clusters      Json
+
+  createdAt         DateTime @default(now())
+}
+
+model CareerCluster {
+  id           Int      @id @default(autoincrement())
+
+  code         String   @unique
+  name         String
+  hollandCode  String?
+  description  String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  weights      CareerClusterWeight[]
+}
+
+model CareerClusterWeight {
+  id          Int      @id @default(autoincrement())
+
+  clusterId   Int
+  cluster     CareerCluster @relation( fields: [clusterId], references: [id], onDelete: Cascade)
+
+  facet       String
+  weight      Float
+
+  @@unique([clusterId, facet])
+  @@index([clusterId])
 }
