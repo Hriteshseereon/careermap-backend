@@ -10,6 +10,10 @@ import {
   normalizeSectionCode
 } from "./psychoassessment.engine.js";
 
+import {
+  seedCareerClustersToDatabase
+} from "./psychoassessment.seed.js";
+
 
 function generateQuestionItemId(sectionCode, facet, count = 1) {
   const code = normalizeSectionCode(sectionCode || "");
@@ -513,11 +517,15 @@ export const assessmentService = {
       description: body.description || null
     });
 
-    // If weights are provided inline
-    if (Array.isArray(body.weights) && body.weights.length > 0) {
-      for (const w of body.weights) {
+    // If weights are provided inline (as array or object)
+    if (body.weights && typeof body.weights === "object") {
+      const weightsList = Array.isArray(body.weights)
+        ? body.weights
+        : Object.entries(body.weights).map(([facet, weight]) => ({ facet, weight }));
+
+      for (const w of weightsList) {
         if (w.facet && w.weight !== undefined) {
-          await assessmentRepository.upsertCareerClusterWeight(cluster.id, w.facet, w.weight);
+          await assessmentRepository.upsertCareerClusterWeight(cluster.id, w.facet, Number(w.weight));
         }
       }
       return assessmentRepository.findCareerClusterById(cluster.id);
@@ -528,6 +536,53 @@ export const assessmentService = {
 
   getAllCareerClusters: async () => {
     return assessmentRepository.getCareerClusters();
+  },
+
+  seedDefaultCareerClusters: async () => {
+    return seedCareerClustersToDatabase();
+  },
+
+  bulkImportCareerClusters: async (clustersArray) => {
+    if (!Array.isArray(clustersArray) || !clustersArray.length) {
+      throw new Error("Clusters array is required");
+    }
+
+    const results = [];
+    for (const item of clustersArray) {
+      if (!item.code || !item.name) continue;
+
+      let cluster = await assessmentRepository.findCareerClusterByCode(item.code);
+      if (cluster) {
+        cluster = await assessmentRepository.updateCareerCluster(cluster.id, {
+          name: item.name,
+          hollandCode: item.hollandCode || null,
+          description: item.description || null
+        });
+      } else {
+        cluster = await assessmentRepository.createCareerCluster({
+          code: item.code,
+          name: item.name,
+          hollandCode: item.hollandCode || null,
+          description: item.description || null
+        });
+      }
+
+      if (item.weights && typeof item.weights === "object") {
+        const weightsList = Array.isArray(item.weights)
+          ? item.weights
+          : Object.entries(item.weights).map(([facet, weight]) => ({ facet, weight }));
+
+        for (const w of weightsList) {
+          if (w.facet && w.weight !== undefined) {
+            await assessmentRepository.upsertCareerClusterWeight(cluster.id, w.facet, Number(w.weight));
+          }
+        }
+      }
+
+      results.push(await assessmentRepository.findCareerClusterById(cluster.id));
+    }
+
+    return results;
   },
 
   getCareerClusterById: async (clusterId) => {
@@ -559,12 +614,16 @@ export const assessmentService = {
 
     const updated = await assessmentRepository.updateCareerCluster(clusterId, updateData);
 
-    // If weights array is provided, upsert them
-    if (Array.isArray(body.weights)) {
+    // If weights are provided, upsert them
+    if (body.weights && typeof body.weights === "object") {
+      const weightsList = Array.isArray(body.weights)
+        ? body.weights
+        : Object.entries(body.weights).map(([facet, weight]) => ({ facet, weight }));
+
       await assessmentRepository.deleteWeightsByClusterId(clusterId);
-      for (const w of body.weights) {
+      for (const w of weightsList) {
         if (w.facet && w.weight !== undefined) {
-          await assessmentRepository.upsertCareerClusterWeight(clusterId, w.facet, w.weight);
+          await assessmentRepository.upsertCareerClusterWeight(clusterId, w.facet, Number(w.weight));
         }
       }
       return assessmentRepository.findCareerClusterById(clusterId);

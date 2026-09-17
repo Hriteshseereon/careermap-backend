@@ -185,6 +185,18 @@ router.delete(
 // ============================================================
 
 router.post(
+  "/admin/career-clusters/seed-defaults",
+  protectAdmin,
+  assessmentController.seedDefaultCareerClusters
+);
+
+router.post(
+  "/admin/career-clusters/bulk-import",
+  protectAdmin,
+  assessmentController.bulkImportCareerClusters
+);
+
+router.post(
   "/admin/career-clusters",
   protectAdmin,
   assessmentController.createCareerCluster

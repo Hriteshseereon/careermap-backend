@@ -448,6 +448,41 @@ export const assessmentController = {
     }
   },
 
+  seedDefaultCareerClusters: async (req, res) => {
+    try {
+      const result = await assessmentService.seedDefaultCareerClusters();
+      return res.status(200).json({
+        success: true,
+        message: "Default 18 career clusters and weights seeded successfully",
+        count: result.length,
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
+  bulkImportCareerClusters: async (req, res) => {
+    try {
+      const clusters = Array.isArray(req.body) ? req.body : req.body.clusters;
+      const result = await assessmentService.bulkImportCareerClusters(clusters);
+      return res.status(200).json({
+        success: true,
+        message: "Career clusters imported successfully",
+        count: result.length,
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
   getCareerClusterById: async (req, res) => {
     try {
       const result = await assessmentService.getCareerClusterById(req.params.clusterId);
