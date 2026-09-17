@@ -15,6 +15,18 @@ const router = express.Router();
 // ============================================================
 
 router.post(
+  "/admin/assessments/seed-defaults",
+  protectAdmin,
+  assessmentController.seedDefaultAssessmentAndQuestions
+);
+
+router.post(
+  "/admin/questions/seed-defaults",
+  protectAdmin,
+  assessmentController.seedDefaultAssessmentAndQuestions
+);
+
+router.post(
   "/admin/assessments",
   protectAdmin,
   assessmentController.createAssessment

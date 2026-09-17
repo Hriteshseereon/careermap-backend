@@ -14,6 +14,10 @@ import {
   seedCareerClustersToDatabase
 } from "./psychoassessment.seed.js";
 
+import {
+  seedAssessmentAndQuestions
+} from "./psychoassessment.questions.seed.js";
+
 
 function generateQuestionItemId(sectionCode, facet, count = 1) {
   const code = normalizeSectionCode(sectionCode || "");
@@ -57,6 +61,10 @@ export const assessmentService = {
       version: body.version || "1.0",
       status: body.status || "draft"
     });
+  },
+
+  seedDefaultAssessmentAndQuestions: async (targetAssessmentId = null) => {
+    return seedAssessmentAndQuestions(targetAssessmentId);
   },
 
   getAllAssessments: async (query = {}) => {

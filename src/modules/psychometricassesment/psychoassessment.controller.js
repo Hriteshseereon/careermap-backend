@@ -30,6 +30,23 @@ export const assessmentController = {
     }
   },
 
+  seedDefaultAssessmentAndQuestions: async (req, res) => {
+    try {
+      const assessmentId = req.body?.assessmentId || req.params?.assessmentId || null;
+      const result = await assessmentService.seedDefaultAssessmentAndQuestions(assessmentId);
+      return res.status(200).json({
+        success: true,
+        message: "Default assessment, 6 sections, and 163 questions seeded successfully",
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
   getAllAssessments: async (req, res) => {
     try {
       const result = await assessmentService.getAllAssessments(req.query);
