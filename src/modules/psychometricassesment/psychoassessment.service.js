@@ -785,8 +785,22 @@ export const assessmentService = {
       });
     }
 
+    const studentFullName = attempt.user
+      ? [attempt.user.firstName, attempt.user.lastName].filter(Boolean).join(" ") || attempt.user.username || attempt.user.email
+      : null;
+
     return {
       ...attempt,
+      studentName: studentFullName,
+      className: attempt.user?.profile?.class || null,
+      school: attempt.user?.institute?.name || null,
+      email: attempt.user?.email || null,
+      phone: attempt.user?.mobile || null,
+      hollandCode: attempt.result?.hollandCode || null,
+      topCareerCluster: attempt.result?.topCareerCluster || null,
+      topCareerMatch: attempt.result?.topCareerMatch || null,
+      scores: attempt.result?.scores || null,
+      top5Clusters: attempt.result?.top5Clusters || null,
       report
     };
   },
