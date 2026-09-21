@@ -100,6 +100,7 @@ model Users {
   previewSessions  PreviewSession[]
    reviews MentorReview[]
    psychometricAssessments PsychometricAssessment[]
+   assessmentAttempts AssessmentAttempt[]
 }
 
 model Subscriptions {
@@ -1171,6 +1172,7 @@ model AssessmentAttempt {
   assessment   Assessment @relation(fields: [assessmentId],references: [id])
 
   userId       Int
+  user         Users      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   startedAt    DateTime @default(now())
   completedAt  DateTime?
