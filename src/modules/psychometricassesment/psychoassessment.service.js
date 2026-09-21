@@ -732,7 +732,7 @@ export const assessmentService = {
   // =========================================================
 
   getAllAttemptsAdmin: async (query = {}) => {
-    const { assessmentId, userId, status, page = 1, limit = 20 } = query;
+    const { assessmentId, userId, status, search, page = 1, limit = 20 } = query;
     const skip = (Number(page) - 1) * Number(limit);
 
     const [attempts, total] = await Promise.all([
@@ -740,10 +740,11 @@ export const assessmentService = {
         assessmentId,
         userId,
         status,
+        search,
         skip,
         take: Number(limit)
       }),
-      assessmentRepository.countAttempts({ assessmentId, userId, status })
+      assessmentRepository.countAttempts({ assessmentId, userId, status, search })
     ]);
 
     return {
@@ -762,7 +763,32 @@ export const assessmentService = {
     if (!attempt) {
       throw new Error("Attempt not found");
     }
-    return attempt;
+
+    let report = null;
+    if (attempt.result) {
+      const clusters = await assessmentRepository.getCareerClusters();
+      const rankedClusters = calculateClusterMatches(attempt.result.scores, clusters);
+      const studentName = attempt.user
+        ? [attempt.user.firstName, attempt.user.lastName].filter(Boolean).join(" ") || attempt.user.username || attempt.user.email
+        : null;
+      const className = attempt.user?.profile?.class || null;
+      const school = attempt.user?.institute?.name || null;
+
+      report = buildAssessmentReport({
+        studentName,
+        className,
+        school,
+        scores: attempt.result.scores,
+        hollandCode: attempt.result.hollandCode,
+        rankedClusters,
+        completedAt: attempt.completedAt || attempt.result.createdAt
+      });
+    }
+
+    return {
+      ...attempt,
+      report
+    };
   },
 
   deleteAttemptAdmin: async (attemptId) => {
@@ -1141,20 +1167,42 @@ export const assessmentService = {
     // Mark attempt completed
     await assessmentRepository.completeAttempt(attemptId);
 
+    // Fetch updated attempt to ensure completedAt and user details are fresh
+    const updatedAttempt = await assessmentRepository.findAttemptById(attemptId);
+
+    const studentName = updatedAttempt?.user
+      ? [updatedAttempt.user.firstName, updatedAttempt.user.lastName].filter(Boolean).join(" ") || updatedAttempt.user.username || updatedAttempt.user.email
+      : null;
+    const className = updatedAttempt?.user?.profile?.class || null;
+    const school = updatedAttempt?.user?.institute?.name || null;
+
     // Build rich formatted report matching Career Compass report structure
     const fullReport = buildAssessmentReport({
-      studentName: null,
-      className: null,
-      school: null,
+      studentName,
+      className,
+      school,
       scores,
       hollandCode,
       rankedClusters,
-      completedAt: new Date()
+      completedAt: updatedAttempt?.completedAt || new Date()
     });
 
     return {
       resultId: resultRecord.id,
       attemptId: Number(attemptId),
+      assessmentId: attempt.assessmentId,
+      assessmentTitle: attempt.assessment.title,
+      user: updatedAttempt?.user ? {
+        id: updatedAttempt.user.id,
+        name: studentName,
+        firstName: updatedAttempt.user.firstName,
+        lastName: updatedAttempt.user.lastName,
+        username: updatedAttempt.user.username,
+        email: updatedAttempt.user.email,
+        mobile: updatedAttempt.user.mobile,
+        class: className,
+        school: school
+      } : null,
       hollandCode: resultRecord.hollandCode,
       topCareerCluster: resultRecord.topCareerCluster,
       topCareerMatch: resultRecord.topCareerMatch,
@@ -1182,10 +1230,16 @@ export const assessmentService = {
     const clusters = await assessmentRepository.getCareerClusters();
     const rankedClusters = calculateClusterMatches(result.scores, clusters);
 
+    const studentName = attempt.user
+      ? [attempt.user.firstName, attempt.user.lastName].filter(Boolean).join(" ") || attempt.user.username || attempt.user.email
+      : null;
+    const className = attempt.user?.profile?.class || null;
+    const school = attempt.user?.institute?.name || null;
+
     const fullReport = buildAssessmentReport({
-      studentName: null,
-      className: null,
-      school: null,
+      studentName,
+      className,
+      school,
       scores: result.scores,
       hollandCode: result.hollandCode,
       rankedClusters,
@@ -1199,6 +1253,17 @@ export const assessmentService = {
       assessmentTitle: attempt.assessment.title,
       status: attempt.status,
       completedAt: attempt.completedAt,
+      user: attempt.user ? {
+        id: attempt.user.id,
+        name: studentName,
+        firstName: attempt.user.firstName,
+        lastName: attempt.user.lastName,
+        username: attempt.user.username,
+        email: attempt.user.email,
+        mobile: attempt.user.mobile,
+        class: className,
+        school: school
+      } : null,
       hollandCode: result.hollandCode,
       topCareerCluster: result.topCareerCluster,
       topCareerMatch: result.topCareerMatch,

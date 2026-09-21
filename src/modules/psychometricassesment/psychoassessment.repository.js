@@ -673,6 +673,29 @@ export const assessmentRepository = {
         id: Number(attemptId)
       },
       include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            email: true,
+            mobile: true,
+            gender: true,
+            institute: {
+              select: {
+                id: true,
+                name: true
+              }
+            },
+            profile: {
+              select: {
+                class: true,
+                stream: true
+              }
+            }
+          }
+        },
         assessment: {
           include: {
             sections: {
@@ -712,7 +735,7 @@ export const assessmentRepository = {
     });
   },
 
-  findAllAttempts: ({ assessmentId, userId, status, skip = 0, take = 50 } = {}) => {
+  findAllAttempts: ({ assessmentId, userId, status, search, skip = 0, take = 50 } = {}) => {
     const where = {};
 
     if (assessmentId) {
@@ -727,6 +750,16 @@ export const assessmentRepository = {
       where.status = status;
     }
 
+    if (search) {
+      where.OR = [
+        { user: { firstName: { contains: search, mode: "insensitive" } } },
+        { user: { lastName: { contains: search, mode: "insensitive" } } },
+        { user: { username: { contains: search, mode: "insensitive" } } },
+        { user: { email: { contains: search, mode: "insensitive" } } },
+        { assessment: { title: { contains: search, mode: "insensitive" } } }
+      ];
+    }
+
     return prisma.assessmentAttempt.findMany({
       where,
       skip: Number(skip),
@@ -735,6 +768,28 @@ export const assessmentRepository = {
         createdAt: "desc"
       },
       include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            email: true,
+            mobile: true,
+            institute: {
+              select: {
+                id: true,
+                name: true
+              }
+            },
+            profile: {
+              select: {
+                class: true,
+                stream: true
+              }
+            }
+          }
+        },
         assessment: {
           select: {
             id: true,
@@ -753,7 +808,7 @@ export const assessmentRepository = {
     });
   },
 
-  countAttempts: ({ assessmentId, userId, status } = {}) => {
+  countAttempts: ({ assessmentId, userId, status, search } = {}) => {
     const where = {};
 
     if (assessmentId) {
@@ -768,6 +823,16 @@ export const assessmentRepository = {
       where.status = status;
     }
 
+    if (search) {
+      where.OR = [
+        { user: { firstName: { contains: search, mode: "insensitive" } } },
+        { user: { lastName: { contains: search, mode: "insensitive" } } },
+        { user: { username: { contains: search, mode: "insensitive" } } },
+        { user: { email: { contains: search, mode: "insensitive" } } },
+        { assessment: { title: { contains: search, mode: "insensitive" } } }
+      ];
+    }
+
     return prisma.assessmentAttempt.count({ where });
   },
 
@@ -780,6 +845,16 @@ export const assessmentRepository = {
         createdAt: "desc"
       },
       include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            username: true,
+            email: true,
+            mobile: true
+          }
+        },
         assessment: {
           select: {
             id: true,
