@@ -1,3 +1,8 @@
+import prisma from "../../config/db.js";
+import {
+  isAssessmentModule,
+  canAccessAssessment
+} from "../../constants/assessmentAccess.js";
 import {
   assessmentRepository
 } from "./psychoassessment.repository.js";
@@ -308,6 +313,86 @@ export const assessmentService = {
     }
 
     return question;
+  },
+
+  bulkCreateQuestions: async (targetSectionId, payload) => {
+    let questionsArray = [];
+    let commonDefaults = {};
+
+    if (Array.isArray(payload)) {
+      questionsArray = payload;
+    } else if (payload && typeof payload === "object") {
+      questionsArray = payload.questions || [];
+      commonDefaults = {
+        sectionId: payload.sectionId || targetSectionId,
+        facet: payload.facet,
+        type: payload.type,
+        reverse: payload.reverse
+      };
+    }
+
+    if (!Array.isArray(questionsArray) || !questionsArray.length) {
+      throw new Error("Questions array is required");
+    }
+
+    const createdQuestions = [];
+
+    for (let i = 0; i < questionsArray.length; i++) {
+      const item = questionsArray[i];
+      const sectionId = item.sectionId || commonDefaults.sectionId || targetSectionId;
+
+      if (!sectionId) {
+        throw new Error(`Section ID is required for question index ${i}`);
+      }
+
+      if (!item.text) {
+        throw new Error(`Question text is required at index ${i}`);
+      }
+
+      const section = await assessmentRepository.findSectionById(sectionId);
+      if (!section) {
+        throw new Error(`Section with ID ${sectionId} not found at index ${i}`);
+      }
+
+      const qFacet = item.facet || commonDefaults.facet || null;
+      const qReverse = item.reverse !== undefined ? Boolean(item.reverse) : Boolean(commonDefaults.reverse);
+      const qType = item.type || commonDefaults.type || (item.options?.length ? "mcq" : "likert5");
+
+      // Auto-generate item code
+      let itemId = item.itemId ? String(item.itemId).trim() : null;
+      if (!itemId) {
+        const count = await assessmentRepository.countQuestionsBySectionId(sectionId);
+        itemId = generateQuestionItemId(section.code, qFacet, count + 1 + i);
+      }
+
+      const existing = await assessmentRepository.findQuestionByItemId(sectionId, itemId);
+      if (existing) {
+        itemId = `${itemId}_${Date.now().toString().slice(-4)}_${i}`;
+      }
+
+      const qOrder = item.order !== undefined ? Number(item.order) : i + 1;
+
+      const question = await assessmentRepository.createQuestion({
+        sectionId: Number(sectionId),
+        itemId,
+        text: item.text,
+        type: qType,
+        facet: qFacet,
+        reverse: qReverse,
+        image: item.image || null,
+        note: item.note || null,
+        order: qOrder
+      });
+
+      if (qType === "mcq" && Array.isArray(item.options) && item.options.length > 0) {
+        await assessmentRepository.createOptions(question.id, item.options);
+      }
+
+      const fullQuestion = await assessmentRepository.findQuestionById(question.id);
+      createdQuestions.push(fullQuestion);
+    }
+
+    return createdQuestions;
   },
 
   getAllQuestions: async (query = {}) => {
@@ -785,8 +870,22 @@ export const assessmentService = {
       });
     }
 
+    const studentFullName = attempt.user
+      ? [attempt.user.firstName, attempt.user.lastName].filter(Boolean).join(" ") || attempt.user.username || attempt.user.email
+      : null;
+
     return {
       ...attempt,
+      studentName: studentFullName,
+      className: attempt.user?.profile?.class || null,
+      school: attempt.user?.institute?.name || null,
+      email: attempt.user?.email || null,
+      phone: attempt.user?.mobile || null,
+      hollandCode: attempt.result?.hollandCode || null,
+      topCareerCluster: attempt.result?.topCareerCluster || null,
+      topCareerMatch: attempt.result?.topCareerMatch || null,
+      scores: attempt.result?.scores || null,
+      top5Clusters: attempt.result?.top5Clusters || null,
       report
     };
   },
@@ -853,9 +952,97 @@ export const assessmentService = {
   },
 
 
-  // =========================================================
-  // USER: TEST TAKING & RESULTS
-  // =========================================================
+  verifyUserAssessmentAccess: async (userId) => {
+    if (!userId) {
+      return { allowed: false, reason: "UNAUTHORIZED", message: "User is not authenticated" };
+    }
+
+    const user = await prisma.users.findUnique({
+      where: { id: Number(userId) },
+      select: {
+        id: true,
+        isInstituteStudent: true,
+        instituteId: true
+      }
+    });
+
+    if (!user) {
+      return { allowed: false, reason: "USER_NOT_FOUND", message: "User not found" };
+    }
+
+    // 1. Institute students have free unlimited access
+    if (canAccessAssessment(user)) {
+      return {
+        allowed: true,
+        isInstituteStudent: true,
+        message: "Access granted (Institute Student)"
+      };
+    }
+
+    // 2. Normal users: Check active subscriptions containing assessment module
+    const activeSubscriptions = await prisma.subscriptions.findMany({
+      where: {
+        userId: Number(userId),
+        status: "active",
+        endDate: { gte: new Date() }
+      },
+      include: {
+        plan: {
+          include: {
+            modules: true
+          }
+        }
+      },
+      orderBy: {
+        startDate: "desc"
+      }
+    });
+
+    const validSubscription = activeSubscriptions.find((sub) =>
+      sub.plan?.modules?.some((mod) => isAssessmentModule(mod))
+    );
+
+    if (!validSubscription) {
+      return {
+        allowed: false,
+        reason: "NO_ACTIVE_PLAN",
+        requiresNewPlan: true,
+        message: "Assessment is locked. Please purchase an assessment plan to unlock access."
+      };
+    }
+
+    // 3. One completed assessment per subscription rule
+    // Check if user has already completed an attempt on or after the start date of this active subscription
+    const completedAttempt = await prisma.assessmentAttempt.findFirst({
+      where: {
+        userId: Number(userId),
+        status: "completed",
+        completedAt: {
+          gte: validSubscription.startDate
+        }
+      },
+      orderBy: {
+        completedAt: "desc"
+      }
+    });
+
+    if (completedAttempt) {
+      return {
+        allowed: false,
+        reason: "ALREADY_COMPLETED",
+        requiresNewPlan: true,
+        completedAttemptId: completedAttempt.id,
+        completedAt: completedAttempt.completedAt,
+        message: "You have already completed your assessment under your current plan. Please subscribe to a new assessment plan to retake the test."
+      };
+    }
+
+    return {
+      allowed: true,
+      subscriptionId: validSubscription.id,
+      planTitle: validSubscription.plan?.title
+    };
+  },
 
   getPublishedAssessments: async () => {
     return assessmentRepository.findAllPublishedAssessments();
@@ -872,6 +1059,16 @@ export const assessmentService = {
   startAttempt: async (userId, assessmentId) => {
     if (!userId) {
       throw new Error("User ID is required to start assessment");
+    }
+
+    // Access check & 1 completed test per subscription enforcement
+    const access = await assessmentService.verifyUserAssessmentAccess(userId);
+    if (!access.allowed) {
+      const err = new Error(access.message);
+      err.status = 403;
+      err.reason = access.reason;
+      err.requiresNewPlan = Boolean(access.requiresNewPlan);
+      throw err;
     }
 
     const assessment = await assessmentRepository.findPublishedAssessmentById(assessmentId);

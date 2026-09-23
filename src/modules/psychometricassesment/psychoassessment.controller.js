@@ -249,6 +249,23 @@ export const assessmentController = {
     }
   },
 
+  bulkCreateQuestions: async (req, res) => {
+    try {
+      const sectionId = req.params?.sectionId || req.body?.sectionId || null;
+      const result = await assessmentService.bulkCreateQuestions(sectionId, req.body);
+      return res.status(201).json({
+        success: true,
+        message: `${result.length} questions created successfully`,
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
   getAllQuestions: async (req, res) => {
     try {
       const result = await assessmentService.getAllQuestions(req.query);
@@ -732,6 +749,22 @@ export const assessmentController = {
     }
   },
 
+  checkUserAccess: async (req, res) => {
+    try {
+      const userId = getUserId(req);
+      const result = await assessmentService.verifyUserAssessmentAccess(userId);
+      return res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
   startAttempt: async (req, res) => {
     try {
       const userId = getUserId(req);
@@ -742,8 +775,11 @@ export const assessmentController = {
         data: result
       });
     } catch (error) {
-      return res.status(400).json({
+      const statusCode = error.status || 400;
+      return res.status(statusCode).json({
         success: false,
+        reason: error.reason || "ERROR",
+        requiresNewPlan: Boolean(error.requiresNewPlan),
         message: error.message
       });
     }
