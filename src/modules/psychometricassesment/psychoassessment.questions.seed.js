@@ -262,7 +262,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT06", facet: "Log", type: "mcq", order: 6, reverse: false,
-    text: "Series: 7 O * E B # I 9 P U % K Z $ A 0 — How many vowels are immediately preceded by a symbol?",
+    text: "Refer to the alphanumeric series given below and answer the following question: 7 O * E B # I 9 P U % K Z $ A 0 — How many vowels in the above arrangement are preceded by a symbol?",
     options: [
       { optionText: "One", isCorrect: false },
       { optionText: "Two", isCorrect: false },
@@ -272,7 +272,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT07", facet: "Voc", type: "mcq", order: 7, reverse: false,
-    text: "Complete: 'Youth is the time ___ the seeds of character are sown.'",
+    text: "Complete the following sentences by supplying appropriate connecting words: 'Youth is the time ___ the seeds of character are sown.'",
     options: [
       { optionText: "When", isCorrect: true },
       { optionText: "Where", isCorrect: false },
@@ -282,7 +282,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT08", facet: "Voc", type: "mcq", order: 8, reverse: false,
-    text: "'I told him that he was not working hard.' — direct speech form:",
+    text: "'I told him that he was not working hard.' — Find the most suitable statement that expresses this in direct speech.",
     options: [
       { optionText: "I told him, \"You were not working hard.\"", isCorrect: false },
       { optionText: "I said to him, \"He is not working hard.\"", isCorrect: false },
@@ -292,7 +292,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT09", facet: "Voc", type: "mcq", order: 9, reverse: false,
-    text: "[Internet passage] Which option best describes the main idea?",
+    text: "The Internet has revolutionized communication, making information accessible at lightning speed. However, this ease of access has raised concerns about privacy and misinformation. _ Which of the following best describes the main idea of the passage?",
     options: [
       { optionText: "The Internet has made personal privacy stronger than before.", isCorrect: false },
       { optionText: "The Internet provides rapid access to information but poses challenges like privacy concerns.", isCorrect: true },
@@ -312,7 +312,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT11", facet: "Voc", type: "mcq", order: 11, reverse: false,
-    text: "Find the incorrect part: 'Barely had he arrived to the office when the phone rang.'",
+    text: "Find the incorrect part in this sentence: 'Barely had he arrived to the office when the phone rang.'",
     options: [
       { optionText: "Barely", isCorrect: false },
       { optionText: "had he", isCorrect: false },
@@ -322,7 +322,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT12", facet: "Voc", type: "mcq", order: 12, reverse: false,
-    text: "Word most similar in meaning to 'Ubiquitous':",
+    text: "Identify the word that is most similar in meaning to \"Ubiquitous\":",
     options: [
       { optionText: "Rare", isCorrect: false },
       { optionText: "Widespread", isCorrect: true },
@@ -332,7 +332,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT13", facet: "Num", type: "mcq", order: 13, reverse: false,
-    text: "Profit is 220% of cost. Cost rises 10%, selling price constant. Profit is approximately what % of selling price?",
+    text: "In a Adidas store, the profit is 220% of the cost. If the cost increases by 10% but the selling price remains constant, approximately what percentage of the selling price is the profit?",
     options: [
       { optionText: "66", isCorrect: true },
       { optionText: "54", isCorrect: false },
@@ -342,7 +342,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT14", facet: "Num", type: "mcq", order: 14, reverse: false,
-    text: "Binay (17 km/hr) and Surjay (19 km/hr) travel X to Y, 72 km apart. Surjay reaches Y, returns, meets Binay at Z. Distance Z to Y (km)?",
+    text: "Binay and surjay travels from point X to Y at a speed of 17 km/hr and 19 km/hr respectively. point X and Y are 72 km away from each other. Surjay reaches Y first and returns immediately and meets Binay at Z. Find the distance between Z to Y.",
     options: [
       { optionText: "4", isCorrect: true },
       { optionText: "6", isCorrect: false },
@@ -352,7 +352,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT15", facet: "Num", type: "mcq", order: 15, reverse: false,
-    text: "In what time does money become 4.2 times itself at 16% p.a. simple interest?",
+    text: "In what time does a sum of money becomes 4.2 times of itself at simple interest rate is 16% per annum?",
     options: [
       { optionText: "15 years", isCorrect: false },
       { optionText: "20 years", isCorrect: true },
@@ -362,7 +362,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT16", facet: "Num", type: "mcq", order: 16, reverse: false,
-    text: "A and B complete work in 21 and 28 days; contract is ₹49,000. B's share?",
+    text: "A and B can complete a piece of work in 21 and 28 days respectively. They contracted to complete the work for 49000 rupees. The share of B in the contracted money will be?",
     options: [
       { optionText: "₹28,000", isCorrect: false },
       { optionText: "₹24,000", isCorrect: false },
@@ -372,7 +372,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT17", facet: "Num", type: "mcq", order: 17, reverse: false,
-    text: "Sum of the first 50 natural numbers:",
+    text: "Evaluate the sum of the first 50 natural numbers.",
     options: [
       { optionText: "1175", isCorrect: false },
       { optionText: "1275", isCorrect: true },
@@ -392,7 +392,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT19", facet: "Num", type: "mcq", order: 19, reverse: false,
-    text: "Product of two numbers is 120, sum is 26. The numbers are:",
+    text: "If a product of two numbers is 120 and their sum is 26, find the numbers.",
     options: [
       { optionText: "12 and 10", isCorrect: false },
       { optionText: "15 and 11", isCorrect: false },
@@ -424,7 +424,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT22", facet: "Mech", type: "mcq", order: 22, reverse: false,
-    text: "Single fixed ideal pulley lifting 150 kg (g = 9.8 m/s²). Force needed?",
+    text: "A person uses a single fixed pulley to lift a box weighing 150 kg. How much force does the person need to apply if the pulley is ideal and there is no friction?",
     options: [
       { optionText: "150 N", isCorrect: false },
       { optionText: "1000 N", isCorrect: false },
@@ -434,7 +434,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT23", facet: "Mech", type: "mcq", order: 23, reverse: false,
-    text: "What would be the current flowing through point X if another identical power source were to be added in parallel to the circuit?",
+    text: "What would be the current flowing through point X if another identical power source were to be added in parallel to the circuit? ",
     note: "Circuit diagram question",
     image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789794808/23q.png",
     options: [
@@ -446,7 +446,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT24", facet: "Mech", type: "mcq", order: 24, reverse: false,
-    text: "Load of 100 N lifted with 50 N force in a pulley system. Mechanical advantage?",
+    text: "In a simple pulley system, a load of 100 N is lifted by applying a force of 50 N. What is the mechanical advantage of the pulley system? ",
     options: [
       { optionText: "1", isCorrect: false },
       { optionText: "2", isCorrect: true },
@@ -456,7 +456,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT25", facet: "Mech", type: "mcq", order: 25, reverse: false,
-    text: "Seesaw: 40 kg boy sits 2 m from fulcrum. How far should a 30 kg boy sit to balance (m)?",
+    text: "A seesaw is balanced on a fulcrum in the middle. If a boy weighing 40 kg sits 2 metres from the fulcrum on one side, where should another boy weighing 30 kg sit on the other side to balance the seesaw? ",
     options: [
       { optionText: "2.67", isCorrect: true },
       { optionText: "3.55", isCorrect: false },
@@ -466,7 +466,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT26", facet: "Verb", type: "mcq", order: 26, reverse: false,
-    text: "Arrange: widespread / has / in / modern / technology / society / a / impact",
+    text: "Arrange the following words to form the most meaningful sentence: widespread / has / in / modern / technology / society / a / impact",
     options: [
       { optionText: "Modern society has a widespread impact in technology.", isCorrect: false },
       { optionText: "Technology has a widespread impact in modern society.", isCorrect: true },
@@ -476,7 +476,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT27", facet: "Verb", type: "mcq", order: 27, reverse: false,
-    text: "Given below are five sentences S1, P, Q, R and S that make a paragraph. The sentences making the paragraph have been jumbled randomly, only the first sentence S1 is at its right place. Find out the correct sequence in which P, Q, R and S should follow after S1 so that a coherent and meaningful paragraph is made.\n\nS1: The discovery of penicillin marked a turning point in medical history.\nP. This discovery eventually led to the development of antibiotics.\nQ. It was the first time that bacteria-caused infections could be effectively treated.\nR. Penicillin was discovered by Alexander Fleming in 1928.\nS. Before this, infections were often fatal due to lack of effective treatments.",
+    text: "Given below are five sentences S1, P, Q, R and S that make a paragraph. The sentences making the paragraph have been jumbled randomly, only the first sentence\nS1 is at its right place. Find out the correct sequence in which P, Q, R and S should follow after S1 so that a coherent and meaningful paragraph is made.\n\nS1: The discovery of penicillin marked a turning point in medical history.\n\nP. This discovery eventually led to the development of antibiotics.\nQ. It was the first time that bacteria-caused infections could be effectively treated.\nR. Penicillin was discovered by Alexander Fleming in 1928.\nS. Before this, infections were often fatal due to lack of effective treatments.",
     options: [
       { optionText: "RQPS", isCorrect: false },
       { optionText: "RQSP", isCorrect: false },
@@ -486,7 +486,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT28", facet: "Verb", type: "mcq", order: 28, reverse: false,
-    text: "Sentence using 'apprehensive' correctly:",
+    text: "Select the sentence that uses the word 'apprehensive' correctly.",
     options: [
       { optionText: "She felt apprehensive before her first day at the new school.", isCorrect: true },
       { optionText: "The apprehensive sun shone brightly over the clear blue sky.", isCorrect: false },
@@ -496,7 +496,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT29", facet: "Verb", type: "mcq", order: 29, reverse: false,
-    text: "Statement: \"All successful students plan their studies well in advance. Those who procrastinate often face difficulties in exams.\"\n\nWhich of the following conclusions can be drawn from the above statement?",
+    text: "Statement: \"All successful students plan their studies well in advance. Those who procrastinate often face difficulties in exams.\"\nWhich of the following conclusions can be drawn from the above statement?",
     options: [
       { optionText: "Students who plan never face any difficulties in life.", isCorrect: false },
       { optionText: "Planning is essential for academic success.", isCorrect: true },
@@ -595,7 +595,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT38", facet: "Spat", type: "mcq", order: 38, reverse: false,
-    text: "Cube painted on all sides, cut into 64 equal cubes. How many have exactly one painted face?",
+    text: "A cube is painted on all sides and then cut into smaller cubes. If the original cube is cut into 64 smaller cubes, how many of these smaller cubes will have exactly one face painted?",
     options: [
       { optionText: "24", isCorrect: true },
       { optionText: "26", isCorrect: false },

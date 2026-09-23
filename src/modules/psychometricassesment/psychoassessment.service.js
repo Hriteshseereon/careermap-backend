@@ -1044,8 +1044,17 @@ export const assessmentService = {
     };
   },
 
-  getPublishedAssessments: async () => {
-    return assessmentRepository.findAllPublishedAssessments();
+  getPublishedAssessments: async (userId = null) => {
+    const assessments = await assessmentRepository.findAllPublishedAssessments();
+    if (!userId) {
+      return assessments;
+    }
+
+    const access = await assessmentService.verifyUserAssessmentAccess(userId);
+    return {
+      assessments,
+      access
+    };
   },
 
   getAssessment: async (assessmentId) => {
