@@ -120,6 +120,18 @@ router.post(
   assessmentController.createQuestion
 );
 
+router.post(
+  "/admin/sections/:sectionId/questions/bulk",
+  protectAdmin,
+  assessmentController.bulkCreateQuestions
+);
+
+router.post(
+  "/admin/questions/bulk",
+  protectAdmin,
+  assessmentController.bulkCreateQuestions
+);
+
 router.get(
   "/admin/sections/:sectionId/questions",
   protectAdmin,
@@ -306,6 +318,12 @@ router.get(
   "/assessments",
   protectAuth,
   assessmentController.getPublishedAssessments
+);
+
+router.get(
+  "/assessment/user/access-status",
+  protectAuth,
+  assessmentController.checkUserAccess
 );
 
 router.get(

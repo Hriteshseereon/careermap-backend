@@ -404,6 +404,7 @@ export const DEFAULT_QUESTIONS = [
     sectionCode: "aptitude", itemId: "APT20", facet: "Mech", type: "mcq", order: 20, reverse: false,
     text: "If bar X moves to the left, which way will bar Y move?",
     note: "Image-based mechanism question",
+    image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789794468/20q.png",
     options: [
       { optionText: "Left", isCorrect: false },
       { optionText: "Right", isCorrect: true },
@@ -435,6 +436,7 @@ export const DEFAULT_QUESTIONS = [
     sectionCode: "aptitude", itemId: "APT23", facet: "Mech", type: "mcq", order: 23, reverse: false,
     text: "What would be the current flowing through point X if another identical power source were to be added in parallel to the circuit?",
     note: "Circuit diagram question",
+    image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789794808/23q.png",
     options: [
       { optionText: "Twice as strong", isCorrect: false },
       { optionText: "Half as strong", isCorrect: false },
@@ -474,7 +476,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT27", facet: "Verb", type: "mcq", order: 27, reverse: false,
-    text: "[Penicillin paragraph jumble] Correct sequence of P, Q, R, S after S1:",
+    text: "Given below are five sentences S1, P, Q, R and S that make a paragraph. The sentences making the paragraph have been jumbled randomly, only the first sentence S1 is at its right place. Find out the correct sequence in which P, Q, R and S should follow after S1 so that a coherent and meaningful paragraph is made.\n\nS1: The discovery of penicillin marked a turning point in medical history.\nP. This discovery eventually led to the development of antibiotics.\nQ. It was the first time that bacteria-caused infections could be effectively treated.\nR. Penicillin was discovered by Alexander Fleming in 1928.\nS. Before this, infections were often fatal due to lack of effective treatments.",
     options: [
       { optionText: "RQPS", isCorrect: false },
       { optionText: "RQSP", isCorrect: false },
@@ -494,7 +496,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT29", facet: "Verb", type: "mcq", order: 29, reverse: false,
-    text: "[Planning statement] Which conclusion can be drawn?",
+    text: "Statement: \"All successful students plan their studies well in advance. Those who procrastinate often face difficulties in exams.\"\n\nWhich of the following conclusions can be drawn from the above statement?",
     options: [
       { optionText: "Students who plan never face any difficulties in life.", isCorrect: false },
       { optionText: "Planning is essential for academic success.", isCorrect: true },
@@ -514,7 +516,7 @@ export const DEFAULT_QUESTIONS = [
   },
   {
     sectionCode: "aptitude", itemId: "APT31", facet: "Verb", type: "mcq", order: 31, reverse: false,
-    text: "[Cats/mammals/dogs syllogism] Which conclusion follows logically?",
+    text: "Consider the following statements:\n\"All cats are mammals.\"\n\"Some mammals are not dogs.\"\n\"All dogs are animals.\"\n\nWhich of the following conclusions can be logically drawn?",
     options: [
       { optionText: "All cats are dogs.", isCorrect: false },
       { optionText: "Some animals are not dogs.", isCorrect: true },
@@ -546,6 +548,7 @@ export const DEFAULT_QUESTIONS = [
     sectionCode: "aptitude", itemId: "APT34", facet: "Spat", type: "mcq", order: 34, reverse: false,
     text: "Which figure is identical to the first figure given below?",
     note: "Image figure matching question",
+    image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789794847/34q.png",
     options: [
       { optionText: "A", isCorrect: false },
       { optionText: "B", isCorrect: false },
@@ -557,17 +560,19 @@ export const DEFAULT_QUESTIONS = [
     sectionCode: "aptitude", itemId: "APT35", facet: "Spat", type: "mcq", order: 35, reverse: false,
     text: "If the picture below is rotated, which one of the following options is the result of the rotation?",
     note: "Mental rotation figure question",
+    image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789794882/35q.png",
     options: [
-      { optionText: "Figure 1", isCorrect: false },
-      { optionText: "Figure 2", isCorrect: false },
-      { optionText: "Figure 3", isCorrect: false },
-      { optionText: "Figure 4", isCorrect: true }
+      { optionText: "Figure 1", image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789794978/35op1.png", isCorrect: false },
+      { optionText: "Figure 2", image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789794997/35op2.png", isCorrect: false },
+      { optionText: "Figure 3", image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789795019/35op3.png", isCorrect: true },
+      { optionText: "Figure 4", image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789795039/35op4.png", isCorrect: false }
     ]
   },
   {
     sectionCode: "aptitude", itemId: "APT36", facet: "Spat", type: "mcq", order: 36, reverse: false,
     text: "These are different views of the same cube. What colour is the bottom of the middle cube?",
     note: "Cube folding visual problem",
+    image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789794909/36q.png",
     options: [
       { optionText: "Blue", isCorrect: false },
       { optionText: "Red", isCorrect: false },
@@ -579,6 +584,7 @@ export const DEFAULT_QUESTIONS = [
     sectionCode: "aptitude", itemId: "APT37", facet: "Spat", type: "mcq", order: 37, reverse: false,
     text: "Find the missing part to complete the image.",
     note: "Pattern matrix completion problem",
+    image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789794932/37q.png",
     options: [
       { optionText: "Option 1", isCorrect: true },
       { optionText: "Option 2", isCorrect: false },
@@ -601,6 +607,7 @@ export const DEFAULT_QUESTIONS = [
     sectionCode: "aptitude", itemId: "APT39", facet: "Spat", type: "mcq", order: 39, reverse: false,
     text: "Which figure completes the statement?",
     note: "Visual analogy problem",
+    image: "https://res.cloudinary.com/tj6xmmar/image/upload/v1789794953/39q.png",
     options: [
       { optionText: "A", isCorrect: false },
       { optionText: "B", isCorrect: false },
@@ -683,6 +690,7 @@ export async function seedAssessmentAndQuestions(targetAssessmentId = null) {
         type: q.type,
         facet: q.facet,
         reverse: Boolean(q.reverse),
+        image: q.image || null,
         note: q.note || null,
         order: q.order
       },
@@ -693,6 +701,7 @@ export async function seedAssessmentAndQuestions(targetAssessmentId = null) {
         type: q.type,
         facet: q.facet,
         reverse: Boolean(q.reverse),
+        image: q.image || null,
         note: q.note || null,
         order: q.order
       }
@@ -708,8 +717,9 @@ export async function seedAssessmentAndQuestions(targetAssessmentId = null) {
         data: q.options.map((opt, idx) => ({
           questionId: question.id,
           optionText: opt.optionText,
-          optionIndex: idx,
-          isCorrect: Boolean(opt.isCorrect)
+          optionIndex: typeof opt.optionIndex === "number" ? opt.optionIndex : idx,
+          isCorrect: Boolean(opt.isCorrect),
+          image: opt.image || null
         }))
       });
     }
