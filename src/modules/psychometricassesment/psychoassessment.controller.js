@@ -721,7 +721,8 @@ export const assessmentController = {
 
   getPublishedAssessments: async (req, res) => {
     try {
-      const result = await assessmentService.getPublishedAssessments();
+      const userId = getUserId(req);
+      const result = await assessmentService.getPublishedAssessments(userId);
       return res.status(200).json({
         success: true,
         data: result

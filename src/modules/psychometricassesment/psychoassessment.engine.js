@@ -47,46 +47,69 @@ export const APTITUDE_FACETS = [
   "Voc"
 ];
 
-// Facet Metadata Definitions
-export const FACET_DEFINITIONS = {
-  // Interest (Holland / RIASEC)
+// Facet Metadata Definitions by Domain
+export const INTEREST_FACET_DEFINITIONS = {
   R: { name: "Realistic", domain: "interest", description: "Hands-on, practical, mechanical, tools, physical activities" },
   I: { name: "Investigative", domain: "interest", description: "Analytical, intellectual, scientific, research, problem solving" },
   A: { name: "Artistic", domain: "interest", description: "Creative, expressive, original, design, music, writing" },
   S: { name: "Social", domain: "interest", description: "Helping, teaching, counseling, collaborating, community service" },
   E: { name: "Enterprising", domain: "interest", description: "Leadership, persuasion, business, entrepreneurship, initiative" },
-  C: { name: "Conventional", domain: "interest", description: "Organized, detail-oriented, systematic, data management, precision" },
+  C: { name: "Conventional", domain: "interest", description: "Organized, detail-oriented, systematic, data management, precision" }
+};
 
-  // Big Five Personality
+export const PERSONALITY_FACET_DEFINITIONS = {
   O: { name: "Openness", domain: "personality", description: "Curiosity, imagination, appreciation for new ideas and variety" },
   Cn: { name: "Conscientiousness", domain: "personality", description: "Organization, discipline, goal-directed behavior, reliability" },
   Ex: { name: "Extraversion", domain: "personality", description: "Sociability, energy, assertiveness, enthusiasm" },
   Ag: { name: "Agreeableness", domain: "personality", description: "Empathy, cooperation, trust, altruism, teamwork" },
-  ES: { name: "Emotional Stability", domain: "personality", description: "Resilience, calm under pressure, emotional balance" },
+  ES: { name: "Emotional Stability", domain: "personality", description: "Resilience, calm under pressure, emotional balance" }
+};
 
-  // Work Values (Schwartz)
+export const VALUE_FACET_DEFINITIONS = {
   OC: { name: "Openness to Change", domain: "values", description: "Autonomy, variety, stimulation, innovation in work" },
   SE: { name: "Self-Enhancement", domain: "values", description: "Achievement, influence, financial growth, social recognition" },
   CO: { name: "Conservation", domain: "values", description: "Security, stability, tradition, structure, predictability" },
-  ST: { name: "Self-Transcendence", domain: "values", description: "Helping others, societal impact, benevolence, sustainability" },
+  ST: { name: "Self-Transcendence", domain: "values", description: "Helping others, societal impact, benevolence, sustainability" }
+};
 
-  // VARK Learning Styles
+export const VARK_FACET_DEFINITIONS = {
   V: { name: "Visual", domain: "learning_style", description: "Diagrams, charts, maps, visual demonstrations" },
   A: { name: "Auditory", domain: "learning_style", description: "Discussions, lectures, spoken explanations, listening" },
   Rd: { name: "Read/Write", domain: "learning_style", description: "Textbooks, articles, writing notes, lists" },
-  K: { name: "Kinesthetic", domain: "learning_style", description: "Hands-on practice, experiments, physical engagement" },
+  K: { name: "Kinesthetic", domain: "learning_style", description: "Hands-on practice, experiments, physical engagement" }
+};
 
-  // Goals
+export const GOAL_FACET_DEFINITIONS = {
   L: { name: "Long-term Orientation", domain: "goal_orientation", description: "Strategic planning, patience, multi-year milestones" },
-  S: { name: "Short-term Orientation", domain: "goal_orientation", description: "Quick wins, immediate execution, agile milestones" },
+  S: { name: "Short-term Orientation", domain: "goal_orientation", description: "Quick wins, immediate execution, agile milestones" }
+};
 
-  // Aptitudes
+export const APTITUDE_FACET_DEFINITIONS = {
   Mech: { name: "Mechanical Reasoning", domain: "aptitude", description: "Understanding mechanical principles, physics, practical mechanisms" },
   Log: { name: "Logical Reasoning", domain: "aptitude", description: "Pattern recognition, deductive and inductive problem solving" },
   Verb: { name: "Verbal Ability", domain: "aptitude", description: "Comprehension, communication, text analysis" },
   Spat: { name: "Spatial Ability", domain: "aptitude", description: "3D visualization, mental rotation, spatial relations" },
   Num: { name: "Numerical Ability", domain: "aptitude", description: "Quantitative problem solving, mathematical reasoning, data" },
-  Voc: { name: "Vocational Aptitude", domain: "aptitude", description: "Application-oriented aptitude and domain vocabulary" }
+  Voc: { name: "Vocabulary", domain: "aptitude", description: "Vocabulary mastery, language comprehension, and grammar" }
+};
+
+// Global merged facet definitions fallback (RIASEC takes priority for A and S)
+export const FACET_DEFINITIONS = {
+  ...INTEREST_FACET_DEFINITIONS,
+  ...PERSONALITY_FACET_DEFINITIONS,
+  ...VALUE_FACET_DEFINITIONS,
+  ...APTITUDE_FACET_DEFINITIONS
+};
+
+export const getFacetDefinition = (domain, facet) => {
+  const normDomain = normalizeSectionCode(domain);
+  if (normDomain === "interest") return INTEREST_FACET_DEFINITIONS[facet];
+  if (normDomain === "personality") return PERSONALITY_FACET_DEFINITIONS[facet];
+  if (normDomain === "values") return VALUE_FACET_DEFINITIONS[facet];
+  if (normDomain === "learning_style" || normDomain === "vark") return VARK_FACET_DEFINITIONS[facet];
+  if (normDomain === "goal_orientation" || normDomain === "goals") return GOAL_FACET_DEFINITIONS[facet];
+  if (normDomain === "aptitude") return APTITUDE_FACET_DEFINITIONS[facet];
+  return FACET_DEFINITIONS[facet] || null;
 };
 
 // ============================================================
@@ -385,7 +408,7 @@ export const buildAssessmentReport = ({
   const interestScores = INTEREST_FACETS.map((facet) => {
     const raw = Number(scores[facet] || 0);
     const pct = Math.round(raw * 100);
-    const def = FACET_DEFINITIONS[facet];
+    const def = INTEREST_FACET_DEFINITIONS[facet];
     return {
       facet,
       name: def?.name || facet,
@@ -401,7 +424,7 @@ export const buildAssessmentReport = ({
   const personalityScores = PERSONALITY_FACETS.map((facet) => {
     const raw = Number(scores[facet] || 0);
     const pct = Math.round(raw * 100);
-    const def = FACET_DEFINITIONS[facet];
+    const def = PERSONALITY_FACET_DEFINITIONS[facet];
     return {
       facet,
       name: def?.name || facet,
@@ -417,7 +440,7 @@ export const buildAssessmentReport = ({
   const valueScores = VALUE_FACETS.map((facet) => {
     const raw = Number(scores[facet] || 0);
     const pct = Math.round(raw * 100);
-    const def = FACET_DEFINITIONS[facet];
+    const def = VALUE_FACET_DEFINITIONS[facet];
     return {
       facet,
       name: def?.name || facet,
@@ -433,7 +456,7 @@ export const buildAssessmentReport = ({
   const varkScores = VARK_FACETS.map((facet) => {
     const raw = Number(scores.vark?.[facet] || 0);
     const pct = Math.round(raw * 100);
-    const def = FACET_DEFINITIONS[facet];
+    const def = VARK_FACET_DEFINITIONS[facet];
     return {
       facet,
       name: def?.name || facet,
@@ -449,7 +472,7 @@ export const buildAssessmentReport = ({
   const aptitudeScores = APTITUDE_FACETS.map((facet) => {
     const raw = Number(scores[facet] || 0);
     const pct = Math.round(raw * 100);
-    const def = FACET_DEFINITIONS[facet];
+    const def = APTITUDE_FACET_DEFINITIONS[facet];
     return {
       facet,
       name: def?.name || facet,
@@ -464,7 +487,7 @@ export const buildAssessmentReport = ({
   // Top Holland traits
   const primaryHolland = (hollandCode || "").split("").map((letter) => ({
     code: letter,
-    name: FACET_DEFINITIONS[letter]?.name || letter,
+    name: INTEREST_FACET_DEFINITIONS[letter]?.name || letter,
     score: Math.round((Number(scores[letter]) || 0) * 100)
   }));
 
