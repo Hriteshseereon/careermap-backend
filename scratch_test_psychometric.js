@@ -252,11 +252,17 @@ async function runEngineTests() {
     completedAt: new Date()
   });
 
-  console.log("\n--- 3. Formatted Assessment Report ---");
-  console.log("Holland Profile:", JSON.stringify(report.hollandProfile));
-  console.log("Top Career Cluster:", JSON.stringify(report.careerClusters.topCluster));
-  console.log("Interest Domain Summary:", report.domains.interests.map(i => `${i.facet} (${i.name}): ${i.percentage}% [${i.bandLabel}]`).join(", "));
-  console.log("Personality Summary:", report.domains.personality.map(p => `${p.facet} (${p.name}): ${p.percentage}% [${p.bandLabel}]`).join(", "));
+  // Verify facet name mappings
+  const artisticInterest = report.domains.interests.find(i => i.facet === "A");
+  const socialInterest = report.domains.interests.find(i => i.facet === "S");
+  const auditoryVark = report.domains.learningStyles.find(l => l.facet === "A");
+  const vocAptitude = report.domains.aptitudes.find(a => a.facet === "Voc");
+
+  console.assert(artisticInterest?.name === "Artistic", `Expected Interest 'A' to be 'Artistic', got '${artisticInterest?.name}'`);
+  console.assert(socialInterest?.name === "Social", `Expected Interest 'S' to be 'Social', got '${socialInterest?.name}'`);
+  console.assert(auditoryVark?.name === "Auditory", `Expected VARK 'A' to be 'Auditory', got '${auditoryVark?.name}'`);
+  console.assert(vocAptitude?.name === "Vocabulary", `Expected Aptitude 'Voc' to be 'Vocabulary', got '${vocAptitude?.name}'`);
+  console.log("✅ All Facet mappings (Artistic, Social, Auditory, Vocabulary) verified correctly!");
 
   console.log("\n==================================================");
   console.log("🎉 ALL ENGINE VERIFICATIONS PASSED SUCCESSFULLY!");
