@@ -1,3 +1,7 @@
+import {
+  calculateProfiling
+} from "./profiling.engine.js";
+
 // ============================================================
 // ASSESSMENT SCORING ENGINE
 // ============================================================
@@ -119,6 +123,7 @@ export const getFacetDefinition = (domain, facet) => {
 export const normalizeSectionCode = (code) => {
   if (!code) return "";
   const cleaned = String(code).toLowerCase().trim();
+  if (cleaned === "profiling" || cleaned === "personal_profiling" || cleaned === "career_planning" || cleaned === "profile" || cleaned === "cri" || cleaned === "career_readiness") return "profiling";
   if (cleaned === "interests" || cleaned === "interest") return "interest";
   if (cleaned === "personalities" || cleaned === "personality") return "personality";
   if (cleaned === "value" || cleaned === "values" || cleaned === "work_values") return "values";
@@ -247,6 +252,28 @@ export const calculateScores = (questions, answers) => {
     ...q,
     sectionCode: normalizeSectionCode(q.sectionCode || q.section?.code)
   }));
+
+  // 0. Profiling (Career Planning Track / CRI)
+  const profilingQuestions = normalizedQuestions.filter((q) => q.sectionCode === "profiling");
+  if (profilingQuestions.length > 0) {
+    const profilingAnswers = [];
+    for (const q of profilingQuestions) {
+      const ans = answers.find((a) => Number(a.questionId) === Number(q.id));
+      if (ans) {
+        if (ans.likertValue !== null && ans.likertValue !== undefined) {
+          profilingAnswers.push({ itemId: q.itemId, value: Number(ans.likertValue) });
+        } else if (ans.selectedOptionId || ans.selectedOption) {
+          const opt = q.options?.find((o) => Number(o.id) === Number(ans.selectedOptionId)) || ans.selectedOption;
+          const optText = opt?.optionText || String(ans.selectedOptionId);
+          profilingAnswers.push({ itemId: q.itemId, value: optText });
+        }
+      }
+    }
+    const profResult = calculateProfiling(profilingAnswers);
+    if (profResult.isComplete) {
+      scores.profiling = profResult;
+    }
+  }
 
   // 1. Interest (RIASEC)
   for (const facet of INTEREST_FACETS) {
@@ -498,6 +525,7 @@ export const buildAssessmentReport = ({
       school: school || null,
       completedAt: completedAt || new Date()
     },
+    yourProfiling: scores.profiling?.report || null,
     hollandProfile: {
       code: hollandCode || "",
       traits: primaryHolland

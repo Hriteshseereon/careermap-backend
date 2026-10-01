@@ -11,7 +11,7 @@ async function main() {
   const clusters = await seedCareerClustersToDatabase();
   console.log(`✅ Successfully seeded ${clusters.length} career clusters.`);
 
-  console.log("\n--- 2. Seeding Assessment, 6 Sections & 163 Questions ---");
+  console.log("\n--- 2. Seeding Assessment, 7 Sections & 179 Questions (16 Profiling + 163 Psychometric/Aptitude) ---");
   const questionsResult = await seedAssessmentAndQuestions();
   console.log(`✅ Assessment: [ID: ${questionsResult.assessment.id}] ${questionsResult.assessment.title}`);
   console.log(`✅ Sections: ${questionsResult.sectionsCount}`);
