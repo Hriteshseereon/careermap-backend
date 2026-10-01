@@ -23,6 +23,20 @@ import {
   seedAssessmentAndQuestions
 } from "./psychoassessment.questions.seed.js";
 
+import {
+  calculateProfiling,
+  validateProfilingAgainstTestCases
+} from "./profiling.engine.js";
+
+import {
+  PROFILING_QUESTIONS,
+  PROFILING_DOMAINS,
+  STAGE_BANDS,
+  LIKERT_RESPONSE_SCALE,
+  SELF_PLACEMENT_OPTIONS,
+  TEST_CASES
+} from "./profiling.constants.js";
+
 
 function generateQuestionItemId(sectionCode, facet, count = 1) {
   const code = normalizeSectionCode(sectionCode || "");
@@ -1476,6 +1490,53 @@ export const assessmentService = {
       scores: result.scores,
       top5Clusters: result.top5Clusters,
       report: fullReport
+    };
+  },
+
+  // =========================================================
+  // CAREER PLANNING TRACK / PERSONAL PROFILING (CRI)
+  // =========================================================
+
+  getProfilingQuestions: async () => {
+    return {
+      title: "Career Planning Track / Personal Profiling",
+      purpose: "Places each student on a 5-stage career-planning track (Unaware → Confused → Exploring → Clarity → Future-Ready), shows a risk level, and gives a simple action plan.",
+      totalQuestions: PROFILING_QUESTIONS.length,
+      domains: PROFILING_DOMAINS,
+      stageBands: STAGE_BANDS,
+      likertScale: LIKERT_RESPONSE_SCALE,
+      selfPlacementOptions: SELF_PLACEMENT_OPTIONS,
+      questions: PROFILING_QUESTIONS
+    };
+  },
+
+  calculateProfilingLive: async (answers, options = {}) => {
+    if (!answers) {
+      throw new Error("Answers payload is required");
+    }
+    const result = calculateProfiling(answers, options);
+    if (!result.isComplete) {
+      const err = new Error(result.message);
+      err.missingItems = result.missingItems;
+      err.status = 400;
+      throw err;
+    }
+    return result;
+  },
+
+  getProfilingTestCases: async () => {
+    const validation = validateProfilingAgainstTestCases();
+    return {
+      validationSummary: {
+        allPassed: validation.allPassed,
+        totalCases: validation.totalCases,
+        passedCases: validation.passedCases,
+        failedCases: validation.failedCases
+      },
+      testCases: TEST_CASES.map((tc, idx) => ({
+        ...tc,
+        computed: validation.results[idx]
+      }))
     };
   }
 
