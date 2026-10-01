@@ -381,4 +381,43 @@ router.get(
 );
 
 
+// ============================================================
+// CAREER PLANNING TRACK / PERSONAL PROFILING (CRI)
+// ============================================================
+
+router.get(
+  "/profiling/questions",
+  assessmentController.getProfilingQuestions
+);
+
+router.post(
+  "/profiling/calculate",
+  assessmentController.calculateProfiling
+);
+
+router.get(
+  "/profiling/test-cases",
+  assessmentController.getProfilingTestCases
+);
+
+// Also mount under /admin for admin panel preview
+router.get(
+  "/admin/profiling/questions",
+  protectAdmin,
+  assessmentController.getProfilingQuestions
+);
+
+router.post(
+  "/admin/profiling/calculate",
+  protectAdmin,
+  assessmentController.calculateProfiling
+);
+
+router.get(
+  "/admin/profiling/test-cases",
+  protectAdmin,
+  assessmentController.getProfilingTestCases
+);
+
+
 export default router;

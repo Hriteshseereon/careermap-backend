@@ -10,44 +10,85 @@ export const DEFAULT_ASSESSMENT_CONFIG = {
 
 export const DEFAULT_SECTIONS = [
   {
+    code: "profiling",
+    title: "Career Planning Track / Personal Profiling",
+    description: "Places each student on a 5-stage career-planning track (Unaware, Confused, Exploring, Clarity, Future-Ready), evaluates career readiness index (CRI), shows risk level, and provides personalized next steps.",
+    order: 1
+  },
+  {
     code: "interest",
     title: "Interest Assessment (RIASEC)",
     description: "Evaluates career interests across Realistic, Investigative, Artistic, Social, Enterprising, and Conventional domains.",
-    order: 1
+    order: 2
   },
   {
     code: "personality",
     title: "Personality Assessment (Big Five / OCEAN)",
     description: "Evaluates behavioral traits across Openness, Conscientiousness, Extraversion, Agreeableness, and Emotional Stability.",
-    order: 2
+    order: 3
   },
   {
     code: "learning_style",
     title: "Learning Styles (VARK)",
     description: "Identifies preferred learning modalities across Visual, Auditory, Reading/Writing, and Kinesthetic styles.",
-    order: 3
+    order: 4
   },
   {
     code: "values",
     title: "Work Values (Schwartz)",
     description: "Evaluates core work values across Openness to Change, Self-Enhancement, Conservation, and Self-Transcendence.",
-    order: 4
+    order: 5
   },
   {
     code: "goal_orientation",
     title: "Goal Orientation",
     description: "Assesses long-term academic orientation versus short-term workforce entry preferences.",
-    order: 5
+    order: 6
   },
   {
     code: "aptitude",
     title: "Aptitude & Cognitive Abilities",
     description: "Objective problem-solving assessments across Logical, Vocabulary, Numerical, Mechanical, Verbal, and Spatial reasoning.",
-    order: 6
+    order: 7
   }
 ];
 
 export const DEFAULT_QUESTIONS = [
+  // ==========================================
+  // 0. PROFILING (CAREER PLANNING TRACK / CRI) — 16 items
+  // ==========================================
+  { sectionCode: "profiling", itemId: "SA1", text: "I know at least three things I really like doing.", facet: "SA", type: "likert5", reverse: false, order: 1 },
+  { sectionCode: "profiling", itemId: "SA2", text: "I know which subjects or activities I am good at.", facet: "SA", type: "likert5", reverse: false, order: 2 },
+  { sectionCode: "profiling", itemId: "SA3", text: "I know what is important to me in a future job (like good salary, helping people, being creative, or a safe job).", facet: "SA", type: "likert5", reverse: false, order: 3 },
+  { sectionCode: "profiling", itemId: "CE1", text: "I know about many careers, not only doctor, engineer, or CA.", facet: "CE", type: "likert5", reverse: false, order: 4 },
+  { sectionCode: "profiling", itemId: "CE2", text: "In the last six months, I have searched for information about careers I may like.", facet: "CE", type: "likert5", reverse: false, order: 5 },
+  { sectionCode: "profiling", itemId: "CE3", text: "I have talked to someone who works in a field I like, and asked about their work.", facet: "CE", type: "likert5", reverse: false, order: 6 },
+  { sectionCode: "profiling", itemId: "DC1", text: "I know which field or career I want to go into.", facet: "DC", type: "likert5", reverse: false, order: 7 },
+  { sectionCode: "profiling", itemId: "DC2", text: "I keep changing my mind about which career I want.", facet: "DC", type: "likert5", reverse: true, order: 8 },
+  { sectionCode: "profiling", itemId: "DC3", text: "There are so many choices that I don't know which one to pick.", facet: "DC", type: "likert5", reverse: true, order: 9 },
+  { sectionCode: "profiling", itemId: "PP1", text: "I know which stream (Science, Commerce, Arts) or subjects I need for the career I want.", facet: "PP", type: "likert5", reverse: false, order: 10 },
+  { sectionCode: "profiling", itemId: "PP2", text: "I know which entrance exams, courses, or colleges I need for the career I want.", facet: "PP", type: "likert5", reverse: false, order: 11 },
+  { sectionCode: "profiling", itemId: "PP3", text: "I have already started doing something for my career goal (like a course, practice, or a project).", facet: "PP", type: "likert5", reverse: false, order: 12 },
+  { sectionCode: "profiling", itemId: "CO1", text: "I believe I can make a good career choice.", facet: "CO", type: "likert5", reverse: false, order: 13 },
+  { sectionCode: "profiling", itemId: "CO2", text: "When I think about my career, I feel worried or tense.", facet: "CO", type: "likert5", reverse: true, order: 14 },
+  { sectionCode: "profiling", itemId: "CO3", text: "The career I choose will be my own choice, even if I take advice from others.", facet: "CO", type: "likert5", reverse: false, order: 15 },
+  {
+    sectionCode: "profiling",
+    itemId: "SP",
+    text: "Pick the one sentence that fits you best:",
+    facet: "SP",
+    type: "single_choice",
+    reverse: false,
+    order: 16,
+    options: [
+      { optionText: "A. I have not really thought about my career yet.", optionIndex: 1, isCorrect: false },
+      { optionText: "B. I have thought about it, but I feel confused.", optionIndex: 2, isCorrect: false },
+      { optionText: "C. I am looking at a few options and learning more about them.", optionIndex: 3, isCorrect: false },
+      { optionText: "D. I know what I want, but I don't know the full path yet.", optionIndex: 4, isCorrect: false },
+      { optionText: "E. I know what I want, and I have already started working towards it.", optionIndex: 5, isCorrect: false }
+    ]
+  },
+
   // ==========================================
   // 1. INTEREST (RIASEC) — 30 items
   // ==========================================
@@ -707,8 +748,8 @@ export async function seedAssessmentAndQuestions(targetAssessmentId = null) {
       }
     });
 
-    // Handle MCQ Options
-    if (q.type === "mcq" && Array.isArray(q.options) && q.options.length > 0) {
+    // Handle Options (for MCQ and Single Choice)
+    if (Array.isArray(q.options) && q.options.length > 0) {
       await prisma.assessmentOption.deleteMany({
         where: { questionId: question.id }
       });
@@ -717,7 +758,7 @@ export async function seedAssessmentAndQuestions(targetAssessmentId = null) {
         data: q.options.map((opt, idx) => ({
           questionId: question.id,
           optionText: opt.optionText,
-          optionIndex: typeof opt.optionIndex === "number" ? opt.optionIndex : idx,
+          optionIndex: typeof opt.optionIndex === "number" ? opt.optionIndex : idx + 1,
           isCorrect: Boolean(opt.isCorrect),
           image: opt.image || null
         }))

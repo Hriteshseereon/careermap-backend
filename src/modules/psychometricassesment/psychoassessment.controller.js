@@ -903,6 +903,62 @@ export const assessmentController = {
         message: error.message
       });
     }
+  },
+
+  // =========================================================
+  // CAREER PLANNING TRACK / PERSONAL PROFILING (CRI)
+  // =========================================================
+
+  getProfilingQuestions: async (req, res) => {
+    try {
+      const result = await assessmentService.getProfilingQuestions();
+      return res.status(200).json({
+        success: true,
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+  },
+
+  calculateProfiling: async (req, res) => {
+    try {
+      const answers = req.body?.answers || req.body;
+      const options = {
+        requireSP: req.body?.requireSP !== undefined ? Boolean(req.body.requireSP) : true
+      };
+      const result = await assessmentService.calculateProfilingLive(answers, options);
+      return res.status(200).json({
+        success: true,
+        message: "Profiling calculation completed successfully",
+        data: result
+      });
+    } catch (error) {
+      return res.status(error.status || 400).json({
+        success: false,
+        message: error.message,
+        missingItems: error.missingItems || undefined
+      });
+    }
+  },
+
+  getProfilingTestCases: async (req, res) => {
+    try {
+      const result = await assessmentService.getProfilingTestCases();
+      return res.status(200).json({
+        success: true,
+        message: "Profiling test cases and engine verification retrieved",
+        data: result
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
   }
 
 };

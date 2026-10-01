@@ -117,13 +117,49 @@ async function runEngineTests() {
         { id: 111, optionText: "Definition A", isCorrect: true },
         { id: 112, optionText: "Definition B", isCorrect: false }
       ]
-    }
+    },
+    // Profiling (16 items)
+    { id: 100, sectionCode: "profiling", itemId: "SA1", type: "likert5", facet: "SA", reverse: false },
+    { id: 101, sectionCode: "profiling", itemId: "SA2", type: "likert5", facet: "SA", reverse: false },
+    { id: 102, sectionCode: "profiling", itemId: "SA3", type: "likert5", facet: "SA", reverse: false },
+    { id: 103, sectionCode: "profiling", itemId: "CE1", type: "likert5", facet: "CE", reverse: false },
+    { id: 104, sectionCode: "profiling", itemId: "CE2", type: "likert5", facet: "CE", reverse: false },
+    { id: 105, sectionCode: "profiling", itemId: "CE3", type: "likert5", facet: "CE", reverse: false },
+    { id: 106, sectionCode: "profiling", itemId: "DC1", type: "likert5", facet: "DC", reverse: false },
+    { id: 107, sectionCode: "profiling", itemId: "DC2", type: "likert5", facet: "DC", reverse: true },
+    { id: 108, sectionCode: "profiling", itemId: "DC3", type: "likert5", facet: "DC", reverse: true },
+    { id: 109, sectionCode: "profiling", itemId: "PP1", type: "likert5", facet: "PP", reverse: false },
+    { id: 110, sectionCode: "profiling", itemId: "PP2", type: "likert5", facet: "PP", reverse: false },
+    { id: 111, sectionCode: "profiling", itemId: "PP3", type: "likert5", facet: "PP", reverse: false },
+    { id: 112, sectionCode: "profiling", itemId: "CO1", type: "likert5", facet: "CO", reverse: false },
+    { id: 113, sectionCode: "profiling", itemId: "CO2", type: "likert5", facet: "CO", reverse: true },
+    { id: 114, sectionCode: "profiling", itemId: "CO3", type: "likert5", facet: "CO", reverse: false },
+    { id: 115, sectionCode: "profiling", itemId: "SP", type: "single_choice", facet: "SP", reverse: false, options: [{ id: 201, optionText: "D. Clarity" }] }
   ];
 
   // Candidate answers:
   // High in Realistic (5, 5), High in Investigative (5, 5), Moderate in Conventional (4), Low in others
   // In Aptitude: all correct except Verbal
+  // In Profiling: T4 (Decided, path unclear: SA=83, CE=58, DC=83, PP=50, CO=75 -> Stage 4 Clarity)
   const sampleAnswers = [
+    // Profiling (T4 answers)
+    { questionId: 100, likertValue: 4 }, // SA1
+    { questionId: 101, likertValue: 4 }, // SA2
+    { questionId: 102, likertValue: 5 }, // SA3
+    { questionId: 103, likertValue: 4 }, // CE1
+    { questionId: 104, likertValue: 3 }, // CE2
+    { questionId: 105, likertValue: 3 }, // CE3
+    { questionId: 106, likertValue: 5 }, // DC1
+    { questionId: 107, likertValue: 2 }, // DC2 (rev)
+    { questionId: 108, likertValue: 2 }, // DC3 (rev)
+    { questionId: 109, likertValue: 4 }, // PP1
+    { questionId: 110, likertValue: 3 }, // PP2
+    { questionId: 111, likertValue: 2 }, // PP3
+    { questionId: 112, likertValue: 4 }, // CO1
+    { questionId: 113, likertValue: 2 }, // CO2 (rev)
+    { questionId: 114, likertValue: 4 }, // CO3
+    { questionId: 115, selectedOptionId: 201 }, // SP -> D
+
     { questionId: 1, likertValue: 5 }, // R -> 5
     { questionId: 2, likertValue: 5 }, // R -> 5 (R = 1.0 / 100%)
     { questionId: 3, likertValue: 5 }, // I -> 5
@@ -171,7 +207,9 @@ async function runEngineTests() {
   console.assert(scores.ES === 1.0, `Expected ES = 1.0 (reverse 1 -> 5), got ${scores.ES}`);
   console.assert(scores.Mech === 1.0, `Expected Mech = 1.0, got ${scores.Mech}`);
   console.assert(scores.Verb === 0.0, `Expected Verb = 0.0, got ${scores.Verb}`);
-  console.log("✅ Scores calculated accurately!");
+  console.assert(scores.profiling && scores.profiling.stageName === "Clarity", "Profiling stage should be Clarity for T4");
+  console.assert(scores.profiling && scores.profiling.cri === 70, "Profiling CRI should be 70 for T4");
+  console.log("✅ Scores & Profiling calculated accurately!");
 
   // Holland Code
   const hollandCode = calculateHollandCode(scores);
@@ -252,6 +290,13 @@ async function runEngineTests() {
     completedAt: new Date()
   });
 
+  // Verify Profiling Block in Full Report
+  console.assert(report.yourProfiling !== null, "yourProfiling block should be present in full report");
+  console.assert(report.yourProfiling.heading === "YOUR PROFILING", "yourProfiling heading must be 'YOUR PROFILING'");
+  console.assert(report.yourProfiling.stageTrack.currentStageName === "Clarity", "yourProfiling currentStageName must be Clarity");
+  console.assert(report.yourProfiling.your5Areas.length === 5, "yourProfiling should have 5 area breakdowns");
+  console.log("✅ 'YOUR PROFILING' page block successfully placed as top section in Report!");
+
   // Verify facet name mappings
   const artisticInterest = report.domains.interests.find(i => i.facet === "A");
   const socialInterest = report.domains.interests.find(i => i.facet === "S");
@@ -265,7 +310,7 @@ async function runEngineTests() {
   console.log("✅ All Facet mappings (Artistic, Social, Auditory, Vocabulary) verified correctly!");
 
   console.log("\n==================================================");
-  console.log("🎉 ALL ENGINE VERIFICATIONS PASSED SUCCESSFULLY!");
+  console.log("🎉 ALL ENGINE & PROFILING VERIFICATIONS PASSED SUCCESSFULLY!");
   console.log("==================================================");
 }
 
