@@ -1323,18 +1323,22 @@ export const assessmentService = {
       }))
     );
 
-    // Verify all questions are answered
+    // Verify all mandatory questions are answered
+    // Note: Aptitude section has a 15-minute timer on the frontend UI, so answering every aptitude question is NOT mandatory.
+    // Unanswered/skipped aptitude questions will automatically be scored as 0 (incorrect) in aptitude calculation.
     const answeredQuestionIds = new Set(
       attempt.answers.map((a) => Number(a.questionId))
     );
 
-    const unanswered = questions.filter(
-      (q) => !answeredQuestionIds.has(Number(q.id))
-    );
+    const unanswered = questions.filter((q) => {
+      const isAptitude = q.sectionCode === "aptitude";
+      if (isAptitude) return false; // Non-mandatory for timed aptitude section
+      return !answeredQuestionIds.has(Number(q.id));
+    });
 
     if (unanswered.length > 0) {
       throw new Error(
-        `Please answer all questions before submitting. Unanswered count: ${unanswered.length}`
+        `Please answer all required questions before submitting. Unanswered count: ${unanswered.length}`
       );
     }
 
