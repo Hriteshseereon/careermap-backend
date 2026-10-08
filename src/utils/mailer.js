@@ -1,4 +1,10 @@
+import dns from "dns";
 import nodemailer from "nodemailer";
+
+// Render and cloud containers do not support outbound IPv6. Force IPv4 first.
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder("ipv4first");
+}
 
 const emailUser = (process.env.EMAIL_USER || "").trim();
 const emailPass = (process.env.EMAIL_PASS || "").trim().replace(/\s+/g, "");
@@ -6,7 +12,8 @@ const emailPass = (process.env.EMAIL_PASS || "").trim().replace(/\s+/g, "");
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
-  secure: true, // SSL direct connection (most reliable on Render/Cloud)
+  secure: true, // SSL direct connection
+  family: 4,    // Force IPv4 socket (prevents ENETUNREACH on Render's IPv6-disabled network)
   pool: true,
   maxConnections: 5,
   maxMessages: 100,
