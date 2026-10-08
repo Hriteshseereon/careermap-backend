@@ -6,6 +6,7 @@ import {
 import {
   assessmentRepository
 } from "./psychoassessment.repository.js";
+import { sendReportEmail } from "../../utils/sendReportEmail.js";
 
 import {
   calculateScores,
@@ -1411,6 +1412,24 @@ export const assessmentService = {
       completedAt: updatedAttempt?.completedAt || new Date()
     });
 
+    // Automatically send report email with direct link
+    try {
+      const recipientEmail = updatedAttempt?.user?.email;
+      if (recipientEmail) {
+        await sendReportEmail({
+          toEmail: recipientEmail,
+          studentName: studentName,
+          attemptId: Number(attemptId),
+          assessmentTitle: attempt.assessment?.title || "Career Compass Psychometric Assessment",
+          hollandCode: resultRecord.hollandCode,
+          topCluster: resultRecord.topCareerCluster,
+          topMatch: resultRecord.topCareerMatch
+        });
+      }
+    } catch (emailErr) {
+      console.error("❌ Failed to send assessment report email:", emailErr.message);
+    }
+
     return {
       resultId: resultRecord.id,
       attemptId: Number(attemptId),
@@ -1541,6 +1560,49 @@ export const assessmentService = {
         ...tc,
         computed: validation.results[idx]
       }))
+    };
+  },
+
+  // =========================================================
+  // SEND / RESEND REPORT EMAIL
+  // =========================================================
+  sendAttemptReportEmail: async (userId, attemptId, customEmail = null) => {
+    const attempt = await assessmentRepository.findAttemptById(attemptId);
+    if (!attempt) {
+      throw new Error("Assessment attempt not found");
+    }
+
+    if (userId && Number(attempt.userId) !== Number(userId)) {
+      throw new Error("You are not allowed to send email for this assessment attempt");
+    }
+
+    const result = await assessmentRepository.findResultByAttemptId(attemptId);
+    if (!result) {
+      throw new Error("Result has not been generated for this attempt yet");
+    }
+
+    const studentName = attempt.user
+      ? [attempt.user.firstName, attempt.user.lastName].filter(Boolean).join(" ") || attempt.user.username || attempt.user.email
+      : "Student";
+
+    const targetEmail = customEmail || attempt.user?.email;
+    if (!targetEmail) {
+      throw new Error("No recipient email address found for this user");
+    }
+
+    await sendReportEmail({
+      toEmail: targetEmail,
+      studentName: studentName,
+      attemptId: Number(attemptId),
+      assessmentTitle: attempt.assessment?.title || "Career Compass Psychometric Assessment",
+      hollandCode: result.hollandCode,
+      topCluster: result.topCareerCluster,
+      topMatch: result.topCareerMatch
+    });
+
+    return {
+      success: true,
+      message: `Assessment report link successfully sent to ${targetEmail}`
     };
   }
 
