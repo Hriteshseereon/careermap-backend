@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import nodemailer from "nodemailer";
+import transporter from "../../utils/mailer.js";
 import { UserRepository } from "./user.repository.js";
 import { generateTokens } from "../../utils/helpers.js";
 
@@ -179,16 +179,6 @@ export const forgotPassword = async (email) => {
 
   const resetLink =
     `${process.env.FRONTEND_URL}/reset-password/${token}`;
-
-  const transporter =
-    nodemailer.createTransport({
-      service: "gmail",
-
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
 
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
