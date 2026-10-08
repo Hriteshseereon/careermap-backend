@@ -16,7 +16,7 @@ export const createInstitute = async (body) => {
   }
 
   const rawPassword = body.password;
-  const hashedPassword = await bcrypt.hash(rawPassword, 12);
+  const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
   const institute = await InstituteRepository.create({
     name: body.name,
@@ -28,16 +28,14 @@ export const createInstitute = async (body) => {
     limit: Number(body.limit) || 100,
   });
 
-  // Send credentials email to institute
-  try {
-    await sendInstituteCredentials(
-      institute.email,
-      institute.name,
-      rawPassword
-    );
-  } catch (emailError) {
+  // Send credentials email to institute in background (non-blocking for fast UI response)
+  sendInstituteCredentials(
+    institute.email,
+    institute.name,
+    rawPassword
+  ).catch((emailError) => {
     console.error("❌ Institute Credentials Email Send Error:", emailError.message);
-  }
+  });
 
   return {
     success: true,
