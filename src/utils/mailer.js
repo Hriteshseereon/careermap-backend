@@ -13,16 +13,22 @@ const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
   secure: true, // SSL direct connection
-  family: 4,    // Force IPv4 socket (prevents ENETUNREACH on Render's IPv6-disabled network)
   pool: true,
   maxConnections: 5,
   maxMessages: 100,
+  // Explicitly forces IPv4 address resolution (bypasses Render IPv6 ENETUNREACH)
+  lookup: (hostname, options, callback) => {
+    dns.lookup(hostname, { family: 4 }, (err, address, family) => {
+      callback(err, address, family);
+    });
+  },
   auth: {
     user: emailUser,
     pass: emailPass,
   },
   tls: {
     rejectUnauthorized: false,
+    servername: "smtp.gmail.com",
   },
 });
 
