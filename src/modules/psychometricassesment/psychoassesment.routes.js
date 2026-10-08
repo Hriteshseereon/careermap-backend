@@ -380,6 +380,12 @@ router.get(
   assessmentController.getResult
 );
 
+router.post(
+  "/assessment/attempt/:attemptId/send-report-email",
+  protectAuth,
+  assessmentController.sendReportEmail
+);
+
 
 // ============================================================
 // CAREER PLANNING TRACK / PERSONAL PROFILING (CRI)
