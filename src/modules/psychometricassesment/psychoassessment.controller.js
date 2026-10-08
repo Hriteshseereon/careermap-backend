@@ -959,6 +959,24 @@ export const assessmentController = {
         message: error.message
       });
     }
+  },
+
+  // Send / Resend report email
+  sendReportEmail: async (req, res) => {
+    try {
+      const userId = getUserId(req);
+      const customEmail = req.body?.email || null;
+      const result = await assessmentService.sendAttemptReportEmail(userId, req.params.attemptId, customEmail);
+      return res.status(200).json({
+        success: true,
+        message: result.message
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
   }
 
 };
