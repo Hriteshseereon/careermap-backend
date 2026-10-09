@@ -35,15 +35,22 @@ const nodemailerTransporter = nodemailer.createTransport({
  * Sends email via Resend HTTPS REST API (Port 443 - 100% works on Render Free Tier)
  */
 export const sendMailViaHttp = async ({ from, to, subject, html }) => {
-  const fromAddress = process.env.EMAIL_FROM || "CareerMap <onboarding@resend.dev>";
+  const verifiedFrom = process.env.EMAIL_FROM || "CareerMap <onboarding@resend.dev>";
+  
+  // If 'from' is a gmail address or not verified, use Resend's default sender so it never errors
+  let sender = from;
+  if (!sender || sender.includes("@gmail.com") || !process.env.EMAIL_FROM) {
+    sender = verifiedFrom;
+  }
+
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+      "Authorization": `Bearer ${process.env.RESEND_API_KEY?.trim()}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: from || fromAddress,
+      from: sender,
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
@@ -52,6 +59,7 @@ export const sendMailViaHttp = async ({ from, to, subject, html }) => {
 
   const data = await response.json();
   if (!response.ok) {
+    console.error("❌ Resend API Error:", data);
     throw new Error(data.message || JSON.stringify(data));
   }
   return data;
