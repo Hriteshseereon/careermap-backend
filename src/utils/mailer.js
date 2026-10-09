@@ -7,6 +7,7 @@ if (dns.setDefaultResultOrder) {
 
 const emailUser = (process.env.EMAIL_USER || "").trim();
 const emailPass = (process.env.EMAIL_PASS || "").trim().replace(/\s+/g, "");
+const brevoApiKey = (process.env.BREVO_API_KEY || "").trim();
 const resendApiKey = (process.env.RESEND_API_KEY || "").trim();
 
 const nodemailerTransporter = nodemailer.createTransport({
@@ -32,21 +33,55 @@ const nodemailerTransporter = nodemailer.createTransport({
 });
 
 /**
- * Sends email via Resend HTTPS REST API (Port 443 - 100% works on Render Free Tier)
+ * 1. Sends email via Brevo (Sendinblue) HTTPS REST API
+ * (Port 443 - 300 free emails/day to ANY recipient, NO domain verification needed!)
  */
-export const sendMailViaHttp = async ({ from, to, subject, html }) => {
-  const verifiedFrom = process.env.EMAIL_FROM || "CareerMap <onboarding@resend.dev>";
+export const sendViaBrevo = async ({ from, to, subject, html }) => {
+  const senderEmail = emailUser || "it.identitygroup@gmail.com";
+  const toList = Array.isArray(to)
+    ? to.map((email) => ({ email: email.trim() }))
+    : [{ email: String(to).trim() }];
+
+  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "api-key": (process.env.BREVO_API_KEY || "").trim(),
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      sender: { name: "CareerMap", email: senderEmail },
+      to: toList,
+      subject,
+      htmlContent: html,
+    }),
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    console.error("❌ Brevo API Error:", data);
+    throw new Error(data.message || JSON.stringify(data));
+  }
+  return data;
+};
+
+/**
+ * 2. Sends email via Resend HTTPS REST API (Port 443)
+ */
+export const sendViaResend = async ({ from, to, subject, html }) => {
+  // Use official verified domain sender
+  const defaultFrom = process.env.EMAIL_FROM || "CareerMap <noreply@thecareermap.in>";
   
-  // If 'from' is a gmail address or not verified, use Resend's default sender so it never errors
   let sender = from;
-  if (!sender || sender.includes("@gmail.com") || !process.env.EMAIL_FROM) {
-    sender = verifiedFrom;
+  // If 'from' is missing, or uses gmail/resend default, use the verified domain sender
+  if (!sender || sender.includes("@gmail.com") || sender.includes("onboarding@resend.dev")) {
+    sender = defaultFrom;
   }
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${process.env.RESEND_API_KEY?.trim()}`,
+      Authorization: `Bearer ${(process.env.RESEND_API_KEY || "").trim()}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -67,32 +102,36 @@ export const sendMailViaHttp = async ({ from, to, subject, html }) => {
 
 /**
  * Unified Mailer Transporter:
- * If RESEND_API_KEY is present -> Uses HTTPS API (Render Free Tier compatible)
- * Otherwise -> Uses standard Nodemailer SMTP
+ * Priority 1: BREVO_API_KEY (Works to any recipient without domain verification!)
+ * Priority 2: RESEND_API_KEY (Works with verified domain or test email)
+ * Priority 3: SMTP (Localhost)
  */
 const transporter = {
   sendMail: async (options) => {
+    if (process.env.BREVO_API_KEY) {
+      return sendViaBrevo(options);
+    }
     if (process.env.RESEND_API_KEY) {
-      return sendMailViaHttp(options);
+      return sendViaResend(options);
     }
     return nodemailerTransporter.sendMail(options);
   },
 };
 
 // Startup diagnostic check
-if (process.env.RESEND_API_KEY) {
-  console.log("✅ Mailer configured using HTTPS REST API (Resend) - Render compatible!");
+if (process.env.BREVO_API_KEY) {
+  console.log("✅ Mailer active using Brevo HTTPS REST API (Free 300 emails/day to any recipient)!");
+} else if (process.env.RESEND_API_KEY) {
+  console.log("✅ Mailer active using Resend HTTPS REST API!");
 } else if (emailUser && emailPass) {
   nodemailerTransporter.verify((error) => {
     if (error) {
       console.warn("⚠️ SMTP Notice: Render Free Tier blocks outbound SMTP (ports 465/587). Error:", error.message);
-      console.warn("👉 Recommendation: Add RESEND_API_KEY in Render Environment Variables to send emails over HTTPS (port 443) for free!");
+      console.warn("👉 Recommendation: Add BREVO_API_KEY in Render Environment Variables to send emails for free over HTTPS!");
     } else {
       console.log(`✅ SMTP Mailer connected for: ${emailUser}`);
     }
   });
-} else {
-  console.warn("⚠️ Warning: Neither RESEND_API_KEY nor (EMAIL_USER & EMAIL_PASS) is set!");
 }
 
 export default transporter;
