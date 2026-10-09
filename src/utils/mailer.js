@@ -1,22 +1,21 @@
 import dns from "dns";
 import nodemailer from "nodemailer";
 
-// Render and cloud containers do not support outbound IPv6. Force IPv4 first.
 if (dns.setDefaultResultOrder) {
   dns.setDefaultResultOrder("ipv4first");
 }
 
 const emailUser = (process.env.EMAIL_USER || "").trim();
 const emailPass = (process.env.EMAIL_PASS || "").trim().replace(/\s+/g, "");
+const resendApiKey = (process.env.RESEND_API_KEY || "").trim();
 
-const transporter = nodemailer.createTransport({
+const nodemailerTransporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
-  secure: true, // SSL direct connection
+  secure: true,
   pool: true,
   maxConnections: 5,
   maxMessages: 100,
-  // Explicitly forces IPv4 address resolution (bypasses Render IPv6 ENETUNREACH)
   lookup: (hostname, options, callback) => {
     dns.lookup(hostname, { family: 4 }, (err, address, family) => {
       callback(err, address, family);
@@ -32,17 +31,60 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Verify connection configuration on startup
-if (emailUser && emailPass) {
-  transporter.verify((error) => {
+/**
+ * Sends email via Resend HTTPS REST API (Port 443 - 100% works on Render Free Tier)
+ */
+export const sendMailViaHttp = async ({ from, to, subject, html }) => {
+  const fromAddress = process.env.EMAIL_FROM || "CareerMap <onboarding@resend.dev>";
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: from || fromAddress,
+      to: Array.isArray(to) ? to : [to],
+      subject,
+      html,
+    }),
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || JSON.stringify(data));
+  }
+  return data;
+};
+
+/**
+ * Unified Mailer Transporter:
+ * If RESEND_API_KEY is present -> Uses HTTPS API (Render Free Tier compatible)
+ * Otherwise -> Uses standard Nodemailer SMTP
+ */
+const transporter = {
+  sendMail: async (options) => {
+    if (process.env.RESEND_API_KEY) {
+      return sendMailViaHttp(options);
+    }
+    return nodemailerTransporter.sendMail(options);
+  },
+};
+
+// Startup diagnostic check
+if (process.env.RESEND_API_KEY) {
+  console.log("✅ Mailer configured using HTTPS REST API (Resend) - Render compatible!");
+} else if (emailUser && emailPass) {
+  nodemailerTransporter.verify((error) => {
     if (error) {
-      console.error("❌ SMTP Connection Error (Render/Server):", error.message);
+      console.warn("⚠️ SMTP Notice: Render Free Tier blocks outbound SMTP (ports 465/587). Error:", error.message);
+      console.warn("👉 Recommendation: Add RESEND_API_KEY in Render Environment Variables to send emails over HTTPS (port 443) for free!");
     } else {
-      console.log(`✅ SMTP Mailer connected successfully for: ${emailUser}`);
+      console.log(`✅ SMTP Mailer connected for: ${emailUser}`);
     }
   });
 } else {
-  console.warn("⚠️ Warning: EMAIL_USER or EMAIL_PASS environment variables are not set!");
+  console.warn("⚠️ Warning: Neither RESEND_API_KEY nor (EMAIL_USER & EMAIL_PASS) is set!");
 }
 
 export default transporter;
