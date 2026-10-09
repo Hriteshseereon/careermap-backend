@@ -1365,7 +1365,8 @@ export const assessmentService = {
       fitI: Math.round(c.fitI * 100),
       fitA: Math.round(c.fitA * 100),
       fitP: Math.round(c.fitP * 100),
-      fitV: Math.round(c.fitV * 100)
+      fitV: Math.round(c.fitV * 100),
+      careers: c.careers || []
     }));
 
     // Save Assessment Result in DB
