@@ -1,55 +1,41 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../../config/db.js";
-import { InstituteRepository }
-from "./institute.repository.js";
-
+import { InstituteRepository } from "./institute.repository.js";
+import { sendInstituteCredentials } from "../../utils/sendInstituteCredentials.js";
 
 // CREATE
-export const createInstitute =
-async (body) => {
-
-  const existing =
-    await InstituteRepository.findByEmail(
-      body.email
-    );
+export const createInstitute = async (body) => {
+  const existing = await InstituteRepository.findByEmail(body.email);
 
   if (existing) {
     return {
       success: false,
-      message:
-        "Email already exists",
+      message: "Email already exists",
     };
   }
 
-  const hashedPassword =
-    await bcrypt.hash(
-      body.password,
-      12
-    );
+  const rawPassword = body.password;
+  const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
-  const institute =
-    await InstituteRepository.create({
+  const institute = await InstituteRepository.create({
+    name: body.name,
+    email: body.email,
+    password: hashedPassword,
+    contract_person: body.contract_person,
+    mobile: body.mobile,
+    address: body.address,
+    limit: Number(body.limit) || 100,
+  });
 
-      name: body.name,
-
-      email: body.email,
-
-      password:
-        hashedPassword,
-
-      contract_person:
-        body.contract_person,
-
-      mobile:
-        body.mobile,
-
-      address:
-        body.address,
-
-      limit:
-        Number(body.limit) || 100,
-    });
+  // Send credentials email to institute in background (non-blocking for fast UI response)
+  sendInstituteCredentials(
+    institute.email,
+    institute.name,
+    rawPassword
+  ).catch((emailError) => {
+    console.error("❌ Institute Credentials Email Send Error:", emailError.message);
+  });
 
   return {
     success: true,
