@@ -6,8 +6,13 @@ export const CounselingRepository = {
       data,
     });
     },
-    findAll(){
-      return  prisma.counselingForm.findMany()
+    findAll(where = {}){
+      return prisma.counselingForm.findMany({
+        where,
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
     },
     findById(id) {
   return prisma.counselingForm.findUnique({

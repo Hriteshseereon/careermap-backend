@@ -1,10 +1,11 @@
 import {
-createCounseling,
-getCounselings,
-getCounselingById,
-updateCounseling,
-deleteCounseling,
- generateCounselingReport
+  createCounseling,
+  getCounselings,
+  getCounselingById,
+  updateCounseling,
+  deleteCounseling,
+  generateCounselingReport,
+  getCounselingsByCounselor,
 } from "./counseling.services.js";
 import PDFDocument from "pdfkit";
 
@@ -13,37 +14,48 @@ const LEFT_LOGO_URL =
   "https://res.cloudinary.com/dfm1xhhwx/image/upload/v1784782926/logo_white_pkzdz0.png";
 const RIGHT_LOGO_URL =
   "https://res.cloudinary.com/dfm1xhhwx/image/upload/v1784783276/logo_ulbkag.png";
+
 export const createCounselingController = async (req, res) => {
-const result = await createCounseling(req.body);
-res.status(result.success ? 201 : 400).json(result);
+  const result = await createCounseling(req.body, { staff: req.staff, admin: req.admin });
+  res.status(result.success ? 201 : (result.statusCode || 400)).json(result);
 };
 
 export const getCounselingsController = async (req, res) => {
-const result = await getCounselings();
-res.status(200).json(result);
+  const result = await getCounselings({ staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 400)).json(result);
+};
+
+export const getMyCounselingReportsController = async (req, res) => {
+  const result = await getCounselings({ staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 400)).json(result);
+};
+
+export const getCounselingsByCounselorController = async (req, res) => {
+  const result = await getCounselingsByCounselor(req.params.counselorName, { staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 400)).json(result);
 };
 
 export const getCounselingByIdController = async (req, res) => {
-const result = await getCounselingById(req.params.id);
-res.status(result.success ? 200 : 404).json(result);
+  const result = await getCounselingById(req.params.id, { staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 404)).json(result);
 };
 
 export const updateCounselingController = async (req, res) => {
-const result = await updateCounseling(req.params.id, req.body);
-res.status(result.success ? 200 : 400).json(result);
+  const result = await updateCounseling(req.params.id, req.body, { staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 400)).json(result);
 };
 
 export const deleteCounselingController = async (req, res) => {
-const result = await deleteCounseling(req.params.id);
-res.status(result.success ? 200 : 400).json(result);
+  const result = await deleteCounseling(req.params.id, { staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 400)).json(result);
 };
 
 export const downloadCounselingReportController = async (req, res) => {
   try {
-    const result = await generateCounselingReport(req.params.id);
- 
+    const result = await generateCounselingReport(req.params.id, { staff: req.staff, admin: req.admin });
+
     if (!result.success) {
-      return res.status(404).json(result);
+      return res.status(result.statusCode || 404).json(result);
     }
  
     const data = result.data;

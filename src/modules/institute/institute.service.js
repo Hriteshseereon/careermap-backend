@@ -253,7 +253,7 @@ export const getInstituteStudents = async (instituteId) => {
         select: {
           id: true,
           score: true,
-          createdAt: true,
+          attemptedAt: true,
         },
       },
       assessmentAttempts: {
@@ -337,7 +337,7 @@ export const getInstitutePsychometricAssessments = async (instituteId) => {
         select: {
           id: true,
           title: true,
-          code: true,
+          slug: true,
         },
       },
       result: {
@@ -360,6 +360,7 @@ export const getInstitutePsychometricAssessments = async (instituteId) => {
     attemptId: att.id,
     assessmentId: att.assessmentId,
     assessmentTitle: att.assessment?.title || "Career Compass Psychometric Assessment",
+    assessmentSlug: att.assessment?.slug || null,
     status: att.status,
     completedAt: att.completedAt,
     startedAt: att.createdAt,
