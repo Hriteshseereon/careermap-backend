@@ -69,6 +69,43 @@ const canAccessCounseling = (record, resolvedUser) => {
   return false;
 };
 
+/**
+ * Format counseling record for clean frontend consumption:
+ * - Moves _createdById, _creatorType, etc. to creatorMetadata
+ * - Leaves marks containing strictly academic subject scores
+ */
+export const formatCounselingResponse = (record) => {
+  if (!record) return record;
+  const rec = { ...record };
+
+  if (rec.marks && typeof rec.marks === "object") {
+    const cleanMarks = {};
+    const meta = {};
+
+    const source = (rec.marks.rawMarks && typeof rec.marks.rawMarks === "object")
+      ? { ...rec.marks, ...rec.marks.rawMarks }
+      : rec.marks;
+
+    for (const [key, val] of Object.entries(source)) {
+      if (key.startsWith("_")) {
+        meta[key.slice(1)] = val;
+      } else if (key !== "rawMarks") {
+        cleanMarks[key] = val;
+      }
+    }
+
+    rec.marks = cleanMarks;
+    rec.creatorMetadata = {
+      createdById: meta.createdById || null,
+      counselorName: meta.counselorName || rec.counselorName || null,
+      creatorType: meta.creatorType || null,
+      createdAt: meta.createdAt || rec.createdAt,
+    };
+  }
+
+  return rec;
+};
+
 export const createCounseling = async (body, userContext) => {
   try {
     const user = await resolveUser(userContext);
@@ -129,7 +166,7 @@ export const createCounseling = async (body, userContext) => {
 
     return {
       success: true,
-      data: result,
+      data: formatCounselingResponse(result),
     };
   } catch (err) {
     return {
@@ -149,7 +186,7 @@ export const getCounselings = async (userContext) => {
       return {
         success: true,
         total: allRecords.length,
-        data: allRecords,
+        data: allRecords.map(formatCounselingResponse),
       };
     }
 
@@ -159,7 +196,7 @@ export const getCounselings = async (userContext) => {
     return {
       success: true,
       total: filtered.length,
-      data: filtered,
+      data: filtered.map(formatCounselingResponse),
     };
   } catch (err) {
     return {
@@ -192,7 +229,7 @@ export const getCounselingById = async (id, userContext) => {
 
     return {
       success: true,
-      data,
+      data: formatCounselingResponse(data),
     };
   } catch (err) {
     return {
@@ -281,7 +318,7 @@ export const updateCounseling = async (id, body, userContext) => {
 
     return {
       success: true,
-      data: result,
+      data: formatCounselingResponse(result),
     };
   } catch (err) {
     return {
@@ -348,7 +385,7 @@ export const generateCounselingReport = async (id, userContext) => {
 
   return {
     success: true,
-    data: counseling,
+    data: formatCounselingResponse(counseling),
   };
 };
 
@@ -378,7 +415,7 @@ export const getCounselingsByCounselor = async (counselorName, userContext) => {
     return {
       success: true,
       total: filtered.length,
-      data: filtered,
+      data: filtered.map(formatCounselingResponse),
     };
   } catch (err) {
     return {

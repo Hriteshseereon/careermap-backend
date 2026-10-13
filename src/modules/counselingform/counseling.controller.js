@@ -15,6 +15,31 @@ const LEFT_LOGO_URL =
 const RIGHT_LOGO_URL =
   "https://res.cloudinary.com/dfm1xhhwx/image/upload/v1784783276/logo_ulbkag.png";
 
+export const stripHtml = (html) => {
+  if (html === undefined || html === null) return "";
+  if (typeof html !== "string") return String(html);
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<br\s*[\/]?>/gi, "\n")
+    .replace(/<\/p\s*>/gi, "\n\n")
+    .replace(/<\/div\s*>/gi, "\n")
+    .replace(/<\/li\s*>/gi, "\n")
+    .replace(/<li[^>]*>/gi, "• ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&apos;/gi, "'")
+    .replace(/&bull;/gi, "•")
+    .replace(/\r\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+};
+
 export const createCounselingController = async (req, res) => {
   const result = await createCounseling(req.body, { staff: req.staff, admin: req.admin });
   res.status(result.success ? 201 : (result.statusCode || 400)).json(result);
@@ -142,12 +167,16 @@ export const downloadCounselingReportController = async (req, res) => {
       const valueFont = opts.valueFont || "Helvetica";
       const fontSize = opts.fontSize || 10;
  
+      const cleanValue = typeof value === "string" ? stripHtml(value) : value;
+      const displayString =
+        cleanValue !== undefined && cleanValue !== null && String(cleanValue).trim().length > 0
+          ? String(cleanValue).trim()
+          : "-";
+
       doc.font(labelFont).fontSize(fontSize);
       const labelHeight = doc.heightOfString(label, { width: labelWidth - 10 });
       doc.font(valueFont).fontSize(fontSize);
-      const valueHeight = value
-        ? doc.heightOfString(String(value), { width: valueWidth - 10 })
-        : fontSize;
+      const valueHeight = doc.heightOfString(displayString, { width: valueWidth - 10 });
  
       const rowHeight =
         Math.max(labelHeight, valueHeight, opts.minHeight || 20) + 10;
@@ -169,7 +198,7 @@ export const downloadCounselingReportController = async (req, res) => {
         .font(valueFont)
         .fontSize(fontSize)
         .fillColor(BLACK)
-        .text(value ? String(value) : "-", LEFT + labelWidth + 5, y + 5, {
+        .text(displayString, LEFT + labelWidth + 5, y + 5, {
           width: valueWidth - 10,
         });
  
@@ -233,14 +262,32 @@ export const downloadCounselingReportController = async (req, res) => {
       LABEL_W2
     );
  
-    // Marks
-    const marks = data.marks || {};
-    const markEntries = Object.entries(marks);
-    const marksText =
-      markEntries.length > 0
-        ? markEntries.map(([subject, mark]) => `${subject} - ${mark}`).join("\n")
-        : "-";
-    twoColRow("Latest Score (if 11th / 12th) SCIENCE", marksText, LABEL_W2);
+    // Marks (filter out internal metadata like _createdAt, _createdById, _creatorType, _counselorName, rawMarks)
+    let marksText = "-";
+    if (data.marks && typeof data.marks === "object") {
+      const source = (data.marks.rawMarks && typeof data.marks.rawMarks === "object")
+        ? { ...data.marks, ...data.marks.rawMarks }
+        : data.marks;
+
+      const subjectEntries = [];
+      for (const [subject, mark] of Object.entries(source)) {
+        if (subject.startsWith("_") || subject === "rawMarks") continue;
+        if (mark === undefined || mark === null) continue;
+        const cleanSub = stripHtml(String(subject)).trim();
+        const cleanScore = typeof mark === "string" ? stripHtml(mark).trim() : mark;
+        if (cleanSub) {
+          subjectEntries.push(`${cleanSub} - ${cleanScore}`);
+        }
+      }
+
+      if (subjectEntries.length > 0) {
+        marksText = subjectEntries.join("\n");
+      }
+    }
+    const scoreLabel = data.stream
+      ? `Latest Score (${data.stream})`
+      : "Latest Score (if 11th / 12th)";
+    twoColRow(scoreLabel, marksText, LABEL_W2);
  
     // Dream career
     const careerText = [
@@ -264,7 +311,7 @@ export const downloadCounselingReportController = async (req, res) => {
       "(D) Changing career options quite frequently",
       "(E) Vague knowledge about Career options",
     ];
-    const selectedCategory = (data.category || "").toString().trim().toUpperCase();
+    const selectedCategory = stripHtml(data.category || "").toUpperCase();
  
     {
       const label = "Which category does your counselee belong to?";
@@ -311,12 +358,13 @@ export const downloadCounselingReportController = async (req, res) => {
       doc.y = y + rowHeight;
     }
  
-    // Observation & Recommendation
+    // Observation & Recommendation (strip HTML so tags like <p> don't print in PDF)
     {
       const label = "Observation & Recommendation/ Suggestion";
       const labelWidth = LABEL_W2;
       const valueWidth = TABLE_WIDTH - labelWidth;
-      const text = data.observation || "No Observation Available";
+      const rawText = data.observation || "";
+      const text = stripHtml(rawText) || "No Observation Available";
  
       doc.font("Helvetica-Bold").fontSize(10);
       const labelHeight = doc.heightOfString(label, { width: labelWidth - 10 });
