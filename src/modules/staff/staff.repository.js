@@ -5,6 +5,13 @@ export const StaffRepository = {
   create(data) {
     return prisma.staffUser.create({
       data,
+      include: {
+        role: {
+          include: {
+            permissions: true,
+          },
+        },
+      },
     });
   },
 
@@ -27,7 +34,14 @@ export const StaffRepository = {
   findAll() {
     return prisma.staffUser.findMany({
       include: {
-        role: true,
+        role: {
+          include: {
+            permissions: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
   },
@@ -48,12 +62,19 @@ export const StaffRepository = {
     });
   },
 
-  update(id,data) {
+  update(id, data) {
     return prisma.staffUser.update({
       where: {
-        id:Number(id),
+        id: Number(id),
       },
       data,
+      include: {
+        role: {
+          include: {
+            permissions: true,
+          },
+        },
+      },
     });
   },
 
