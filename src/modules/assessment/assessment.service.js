@@ -16,6 +16,18 @@ const ensureAssessmentAccess = async (userId) => {
     return null;
   }
 
+  // 1st free attempt check: if user has 0 completed attempts, it is free
+  const completedAttemptsCount = await prisma.assessmentAttempt.count({
+    where: {
+      userId: Number(userId),
+      status: "completed",
+    },
+  });
+
+  if (completedAttemptsCount === 0) {
+    return null;
+  }
+
   // Normal users: unlock only if an active plan includes assessment
   const subscriptions = await prisma.subscriptions.findMany({
     where: {

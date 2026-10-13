@@ -110,8 +110,17 @@ const unlockedModuleIds = [
 ];
     const instituteHasAssessmentAccess = canAccessAssessment(user);
 
+    // Check if user has free 1st attempt available (0 completed attempts)
+    const completedAssessmentAttemptsCount = await prisma.assessmentAttempt.count({
+      where: {
+        userId: Number(userId),
+        status: "completed",
+      },
+    });
+    const hasFreeFirstAttempt = completedAssessmentAttemptsCount === 0;
+
     // Final module status — repeatable 15s preview until purchase
-    // Assessment: free for institute students; locked for normal users
+    // Assessment: free for institute students OR 1st time users; locked for retakes
     // until they purchase a plan that includes it.
     const modules = allModules.map((mod) => {
       if (isAssessmentModule(mod)) {
@@ -120,9 +129,10 @@ const unlockedModuleIds = [
         return {
           ...mod,
           accessStatus:
-            instituteHasAssessmentAccess || unlockedViaPlan
+            instituteHasAssessmentAccess || hasFreeFirstAttempt || unlockedViaPlan
               ? "unlocked"
               : "locked",
+          isFreeAttempt: hasFreeFirstAttempt && !instituteHasAssessmentAccess && !unlockedViaPlan,
           previewDurationSeconds: null,
         };
       }
