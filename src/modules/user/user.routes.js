@@ -2,7 +2,7 @@ import { Router } from "express";
 import {signup, updateProfileController,changePasswordController,forgotPasswordController,resetPasswordController, getAllUsersController,getUserByIdController, banUserController,
   unbanUserController,getBannedUsersController,getUserTransactionsController, getLoginHistoryController} from "./user.controller.js";
 import { protectAuth } from "../../middlewares/protectAuth.js";
-import {protectAdmin} from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 import { protectTemp } from "../../middlewares/protectTemp.js";
 const router = Router();
 
@@ -29,40 +29,39 @@ router.post(
 );
 router.get(
   "/admin/users",
-  protectAdmin,
+  protectAdminOrStaff,
   getAllUsersController
 );
 router.get(
   "/admin/users/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   getUserByIdController
 );
 
 router.put(
   "/admin/users/:id/ban",
-  protectAdmin,
+  protectAdminOrStaff,
   banUserController
 );
 
 router.put(
   "/admin/users/:id/unban",
-  protectAdmin,
+  protectAdminOrStaff,
   unbanUserController
 );
 router.get(
   "/admin/banned-users",
-  protectAdmin,
+  protectAdminOrStaff,
   getBannedUsersController
 );
 router.get(
   "/admin/users/:id/transactions",
-  protectAdmin,
+  protectAdminOrStaff,
   getUserTransactionsController
 );
 router.get(
   "/admin/users/:id/login-history",
-  protectAdmin,
+  protectAdminOrStaff,
   getLoginHistoryController
 );
 export default router;
-    

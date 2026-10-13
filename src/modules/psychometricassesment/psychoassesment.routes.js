@@ -4,7 +4,7 @@ import {
   assessmentController
 } from "./psychoassessment.controller.js";
 
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 import { protectAuth } from "../../middlewares/protectAuth.js";
 
 const router = express.Router();
@@ -16,49 +16,49 @@ const router = express.Router();
 
 router.post(
   "/admin/assessments/seed-defaults",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.seedDefaultAssessmentAndQuestions
 );
 
 router.post(
   "/admin/questions/seed-defaults",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.seedDefaultAssessmentAndQuestions
 );
 
 router.post(
   "/admin/assessments",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.createAssessment
 );
 
 router.get(
   "/admin/assessments",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getAllAssessments
 );
 
 router.get(
   "/admin/assessments/:assessmentId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getAssessmentByIdAdmin
 );
 
 router.put(
   "/admin/assessments/:assessmentId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.updateAssessment
 );
 
 router.patch(
   "/admin/assessments/:assessmentId/status",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.updateAssessmentStatus
 );
 
 router.delete(
   "/admin/assessments/:assessmentId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.deleteAssessment
 );
 
@@ -69,37 +69,37 @@ router.delete(
 
 router.post(
   "/admin/assessments/:assessmentId/sections",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.createSection
 );
 
 router.get(
   "/admin/sections",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getAllSections
 );
 
 router.get(
   "/admin/assessments/:assessmentId/sections",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getSectionsByAssessment
 );
 
 router.get(
   "/admin/sections/:sectionId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getSectionById
 );
 
 router.put(
   "/admin/sections/:sectionId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.updateSection
 );
 
 router.delete(
   "/admin/sections/:sectionId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.deleteSection
 );
 
@@ -110,61 +110,61 @@ router.delete(
 
 router.post(
   "/admin/assessment-sections/:sectionId/questions",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.createQuestion
 );
 
 router.post(
   "/admin/sections/:sectionId/questions",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.createQuestion
 );
 
 router.post(
   "/admin/sections/:sectionId/questions/bulk",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.bulkCreateQuestions
 );
 
 router.post(
   "/admin/questions/bulk",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.bulkCreateQuestions
 );
 
 router.get(
   "/admin/sections/:sectionId/questions",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getQuestionsBySection
 );
 
 router.get(
   "/admin/assessments/:assessmentId/questions",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getQuestionsByAssessment
 );
 
 router.get(
   "/admin/questions",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getAllQuestions
 );
 
 router.get(
   "/admin/questions/:questionId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getQuestionById
 );
 
 router.put(
   "/admin/questions/:questionId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.updateQuestion
 );
 
 router.delete(
   "/admin/questions/:questionId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.deleteQuestion
 );
 
@@ -175,31 +175,31 @@ router.delete(
 
 router.post(
   "/admin/questions/:questionId/options",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.createOptions
 );
 
 router.get(
   "/admin/questions/:questionId/options",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getOptionsByQuestion
 );
 
 router.put(
   "/admin/questions/:questionId/options",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.updateOptionsForQuestion
 );
 
 router.put(
   "/admin/options/:optionId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.updateSingleOption
 );
 
 router.delete(
   "/admin/options/:optionId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.deleteSingleOption
 );
 
@@ -210,73 +210,73 @@ router.delete(
 
 router.post(
   "/admin/career-clusters/seed-defaults",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.seedDefaultCareerClusters
 );
 
 router.post(
   "/admin/career-clusters/bulk-import",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.bulkImportCareerClusters
 );
 
 router.post(
   "/admin/career-clusters",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.createCareerCluster
 );
 
 router.get(
   "/admin/career-clusters",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getAllCareerClusters
 );
 
 router.get(
   "/admin/career-clusters/:clusterId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getCareerClusterById
 );
 
 router.put(
   "/admin/career-clusters/:clusterId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.updateCareerCluster
 );
 
 router.delete(
   "/admin/career-clusters/:clusterId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.deleteCareerCluster
 );
 
 router.post(
   "/admin/career-clusters/:clusterId/weights",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.createCareerClusterWeight
 );
 
 router.get(
   "/admin/career-clusters/:clusterId/weights",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getWeightsByCluster
 );
 
 router.put(
   "/admin/career-clusters/:clusterId/weights",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.bulkUpdateClusterWeights
 );
 
 router.put(
   "/admin/career-cluster-weights/:weightId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.updateSingleClusterWeight
 );
 
 router.delete(
   "/admin/career-cluster-weights/:weightId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.deleteSingleClusterWeight
 );
 
@@ -287,25 +287,25 @@ router.delete(
 
 router.get(
   "/admin/attempts",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getAllAttemptsAdmin
 );
 
 router.get(
   "/admin/attempts/:attemptId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getAttemptByIdAdmin
 );
 
 router.delete(
   "/admin/attempts/:attemptId",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.deleteAttemptAdmin
 );
 
 router.post(
   "/admin/attempts/:attemptId/recalculate",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.recalculateAttempt
 );
 
@@ -409,19 +409,19 @@ router.get(
 // Also mount under /admin for admin panel preview
 router.get(
   "/admin/profiling/questions",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getProfilingQuestions
 );
 
 router.post(
   "/admin/profiling/calculate",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.calculateProfiling
 );
 
 router.get(
   "/admin/profiling/test-cases",
-  protectAdmin,
+  protectAdminOrStaff,
   assessmentController.getProfilingTestCases
 );
 

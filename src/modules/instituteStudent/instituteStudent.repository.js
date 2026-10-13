@@ -8,7 +8,11 @@ export const InstituteStudentRepository = {
         id: Number(instituteId),
       },
       include: {
-        users: true,
+        _count: {
+          select: {
+            users: true,
+          },
+        },
       },
     });
   },

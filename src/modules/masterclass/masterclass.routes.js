@@ -8,7 +8,6 @@ import {
   updateMasterClassFreeStatusController,
 } from "./masterclass.controller.js";
 import { optionalAuth } from "../../middlewares/optionalAuth.js";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
 import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 import upload from "../../middlewares/upload.js";
 const router = Router();

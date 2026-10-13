@@ -7,7 +7,6 @@ import {
   deleteCounselingController,
  downloadCounselingReportController,
 } from "./counseling.controller.js";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
 import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 
 const router = express.Router();

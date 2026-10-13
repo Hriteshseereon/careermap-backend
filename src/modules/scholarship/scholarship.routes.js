@@ -1,6 +1,6 @@
 import { Router } from "express";
 import upload from "../../middlewares/upload.js";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 import { optionalAuth } from "../../middlewares/optionalAuth.js";
 
 import {
@@ -16,7 +16,7 @@ const router = Router();
 
 router.post(
   "/",
-  protectAdmin,
+  protectAdminOrStaff,
   upload.single("image"),
   createScholarshipController
 );
@@ -26,15 +26,15 @@ router.get("/:id", optionalAuth, getScholarshipByIdController);
 
 router.put(
   "/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   upload.single("image"),
   updateScholarshipController
 );
 
-router.delete("/:id", protectAdmin, deleteScholarshipController);
+router.delete("/:id", protectAdminOrStaff, deleteScholarshipController);
 router.patch(
   "/:id/free-status",
-  protectAdmin,
+  protectAdminOrStaff,
   updateScholarshipFreeStatusController
 );
 export default router;

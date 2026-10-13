@@ -1,23 +1,21 @@
 import { Router } from "express";
 
 import {
-
   createInstituteController,
   loginInstituteController,
   getInstitutesController,
   getInstituteByIdController,
   updateInstituteController,
   deleteInstituteController,
-   getInstituteDashboardController
-
+  getInstituteDashboardController,
+  getInstituteStudentsController,
+  getInstitutePsychometricAssessmentsController,
 } from "./institute.controller.js";
 
-import {
-  protectAdmin
-} from "../../middlewares/protectAdmin.js";
-import {protectInstitute} from "../../middlewares/protectInstitute.js"
-const router = Router();
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
+import { protectInstitute } from "../../middlewares/protectInstitute.js";
 
+const router = Router();
 
 // LOGIN
 router.post(
@@ -25,43 +23,66 @@ router.post(
   loginInstituteController
 );
 
-
-// CRUD
-
-router.post(
-  "/",
-  protectAdmin,
-  createInstituteController
-);
-
+// INSTITUTE PORTAL (Institute Logged In)
 router.get(
   "/dashboard",
   protectInstitute,
   getInstituteDashboardController
 );
+
+router.get(
+  "/students",
+  protectInstitute,
+  getInstituteStudentsController
+);
+
+router.get(
+  "/psychometric-assessments",
+  protectInstitute,
+  getInstitutePsychometricAssessmentsController
+);
+
+// ADMIN / STAFF CRUD ROUTES
+router.post(
+  "/",
+  protectAdminOrStaff,
+  createInstituteController
+);
+
 router.get(
   "/",
-  protectAdmin,
+  protectAdminOrStaff,
   getInstitutesController
 );
 
 router.get(
   "/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   getInstituteByIdController
+);
+
+router.get(
+  "/:id/students",
+  protectAdminOrStaff,
+  getInstituteStudentsController
+);
+
+router.get(
+  "/:id/psychometric-assessments",
+  protectAdminOrStaff,
+  getInstitutePsychometricAssessmentsController
 );
 
 router.put(
   "/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   updateInstituteController
 );
 
 router.delete(
   "/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   deleteInstituteController
 );
-
 
 export default router;

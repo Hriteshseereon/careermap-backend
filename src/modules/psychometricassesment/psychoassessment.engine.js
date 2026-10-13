@@ -1,6 +1,9 @@
 import {
   calculateProfiling
 } from "./profiling.engine.js";
+import {
+  CLUSTER_CAREERS
+} from "./psychoassessment.seed.js";
 
 // ============================================================
 // ASSESSMENT SCORING ENGINE
@@ -404,6 +407,7 @@ export const calculateClusterMatches = (scores, clusters) => {
       name: cluster.name,
       hollandCode: cluster.hollandCode || null,
       description: cluster.description || null,
+      careers: cluster.careers || CLUSTER_CAREERS[cluster.code] || [],
       match: Math.max(0, Math.min(1, match)),
       fitI: fitI !== null ? Math.max(0, Math.min(1, fitI)) : 0,
       fitA: fitA !== null ? Math.max(0, Math.min(1, fitA)) : 0,
@@ -535,12 +539,14 @@ export const buildAssessmentReport = ({
         clusterId: top1.clusterId,
         code: top1.code,
         name: top1.name,
+        hollandCode: top1.hollandCode,
         matchPercentage: Math.round(top1.match * 100),
         fitI: Math.round(top1.fitI * 100),
         fitA: Math.round(top1.fitA * 100),
         fitP: Math.round(top1.fitP * 100),
         fitV: Math.round(top1.fitV * 100),
-        description: top1.description || ""
+        description: top1.description || "",
+        careers: top1.careers || CLUSTER_CAREERS[top1.code] || []
       } : null,
       top5: top5.map((c) => ({
         clusterId: c.clusterId,
@@ -552,13 +558,16 @@ export const buildAssessmentReport = ({
         fitA: Math.round(c.fitA * 100),
         fitP: Math.round(c.fitP * 100),
         fitV: Math.round(c.fitV * 100),
-        description: c.description || ""
+        description: c.description || "",
+        careers: c.careers || CLUSTER_CAREERS[c.code] || []
       })),
       allRanked: (rankedClusters || []).map((c) => ({
         clusterId: c.clusterId,
         code: c.code,
         name: c.name,
-        matchPercentage: Math.round(c.match * 100)
+        hollandCode: c.hollandCode,
+        matchPercentage: Math.round(c.match * 100),
+        careers: c.careers || CLUSTER_CAREERS[c.code] || []
       }))
     },
     domains: {

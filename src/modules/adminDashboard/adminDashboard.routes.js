@@ -6,9 +6,6 @@ import {
   getAllMentorBookingsController,
 } from "./adminDashboard.controller.js";
 
-import {
-  protectAdmin,
-} from "../../middlewares/protectAdmin.js";
 import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 const router = Router();
 

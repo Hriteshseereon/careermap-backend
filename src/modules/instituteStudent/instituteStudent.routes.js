@@ -1,8 +1,5 @@
 import { Router } from "express";
 
-import {
-  protectAdmin,
-} from "../../middlewares/protectAdmin.js";
 import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 import {
 

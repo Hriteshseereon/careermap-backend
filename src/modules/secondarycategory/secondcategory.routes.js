@@ -1,6 +1,6 @@
 import { Router } from "express";
 import upload from "../../middlewares/upload.js";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 import {
   createSecondCategoryController,
   getSecondCategoriesController,
@@ -14,7 +14,7 @@ const router = Router();
 
 router.post(
   "/",
-  protectAdmin,
+  protectAdminOrStaff,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "coverImage", maxCount: 1 },
@@ -27,7 +27,7 @@ router.get("/:id", getSecondCategoryByIdController);
 
 router.put(
   "/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "coverImage", maxCount: 1 },
@@ -35,7 +35,7 @@ router.put(
   updateSecondCategoryController
 );
 
-router.delete("/:id", protectAdmin, deleteSecondCategoryController);
+router.delete("/:id", protectAdminOrStaff, deleteSecondCategoryController);
 router.get(
   "/category/:categoryId",
   getSecondByCategoryController

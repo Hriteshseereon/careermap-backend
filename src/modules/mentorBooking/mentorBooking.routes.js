@@ -11,7 +11,7 @@ import {
 } from "./mentorBooking.controller.js";
 
 import { protectAuth } from "../../middlewares/protectAuth.js";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 
 const router = Router();
 
@@ -35,7 +35,7 @@ router.get(
 
 router.get(
   "/all-bookings",
-  protectAdmin,
+  protectAdminOrStaff,
   allBookingsController
 );
 router.get(

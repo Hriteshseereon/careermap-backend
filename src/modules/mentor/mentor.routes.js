@@ -1,9 +1,6 @@
 import { Router } from "express";
 import upload from "../../middlewares/upload.js";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
-import { protectStaff } from "../../middlewares/protectStaff.js";
 import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
-import { checkPermission } from "../../middlewares/checkPermission.js";
 import {
   createMentorController,
   getMentorsController,
@@ -17,11 +14,7 @@ const router = Router();
 // 🔹 CREATE
 router.post(
   "/",
-   protectAdminOrStaff,
-  checkPermission(
-    "mentor",
-    "create"
-  ),
+  protectAdminOrStaff,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "resume", maxCount: 1 },
@@ -36,11 +29,7 @@ router.get("/:id", getMentorByIdController);
 // 🔹 UPDATE
 router.put(
   "/:id",
-   protectAdminOrStaff,
-  checkPermission(
-    "mentor",
-    "edit"
-  ),
+  protectAdminOrStaff,
   upload.fields([
     { name: "image", maxCount: 1 },
     { name: "resume", maxCount: 1 },
@@ -49,6 +38,6 @@ router.put(
 );
 
 // 🔹 DELETE
-router.delete("/:id", protectAdmin, deleteMentorController);
+router.delete("/:id", protectAdminOrStaff, deleteMentorController);
 
 export default router;
