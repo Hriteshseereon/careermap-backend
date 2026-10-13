@@ -7,7 +7,7 @@ import {
 } from "./userLoginHistory.controller.js";
 
 import { protectAuth } from "../../middlewares/protectAuth.js";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 
 const router = Router();
 
@@ -23,7 +23,7 @@ router.post(
 
 router.get(
   "/",
-  protectAdmin,
+  protectAdminOrStaff,
   getLoginHistoryController
 );
 
@@ -31,7 +31,7 @@ router.get(
 
 router.get(
   "/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   getLoginHistoryByIdController
 );
 
