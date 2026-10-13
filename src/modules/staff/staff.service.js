@@ -66,11 +66,14 @@ async (email,password) => {
       {
         id: staff.id,
         roleId: staff.roleId,
-        type:"staff"
+        name: staff.name,
+        email: staff.email,
+        roleName: staff.role?.name || null,
+        type: "staff",
       },
       process.env.STAFF_SECRET,
       {
-        expiresIn:"1d"
+        expiresIn: "1d",
       }
     );
 
