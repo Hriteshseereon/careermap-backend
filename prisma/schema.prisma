@@ -925,6 +925,9 @@ model CounselingForm {
   // Marks (Dynamic)
   marks                  Json?
 
+  // Total Percentage
+  totalPercentage        String?
+
   // Career
   dreamCareerOption1     String?
   dreamCareerOption2     String?

@@ -6,6 +6,7 @@ import {
   deleteCounseling,
   generateCounselingReport,
   getCounselingsByCounselor,
+  parseMarksEntries,
 } from "./counseling.services.js";
 import PDFDocument from "pdfkit";
 
@@ -262,32 +263,37 @@ export const downloadCounselingReportController = async (req, res) => {
       LABEL_W2
     );
  
-    // Marks (filter out internal metadata like _createdAt, _createdById, _creatorType, _counselorName, rawMarks)
+    // Academic Marks / Latest Score
+    const parsedEntries = parseMarksEntries(data.marks);
     let marksText = "-";
-    if (data.marks && typeof data.marks === "object") {
-      const source = (data.marks.rawMarks && typeof data.marks.rawMarks === "object")
-        ? { ...data.marks, ...data.marks.rawMarks }
-        : data.marks;
-
-      const subjectEntries = [];
-      for (const [subject, mark] of Object.entries(source)) {
-        if (subject.startsWith("_") || subject === "rawMarks") continue;
-        if (mark === undefined || mark === null) continue;
-        const cleanSub = stripHtml(String(subject)).trim();
-        const cleanScore = typeof mark === "string" ? stripHtml(mark).trim() : mark;
-        if (cleanSub) {
-          subjectEntries.push(`${cleanSub} - ${cleanScore}`);
-        }
-      }
-
-      if (subjectEntries.length > 0) {
-        marksText = subjectEntries.join("\n");
-      }
+    if (parsedEntries.length > 0) {
+      marksText = parsedEntries
+        .map((entry) => `${entry.subject} - ${entry.score}`)
+        .join("\n");
     }
+
     const scoreLabel = data.stream
       ? `Latest Score (${data.stream})`
       : "Latest Score (if 11th / 12th)";
     twoColRow(scoreLabel, marksText, LABEL_W2);
+
+    // Total Percentage Row
+    const rawTotalPercentage =
+      data.totalPercentage ||
+      (data.marks && typeof data.marks === "object"
+        ? data.marks.totalPercentage || data.marks._totalPercentage
+        : null);
+
+    const cleanTotalPercentage =
+      rawTotalPercentage !== undefined &&
+      rawTotalPercentage !== null &&
+      String(rawTotalPercentage).trim().length > 0
+        ? (String(rawTotalPercentage).trim().endsWith("%")
+            ? String(rawTotalPercentage).trim()
+            : `${String(rawTotalPercentage).trim()}%`)
+        : "-";
+
+    twoColRow("Total Percentage", cleanTotalPercentage, LABEL_W2);
  
     // Dream career
     const careerText = [
