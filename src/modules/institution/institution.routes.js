@@ -1,13 +1,18 @@
-import { createInstitutionController,getInstitutionsController,updateInstitutionController,deleteInstitutionController,getInstitutionByIdController } from "./institution.controller.js";
+import { createInstitutionController,getInstitutionsController,updateInstitutionController,deleteInstitutionController,getInstitutionByIdController, getPaginatedInstitutionsController, } from "./institution.controller.js";
 import { Router } from "express";
 import upload from "../../middlewares/upload.js";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 
 const router = Router();
-router.post("/", protectAdmin, upload.single("image"), createInstitutionController);
+router.post("/", protectAdminOrStaff, upload.single("image"), createInstitutionController);
 router.get("/", getInstitutionsController);
+router.get(
+  "/paginated",
+  getPaginatedInstitutionsController
+);
 router.get("/:id", getInstitutionByIdController);
-router.put("/:id", protectAdmin, upload.single("image"), updateInstitutionController);
-router.delete("/:id", protectAdmin, deleteInstitutionController);
+
+router.put("/:id", protectAdminOrStaff, upload.single("image"), updateInstitutionController);
+router.delete("/:id", protectAdminOrStaff, deleteInstitutionController);
 
 export default router;

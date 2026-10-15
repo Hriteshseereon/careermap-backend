@@ -1,10 +1,11 @@
 import {
-createCounseling,
-getCounselings,
-getCounselingById,
-updateCounseling,
-deleteCounseling,
- generateCounselingReport
+  createCounseling,
+  getCounselings,
+  getCounselingById,
+  updateCounseling,
+  deleteCounseling,
+  generateCounselingReport,
+  getCounselingsByCounselor,
 } from "./counseling.services.js";
 import PDFDocument from "pdfkit";
 
@@ -13,37 +14,148 @@ const LEFT_LOGO_URL =
   "https://res.cloudinary.com/dfm1xhhwx/image/upload/v1784782926/logo_white_pkzdz0.png";
 const RIGHT_LOGO_URL =
   "https://res.cloudinary.com/dfm1xhhwx/image/upload/v1784783276/logo_ulbkag.png";
+
+export const stripHtml = (html) => {
+  if (html === undefined || html === null) return "";
+  if (typeof html !== "string") return String(html);
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<br\s*[\/]?>/gi, "\n")
+    .replace(/<\/p\s*>/gi, "\n\n")
+    .replace(/<\/div\s*>/gi, "\n")
+    .replace(/<\/li\s*>/gi, "\n")
+    .replace(/<li[^>]*>/gi, "• ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&apos;/gi, "'")
+    .replace(/&bull;/gi, "•")
+    .replace(/\r\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+};
+
+export const formatMarksForReport = (marksData, fallbackSubjects = []) => {
+  if (!marksData && (!fallbackSubjects || fallbackSubjects.length === 0)) return "-";
+
+  let source = marksData;
+  if (typeof source === "string") {
+    try {
+      source = JSON.parse(source);
+    } catch (e) {}
+  }
+
+  if (source && typeof source === "object" && !Array.isArray(source)) {
+    if (source.rawMarks !== undefined && source.rawMarks !== null) {
+      source = source.rawMarks;
+    }
+  }
+
+  const entries = [];
+
+  // If Array
+  if (Array.isArray(source)) {
+    source.forEach((item, idx) => {
+      if (item === undefined || item === null) return;
+      if (typeof item === "object") {
+        const sub = item.subject || item.subjectName || item.name || item.title || item.sub || `sub${idx + 1}`;
+        const score = item.score !== undefined ? item.score : (item.marks !== undefined ? item.marks : (item.mark !== undefined ? item.mark : ""));
+        const cleanSub = stripHtml(String(sub)).trim();
+        const cleanScore = stripHtml(String(score)).trim();
+        entries.push(cleanScore ? `${cleanSub} - ${cleanScore}` : cleanSub);
+      } else {
+        entries.push(stripHtml(String(item)).trim());
+      }
+    });
+  } else if (source && typeof source === "object") {
+    for (const [key, val] of Object.entries(source)) {
+      if (key.startsWith("_") || key === "rawMarks" || key === "totalPercentage" || key === "subjects") {
+        continue;
+      }
+      if (val === undefined || val === null) continue;
+
+      const cleanKey = stripHtml(String(key)).trim();
+
+      if (typeof val === "object") {
+        const subName = val.subject || val.subjectName || val.name || cleanKey;
+        const subScore = val.score !== undefined ? val.score : (val.marks !== undefined ? val.marks : (val.mark !== undefined ? val.mark : ""));
+        const cleanSubName = stripHtml(String(subName)).trim();
+        const cleanSubScore = stripHtml(String(subScore)).trim();
+        if (cleanSubName && cleanSubName !== cleanKey) {
+          entries.push(`${cleanKey} - ${cleanSubName} - ${cleanSubScore}`);
+        } else {
+          entries.push(`${cleanKey} - ${cleanSubScore}`);
+        }
+      } else {
+        const cleanVal = stripHtml(String(val)).trim();
+        if (cleanKey && cleanVal) {
+          entries.push(`${cleanKey} - ${cleanVal}`);
+        } else if (cleanVal) {
+          entries.push(cleanVal);
+        }
+      }
+    }
+  }
+
+  // Fallback to parsed subjects if entries is empty
+  if (entries.length === 0 && Array.isArray(fallbackSubjects) && fallbackSubjects.length > 0) {
+    fallbackSubjects.forEach((item) => {
+      if (!item) return;
+      const sub = item.subject || item.name || "Subject";
+      const score = item.score !== undefined ? item.score : (item.marks !== undefined ? item.marks : "-");
+      entries.push(`${stripHtml(String(sub)).trim()} - ${stripHtml(String(score)).trim()}`);
+    });
+  }
+
+  return entries.length > 0 ? entries.join("\n") : "-";
+};
+
 export const createCounselingController = async (req, res) => {
-const result = await createCounseling(req.body);
-res.status(result.success ? 201 : 400).json(result);
+  const result = await createCounseling(req.body, { staff: req.staff, admin: req.admin });
+  res.status(result.success ? 201 : (result.statusCode || 400)).json(result);
 };
 
 export const getCounselingsController = async (req, res) => {
-const result = await getCounselings();
-res.status(200).json(result);
+  const result = await getCounselings({ staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 400)).json(result);
+};
+
+export const getMyCounselingReportsController = async (req, res) => {
+  const result = await getCounselings({ staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 400)).json(result);
+};
+
+export const getCounselingsByCounselorController = async (req, res) => {
+  const result = await getCounselingsByCounselor(req.params.counselorName, { staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 400)).json(result);
 };
 
 export const getCounselingByIdController = async (req, res) => {
-const result = await getCounselingById(req.params.id);
-res.status(result.success ? 200 : 404).json(result);
+  const result = await getCounselingById(req.params.id, { staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 404)).json(result);
 };
 
 export const updateCounselingController = async (req, res) => {
-const result = await updateCounseling(req.params.id, req.body);
-res.status(result.success ? 200 : 400).json(result);
+  const result = await updateCounseling(req.params.id, req.body, { staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 400)).json(result);
 };
 
 export const deleteCounselingController = async (req, res) => {
-const result = await deleteCounseling(req.params.id);
-res.status(result.success ? 200 : 400).json(result);
+  const result = await deleteCounseling(req.params.id, { staff: req.staff, admin: req.admin });
+  res.status(result.success ? 200 : (result.statusCode || 400)).json(result);
 };
 
 export const downloadCounselingReportController = async (req, res) => {
   try {
-    const result = await generateCounselingReport(req.params.id);
- 
+    const result = await generateCounselingReport(req.params.id, { staff: req.staff, admin: req.admin });
+
     if (!result.success) {
-      return res.status(404).json(result);
+      return res.status(result.statusCode || 404).json(result);
     }
  
     const data = result.data;
@@ -130,12 +242,16 @@ export const downloadCounselingReportController = async (req, res) => {
       const valueFont = opts.valueFont || "Helvetica";
       const fontSize = opts.fontSize || 10;
  
+      const cleanValue = typeof value === "string" ? stripHtml(value) : value;
+      const displayString =
+        cleanValue !== undefined && cleanValue !== null && String(cleanValue).trim().length > 0
+          ? String(cleanValue).trim()
+          : "-";
+
       doc.font(labelFont).fontSize(fontSize);
       const labelHeight = doc.heightOfString(label, { width: labelWidth - 10 });
       doc.font(valueFont).fontSize(fontSize);
-      const valueHeight = value
-        ? doc.heightOfString(String(value), { width: valueWidth - 10 })
-        : fontSize;
+      const valueHeight = doc.heightOfString(displayString, { width: valueWidth - 10 });
  
       const rowHeight =
         Math.max(labelHeight, valueHeight, opts.minHeight || 20) + 10;
@@ -157,7 +273,7 @@ export const downloadCounselingReportController = async (req, res) => {
         .font(valueFont)
         .fontSize(fontSize)
         .fillColor(BLACK)
-        .text(value ? String(value) : "-", LEFT + labelWidth + 5, y + 5, {
+        .text(displayString, LEFT + labelWidth + 5, y + 5, {
           width: valueWidth - 10,
         });
  
@@ -221,14 +337,31 @@ export const downloadCounselingReportController = async (req, res) => {
       LABEL_W2
     );
  
-    // Marks
-    const marks = data.marks || {};
-    const markEntries = Object.entries(marks);
-    const marksText =
-      markEntries.length > 0
-        ? markEntries.map(([subject, mark]) => `${subject} - ${mark}`).join("\n")
+    // Academic Marks / Latest Score
+    const marksText = formatMarksForReport(data.marks, data.subjects);
+
+    const scoreLabel = data.stream
+      ? `Latest Score (${data.stream})`
+      : "Latest Score (if 11th / 12th)";
+    twoColRow(scoreLabel, marksText, LABEL_W2);
+
+    // Total Percentage Row
+    const rawTotalPercentage =
+      data.totalPercentage ||
+      (data.marks && typeof data.marks === "object"
+        ? data.marks.totalPercentage || data.marks._totalPercentage
+        : null);
+
+    const cleanTotalPercentage =
+      rawTotalPercentage !== undefined &&
+      rawTotalPercentage !== null &&
+      String(rawTotalPercentage).trim().length > 0
+        ? (String(rawTotalPercentage).trim().endsWith("%")
+            ? String(rawTotalPercentage).trim()
+            : `${String(rawTotalPercentage).trim()}%`)
         : "-";
-    twoColRow("Latest Score (if 11th / 12th) SCIENCE", marksText, LABEL_W2);
+
+    twoColRow("Total Percentage", cleanTotalPercentage, LABEL_W2);
  
     // Dream career
     const careerText = [
@@ -252,7 +385,7 @@ export const downloadCounselingReportController = async (req, res) => {
       "(D) Changing career options quite frequently",
       "(E) Vague knowledge about Career options",
     ];
-    const selectedCategory = (data.category || "").toString().trim().toUpperCase();
+    const selectedCategory = stripHtml(data.category || "").toUpperCase();
  
     {
       const label = "Which category does your counselee belong to?";
@@ -299,12 +432,13 @@ export const downloadCounselingReportController = async (req, res) => {
       doc.y = y + rowHeight;
     }
  
-    // Observation & Recommendation
+    // Observation & Recommendation (strip HTML so tags like <p> don't print in PDF)
     {
       const label = "Observation & Recommendation/ Suggestion";
       const labelWidth = LABEL_W2;
       const valueWidth = TABLE_WIDTH - labelWidth;
-      const text = data.observation || "No Observation Available";
+      const rawText = data.observation || "";
+      const text = stripHtml(rawText) || "No Observation Available";
  
       doc.font("Helvetica-Bold").fontSize(10);
       const labelHeight = doc.heightOfString(label, { width: labelWidth - 10 });

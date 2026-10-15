@@ -1,14 +1,13 @@
 import upload from "../../middlewares/upload.js";
 import { createmodulecontroller,getModuleController,getModuleByIdController,updateModuleController,deleteModuleController } from "./module.controller.js";
 import {Router} from "express";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
-import { use } from "react";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 
 const router = Router();
-router.post("/",protectAdmin,upload.single("image"),createmodulecontroller);
+router.post("/",protectAdminOrStaff,upload.single("image"),createmodulecontroller);
 router.get("/",getModuleController)
 router.get("/:id",getModuleByIdController);
-router.put("/:id",protectAdmin,upload.single("image"),updateModuleController);
-router.delete("/:id",protectAdmin,deleteModuleController);
+router.put("/:id",protectAdminOrStaff,upload.single("image"),updateModuleController);
+router.delete("/:id",protectAdminOrStaff,deleteModuleController);
 
 export default router;

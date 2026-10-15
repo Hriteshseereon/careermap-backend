@@ -1,8 +1,8 @@
+import prisma from "../../config/db.js";
 import { RoleRepository } from "./role.repository.js";
 
 export const createRole = async (body) => {
   try {
-
     const existing =
       await RoleRepository.findByName(
         body.name
@@ -21,9 +21,26 @@ export const createRole = async (body) => {
         description: body.description,
       });
 
+    // If modules were also provided in creation:
+    if (Array.isArray(body.modules) && body.modules.length > 0) {
+      await prisma.permission.createMany({
+        data: body.modules.map((module) => ({
+          roleId: role.id,
+          module,
+          canView: true,
+          canCreate: true,
+          canEdit: true,
+          canDelete: true,
+        })),
+        skipDuplicates: true,
+      });
+    }
+
+    const fullRole = await RoleRepository.findById(role.id);
+
     return {
       success: true,
-      data: role,
+      data: fullRole || role,
     };
 
   } catch (error) {
@@ -84,20 +101,57 @@ export const updateRole = async (
   body
 ) => {
   try {
+    const roleId = Number(id);
+    const existing = await RoleRepository.findById(roleId);
+    if (!existing) {
+      return {
+        success: false,
+        message: "Role not found",
+      };
+    }
 
-    const role =
-      await RoleRepository.update(
-        id,
-        {
-          name: body.name,
-          description:
-            body.description,
-        }
-      );
+    if (body.name && body.name.trim().toLowerCase() !== existing.name.toLowerCase()) {
+      const duplicate = await RoleRepository.findByName(body.name);
+      if (duplicate && duplicate.id !== roleId) {
+        return {
+          success: false,
+          message: "Role with this name already exists",
+        };
+      }
+    }
+
+    const updateData = {};
+    if (body.name !== undefined) updateData.name = body.name;
+    if (body.description !== undefined) updateData.description = body.description;
+
+    await RoleRepository.update(roleId, updateData);
+
+    // If modules are provided, sync permissions too!
+    if (Array.isArray(body.modules)) {
+      await prisma.permission.deleteMany({
+        where: { roleId },
+      });
+
+      if (body.modules.length > 0) {
+        await prisma.permission.createMany({
+          data: body.modules.map((module) => ({
+            roleId,
+            module,
+            canView: true,
+            canCreate: true,
+            canEdit: true,
+            canDelete: true,
+          })),
+          skipDuplicates: true,
+        });
+      }
+    }
+
+    const fullRole = await RoleRepository.findById(roleId);
 
     return {
       success: true,
-      data: role,
+      data: fullRole,
     };
 
   } catch (error) {

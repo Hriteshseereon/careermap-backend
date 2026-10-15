@@ -34,102 +34,59 @@ export const createStudent = async (body) => {
       };
     }
 
-    if (
-      institute.users.length >=
-      institute.limit
-    ) {
+    const usersCount = institute._count?.users ?? institute.users?.length ?? 0;
+    if (usersCount >= institute.limit) {
       return {
         success: false,
-        message:
-          "Institute student limit exceeded",
+        message: "Institute student limit exceeded",
       };
     }
 
-    const existing =
-      await InstituteStudentRepository.findByEmail(
-        body.email
-      );
+    const existing = await InstituteStudentRepository.findByEmail(body.email);
 
     if (existing) {
       return {
         success: false,
-        message:
-          "Email already exists",
+        message: "Email already exists",
       };
     }
 
-    const hashedPassword =
-      await bcrypt.hash(
-        generatedPassword,
-        12
-      );
+    const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
-   const student =
+    const student = await InstituteStudentRepository.createStudent({
+      firstName: body.firstName,
+      lastName: body.lastName,
+      username: body.username,
+      email: body.email,
+      password: hashedPassword,
+      mobile: body.mobile,
+      country: body.country,
+      state: body.state,
+      city: body.city,
+      district: body.district,
+      gender: body.gender,
+      address: body.address,
+      dataOfBirth: body.dataOfBirth ? new Date(body.dataOfBirth) : null,
+      image: body.image,
+      instituteId: Number(body.instituteId),
+      isInstituteStudent: true,
+      status: body.status || "active",
+    });
 
-  await InstituteStudentRepository.createStudent({
+    // Send credentials email in background (non-blocking for fast UI response)
+    sendStudentCredentials(
+      student.email,
+      student.firstName,
+      generatedPassword
+    ).catch((emailError) => {
+      console.error("❌ Email Send Error:", emailError.message);
+    });
 
-    firstName: body.firstName,
-
-    lastName: body.lastName,
-
-    username: body.username,
-
-    email: body.email,
-
-    password: hashedPassword,
-
-    mobile: body.mobile,
-
-    country: body.country,
-
-    state: body.state,
-
-    city: body.city,
-
-    district: body.district,
-
-    gender: body.gender,
-
-    address: body.address,
-
-    dataOfBirth: body.dataOfBirth
-      ? new Date(body.dataOfBirth)
-      : null,
-
-    image: body.image,
-
-    instituteId: Number(body.instituteId),
-
-    isInstituteStudent: true,
-
-    status: body.status || "active",
-  });
-
-    // Email send
-    try {
-
-      await sendStudentCredentials(
-        student.email,
-        student.firstName,
-        generatedPassword
-      );
-
-    } catch (emailError) {
-
-      console.error(
-        "Email Send Error:",
-        emailError.message
-      );
-
-    }
-
-    const { password, ...studentData } =
-      student;
+    const { password, ...studentData } = student;
 
     return {
       success: true,
-      message:
-        "Student created successfully",
+      message: "Student created successfully",
       data: studentData,
     };
 
@@ -321,76 +278,36 @@ async (
           .randomBytes(4)
           .toString("hex");
 
-      const hashedPassword =
-        await bcrypt.hash(
-          password,
-          12
-        );
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-      const created =
-        await InstituteStudentRepository.createStudent({
-
-          firstName:
-            student["First Name"],
-
-          lastName:
-            student["Last Name"],
-
-          username:
-            student["Username"],
-
-          email:
-            student["Email"],
-
-          mobile:
-            String(
-              student["Mobile"]
-            ),
-
-          gender:
-            student["Gender"],
-
-          country:
-            student["Country"],
-
-          state:
-            student["State"],
-
-          city:
-            student["City"],
-
-          district:
-            student["District"],
-
-          address:
-            student["Address"],
-
-          dataOfBirth:
-            student["DOB"]
-              ? new Date(
-                  student["DOB"]
-                )
-              : null,
-
-          password:
-            hashedPassword,
-
-          instituteId:
-            Number(
-              instituteId
-            ),
-
-          isInstituteStudent:
-            true,
-        });
+      const created = await InstituteStudentRepository.createStudent({
+        firstName: student["First Name"],
+        lastName: student["Last Name"],
+        username: student["Username"],
+        email: student["Email"],
+        mobile: String(student["Mobile"]),
+        gender: student["Gender"],
+        country: student["Country"],
+        state: student["State"],
+        city: student["City"],
+        district: student["District"],
+        address: student["Address"],
+        dataOfBirth: student["DOB"] ? new Date(student["DOB"]) : null,
+        password: hashedPassword,
+        instituteId: Number(instituteId),
+        isInstituteStudent: true,
+      });
 
       success.push(created);
 
-      await sendStudentCredentials(
+      // Send email asynchronously in background so bulk creation doesn't hang
+      sendStudentCredentials(
         created.email,
         created.firstName,
         password
-      );
+      ).catch((err) => {
+        console.error(`❌ Background Email Error for ${created.email}:`, err.message);
+      });
 
     } catch (error) {
 

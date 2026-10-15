@@ -10,8 +10,8 @@ import {
 
 } from "./notification.controller.js";
 
-import { protectAdmin }
-from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff }
+from "../../middlewares/protectAdminOrStaff.js";
 
 const router = Router();
 
@@ -19,25 +19,25 @@ const router = Router();
 
 router.post(
   "/",
-  protectAdmin,
+  protectAdminOrStaff,
   createNotificationController
 );
 
 router.get(
   "/",
-  protectAdmin,
+  protectAdminOrStaff,
   getNotificationsController
 );
 
 router.get(
   "/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   getNotificationByIdController
 );
 
 router.put(
   "/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   updateNotificationController
 );
 

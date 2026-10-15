@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 
 import {
   createPlanController,
@@ -11,10 +11,10 @@ import {
 
 const router = Router();
 
-router.post("/", protectAdmin, createPlanController);
+router.post("/", protectAdminOrStaff, createPlanController);
 router.get("/", getPlansController);
 router.get("/:id", getPlanByIdController);
-router.put("/:id", protectAdmin, updatePlanController);
-router.delete("/:id", protectAdmin, deletePlanController);
+router.put("/:id", protectAdminOrStaff, updatePlanController);
+router.delete("/:id", protectAdminOrStaff, deletePlanController);
 
 export default router;

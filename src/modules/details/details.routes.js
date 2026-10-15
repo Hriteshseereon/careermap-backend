@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 import upload from "../../middlewares/upload.js"
 import {
   createDetailsController,
@@ -11,10 +11,10 @@ import {
 
 const router = Router();
 
-router.post("/",upload.single("media"),protectAdmin, createDetailsController);
+router.post("/",upload.single("media"),protectAdminOrStaff, createDetailsController);
 router.get("/", getAllDetailsController);
 router.get("/:id", getDetailsByIdController);
-router.put("/:id",upload.single("media"),protectAdmin, updateDetailsController);
-router.delete("/:id",protectAdmin, deleteDetailsController);
+router.put("/:id",upload.single("media"),protectAdminOrStaff, updateDetailsController);
+router.delete("/:id",protectAdminOrStaff, deleteDetailsController);
 
 export default router;

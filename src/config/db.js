@@ -15,4 +15,10 @@ const adapter = new PrismaPg(pool);
 // Instantiate the Prisma Client passing the adapter
 const prisma = new PrismaClient({ adapter });
 
+// Ensure totalPercentage column exists on CounselingForm table
+pool.query('ALTER TABLE "CounselingForm" ADD COLUMN IF NOT EXISTS "totalPercentage" TEXT;').catch((err) => {
+  console.warn("Notice: could not auto-add totalPercentage column (it may already exist or table not created yet):", err.message);
+});
+
+export { pool };
 export default prisma;

@@ -11,10 +11,36 @@ async (req, res, next) => {
       return next();
     }
 
+    if (!req.staff) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    let roleId = req.staff.roleId;
+
+    // Check DB for latest roleId and account status so changes take effect immediately
+    if (req.staff.id) {
+      const currentStaff = await prisma.staffUser.findUnique({
+        where: { id: Number(req.staff.id) },
+        select: { roleId: true, status: true },
+      });
+      if (currentStaff) {
+        if (currentStaff.status === false) {
+          return res.status(403).json({
+            success: false,
+            message: "Account is inactive. Please contact administrator.",
+          });
+        }
+        roleId = currentStaff.roleId;
+      }
+    }
+
     const permission =
       await prisma.permission.findFirst({
         where: {
-          roleId: req.staff.roleId,
+          roleId: Number(roleId),
           module,
         },
       });

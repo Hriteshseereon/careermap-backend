@@ -14,12 +14,12 @@ import {
   getQuizAttemptsController,
    getUserQuizHistoryController
 } from "./quiz.controller.js";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 import {protectAuth} from "../../middlewares/protectAuth.js"
 const router = Router();
 
-router.post("/", protectAdmin, createQuizController);
-router.post("/question", protectAdmin, addQuestionController);
+router.post("/", protectAdminOrStaff, createQuizController);
+router.post("/question", protectAdminOrStaff, addQuestionController);
 
 // 🔥 USER ROUTES (PUT ABOVE)
 router.get("/user/:id", getQuizForUserController);
@@ -42,7 +42,7 @@ router.get(
   "/:quizId/attempts",
   getQuizAttemptsController
 );
-router.put("/:id", protectAdmin, updateQuizController);
-router.delete("/:id", protectAdmin, deleteQuizController);
+router.put("/:id", protectAdminOrStaff, updateQuizController);
+router.delete("/:id", protectAdminOrStaff, deleteQuizController);
 
 export default router;

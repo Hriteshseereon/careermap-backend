@@ -15,7 +15,7 @@ import {
 
 } from "./studyabroad.controller.js";
 
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 import { protectAuth } from "../../middlewares/protectAuth.js";
 
 const router = Router();
@@ -23,15 +23,15 @@ const router = Router();
 
 // 🔥 STUDY ABROAD CRUD
 
-router.post("/", protectAdmin, createStudyAbroadController);
+router.post("/", protectAdminOrStaff, createStudyAbroadController);
 
 router.get("/", getStudyAbroadController);
 
 router.get("/:id", getStudyAbroadByIdController);
 
-router.put("/:id", protectAdmin, updateStudyAbroadController);
+router.put("/:id", protectAdminOrStaff, updateStudyAbroadController);
 
-router.delete("/:id", protectAdmin, deleteStudyAbroadController);
+router.delete("/:id", protectAdminOrStaff, deleteStudyAbroadController);
 
 
 // ====================================================
@@ -48,28 +48,28 @@ router.post(
 // ADMIN GET ALL CONSULTS
 router.get(
   "/consult/all",
-  protectAdmin,
+  protectAdminOrStaff,
   getStudyAbroadConsultController
 );
 
 // ADMIN GET SINGLE CONSULT
 router.get(
   "/consult/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   getStudyAbroadConsultByIdController
 );
 
 // ADMIN UPDATE CONSULT
 router.put(
   "/consult/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   updateStudyAbroadConsultController
 );
 
 // ADMIN DELETE CONSULT
 router.delete(
   "/consult/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   deleteStudyAbroadConsultController
 );
 

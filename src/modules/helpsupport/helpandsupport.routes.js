@@ -10,7 +10,7 @@ import {
 } from "./helpandsupport.controller.js";
 
 import { protectAuth } from "../../middlewares/protectAuth.js";
-import { protectAdmin } from "../../middlewares/protectAdmin.js";
+import { protectAdminOrStaff } from "../../middlewares/protectAdminOrStaff.js";
 
 const router = Router();
 
@@ -21,22 +21,22 @@ router.post(
   createHelpRequestController
 );
 
-// ADMIN
+// ADMIN / STAFF
 router.get(
   "/",
-  protectAdmin,
+  protectAdminOrStaff,
   getHelpRequestsController
 );
 
 router.get(
   "/:id",
-  protectAdmin,
+  protectAdminOrStaff,
   getHelpRequestByIdController
 );
 
 router.put(
   "/:id/status",
-  protectAdmin,
+  protectAdminOrStaff,
   updateHelpStatusController
 );
 

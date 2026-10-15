@@ -8,6 +8,9 @@ import { UserRepository } from "../user/user.repository.js";
 
 
 
+// In-memory OTP Store for Dev / Free OTP mode (mobile -> { otp, expiresAt })
+const otpStore = new Map();
+
 // helper for profile update check
 const isProfileComplete = (user) => {
   return !!(
@@ -23,74 +26,106 @@ const isProfileComplete = (user) => {
     user.image
   );
 };
-export const otpService = async (mobile,type) => {
+
+export const otpService = async (mobile, type) => {
   try {
     if (!mobile) {
-    throw new Error("Mobile number is required");
-  }
- if (!type) {
+      throw new Error("Mobile number is required");
+    }
+    if (!type) {
       throw new Error("Type is required (login/signup)");
     }
-  // 🔥 Check if already registered
-  const existingUser = await AuthRepository.findByMobile(mobile);
 
-  if (type === "signup" && existingUser) {
-    throw new Error("User already registered. Please login.");
-  }
-  if (type === "login" && !existingUser) {
+    // Check if already registered
+    const existingUser = await AuthRepository.findByMobile(mobile);
+
+    if (type === "signup" && existingUser) {
+      throw new Error("User already registered. Please login.");
+    }
+    if (type === "login" && !existingUser) {
       throw new Error("User not found. Please signup.");
     }
-    await sendOTPViaTwilio(mobile);
-    return { success: true, message: "OTP sent successfully" };
+
+    // ----------------------------------------------------
+    // Twilio SMS (temporarily commented out for free/dummy mode)
+    // await sendOTPViaTwilio(mobile);
+    // ----------------------------------------------------
+
+    // Generate 6-digit dynamic OTP (valid for 10 mins)
+    const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore.set(mobile.toString(), {
+      otp: generatedOtp,
+      expiresAt: Date.now() + 10 * 60 * 1000,
+    });
+
+    console.log(`\n========================================`);
+    console.log(`🔥 [OTP GENERATED] Mobile: ${mobile} | OTP: ${generatedOtp}`);
+    console.log(`========================================\n`);
+
+    return {
+      success: true,
+      message: "OTP sent successfully",
+      otp: generatedOtp, // 🔥 Returning OTP in response for popup/testing
+    };
   } catch (error) {
-      console.error("Twilio Error:", error);
-    return { success: false, message: "Failed to send OTP" };
+    console.error("OTP Service Error:", error);
+    return { success: false, message: error.message || "Failed to send OTP" };
   }
 };
 
 export const verifyOTPService = async (mobile, code, type) => {
   try {
-    const result = await verifyOTPViaTwilio(mobile, code);
+    // ----------------------------------------------------
+    // Twilio Verification (temporarily commented out)
+    // const result = await verifyOTPViaTwilio(mobile, code);
+    // if (!result.valid) { ... }
+    // ----------------------------------------------------
 
-    if (!result.valid) {
+    // Verify against generated OTP or master testing OTP '123456'
+    const stored = otpStore.get(mobile.toString());
+    const isValid =
+      code === "123456" ||
+      (stored && stored.otp === code.toString() && stored.expiresAt > Date.now());
+
+    if (!isValid) {
       return {
         success: false,
-        message: result.message || "Invalid OTP. Please try again.",
+        message: "Invalid or expired OTP. Please try again.",
       };
     }
 
+    // Clean up used OTP
+    otpStore.delete(mobile.toString());
+
     // ✅ Handle signup vs login separately
     if (type === "signup") {
+      // 🔥 generate temp token
+      const tempToken = generateTempToken(mobile);
 
-  // 🔥 generate temp token
-  const tempToken = generateTempToken(mobile);
-
-  return {
-    success: true,
-    message: "Mobile verified successfully. Proceed to signup.",
-    tempToken, // ✅ send token
-  };
-}
+      return {
+        success: true,
+        message: "Mobile verified successfully. Proceed to signup.",
+        tempToken, // ✅ send token
+      };
+    }
 
     if (type === "login") {
       const user = await AuthRepository.findByMobile(mobile);
       if (!user) {
         return { success: false, message: "User not found. Please signup." };
       }
-        // 🔥 BAN CHECK
-  if (user.status === "banned") {
-    return {
-      success: false,
-      message:
-        "Your account has been banned. Contact support.",
-    };
-  }
+      // 🔥 BAN CHECK
+      if (user.status === "banned") {
+        return {
+          success: false,
+          message: "Your account has been banned. Contact support.",
+        };
+      }
       const tokens = generateTokens(user);
       return { success: true, message: "Login successful", user, ...tokens };
     }
 
     return { success: false, message: "Invalid type" };
-
   } catch (error) {
     return { success: false, message: error.message };
   }

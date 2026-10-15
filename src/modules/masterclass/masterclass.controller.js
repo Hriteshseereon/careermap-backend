@@ -9,7 +9,7 @@ import {
 
 // CREATE
 export const createMasterClassController = async (req, res) => {
-  const result = await createMasterClass(req.body);
+  const result = await createMasterClass(req.body, req.file);
   res.status(result.success ? 201 : 400).json(result);
 };
 
@@ -42,8 +42,15 @@ export const getMasterClassByIdController = async (req, res) => {
 
 // UPDATE
 export const updateMasterClassController = async (req, res) => {
-  const result = await updateMasterClass(req.params.id, req.body);
-  res.status(result.success ? 200 : 400).json(result);
+  const result = await updateMasterClass(
+    req.params.id,
+    req.body,
+    req.file
+  );
+
+  res
+    .status(result.success ? 200 : 400)
+    .json(result);
 };
 
 // DELETE

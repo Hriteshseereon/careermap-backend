@@ -1,9 +1,20 @@
+import prisma from "../../config/db.js";
 import { PermissionRepository } from "./permission.repository.js";
 
 export const createPermission = async (body) => {
   try {
-    const permissions = body.modules.map((module) => ({
-      roleId: Number(body.roleId),
+    const modules = Array.isArray(body?.modules) ? body.modules : [];
+    const roleId = Number(body.roleId);
+
+    if (!roleId) {
+      return {
+        success: false,
+        message: "roleId is required",
+      };
+    }
+
+    const permissions = modules.map((module) => ({
+      roleId,
       module,
       canView: true,
       canCreate: true,
@@ -11,9 +22,9 @@ export const createPermission = async (body) => {
       canDelete: true,
     }));
 
-    await PermissionRepository.createMany(
-      permissions
-    );
+    if (permissions.length > 0) {
+      await PermissionRepository.createMany(permissions);
+    }
 
     return {
       success: true,
@@ -79,28 +90,42 @@ export const updatePermission = async (
   body
 ) => {
   try {
+    const numericRoleId = Number(roleId);
+    if (!numericRoleId) {
+      return {
+        success: false,
+        message: "Valid roleId is required",
+      };
+    }
+
+    const modules = Array.isArray(body?.modules)
+      ? body.modules
+      : (Array.isArray(body) ? body : []);
 
     await prisma.permission.deleteMany({
       where: {
-        roleId: Number(roleId),
+        roleId: numericRoleId,
       },
     });
 
-    await prisma.permission.createMany({
-      data: body.modules.map((module) => ({
-        roleId: Number(roleId),
-        module,
-        canView: true,
-        canCreate: true,
-        canEdit: true,
-        canDelete: true,
-      })),
-    });
+    if (modules.length > 0) {
+      await prisma.permission.createMany({
+        data: modules.map((module) => ({
+          roleId: numericRoleId,
+          module,
+          canView: true,
+          canCreate: true,
+          canEdit: true,
+          canDelete: true,
+        })),
+        skipDuplicates: true,
+      });
+    }
 
     const permissions =
       await prisma.permission.findMany({
         where: {
-          roleId: Number(roleId),
+          roleId: numericRoleId,
         },
       });
 

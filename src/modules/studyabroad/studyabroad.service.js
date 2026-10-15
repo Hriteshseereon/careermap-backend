@@ -104,13 +104,148 @@ export const createStudyAbroadConsult = async (userId, body) => {
     const data = await StudyAbroadConsultRepository.create({
       userId,
 
-      studyAbroadId: body.studyAbroadId,
+      // =========================
+      // USER / STUDY ABROAD
+      // =========================
+      studyAbroadId: Number(body.studyAbroadId),
 
-      preferredCountry: body.preferredCountry,
-      courseInterest: body.courseInterest,
-      budgetRange: body.budgetRange,
-      preferredIntake: body.preferredIntake,
+      // =========================
+      // 1. STUDENT BASIC DETAILS
+      // =========================
+      fullName: body.fullName,
+      dateOfBirth: body.dateOfBirth
+        ? new Date(body.dateOfBirth)
+        : null,
 
+      gender: body.gender,
+      email: body.email,
+      mobileNumber: body.mobileNumber,
+      whatsappNumber: body.whatsappNumber,
+      currentCityState: body.currentCityState,
+      countryOfCitizenship: body.countryOfCitizenship,
+
+      // =========================
+      // 2. PARENT / GUARDIAN
+      // =========================
+      parentGuardianName: body.parentGuardianName,
+      parentRelationship: body.parentRelationship,
+      parentMobileNumber: body.parentMobileNumber,
+      parentEmail: body.parentEmail,
+      parentOccupation: body.parentOccupation,
+
+      primaryFundingSource:
+        body.primaryFundingSource || [],
+
+      // =========================
+      // 3. ACADEMIC
+      // =========================
+      highestQualification:
+        body.highestQualification,
+
+      schoolCollegeUniversity:
+        body.schoolCollegeUniversity,
+
+      boardUniversity:
+        body.boardUniversity,
+
+      passingYear:
+        body.passingYear,
+
+      class10PercentageCGPA:
+        body.class10PercentageCGPA,
+
+      class12PercentageCGPA:
+        body.class12PercentageCGPA,
+
+      // =========================
+      // 4. FOREIGN EDUCATION
+      // =========================
+      intendedStudyLevel:
+        body.intendedStudyLevel,
+
+      preferredIntake:
+        body.preferredIntake,
+
+      preferredCountries:
+        body.preferredCountries || [],
+
+      preferredCourseProgramme:
+        body.preferredCourseProgramme,
+
+      preferredSpecialization:
+        body.preferredSpecialization,
+
+      preferredUniversities:
+        body.preferredUniversities,
+
+      openToAlternativeUniversities:
+        body.openToAlternativeUniversities !== undefined
+          ? body.openToAlternativeUniversities === "true" ||
+            body.openToAlternativeUniversities === true
+          : null,
+
+      // =========================
+      // 5. ENGLISH & ENTRANCE EXAMS
+      // =========================
+      englishTest:
+        body.englishTest,
+
+      englishTestScoreDate:
+        body.englishTestScoreDate,
+
+      otherEntranceExams:
+        body.otherEntranceExams || [],
+
+      entranceExamScoreDate:
+        body.entranceExamScoreDate,
+
+      // =========================
+      // 6. CAREER & BUDGET
+      // =========================
+      preferredCareerDomain:
+        body.preferredCareerDomain,
+
+      reasonToStudyAbroad:
+        body.reasonToStudyAbroad,
+
+      topPriorities:
+        body.topPriorities || [],
+
+      annualTuitionBudget:
+        body.annualTuitionBudget,
+
+      totalEducationBudget:
+        body.totalEducationBudget,
+
+      scholarshipRequired:
+        body.scholarshipRequired,
+
+      educationLoanRequired:
+        body.educationLoanRequired,
+
+      // =========================
+      // 7. PASSPORT & DOCUMENTS
+      // =========================
+      passportStatus:
+        body.passportStatus,
+
+      passportExpiryDate:
+        body.passportExpiryDate
+          ? new Date(body.passportExpiryDate)
+          : null,
+
+      documentsAvailable:
+        body.documentsAvailable || [],
+
+      // =========================
+      // 9. SERVICES
+      // =========================
+      servicesRequired:
+        body.servicesRequired || [],
+
+      // =========================
+      // SYSTEM
+      // =========================
       message: body.message,
 
       status: "pending",

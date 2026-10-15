@@ -29,7 +29,7 @@ export const createCareerNewsletter = async (body, file) => {
         url: body.url,
 
         image,
-
+          type: body.type,
       });
 
     return {
@@ -142,7 +142,9 @@ export const updateCareerNewsletter = async (id, body, file) => {
         ...(image && {
           image,
         }),
-
+        ...(body.type && {
+  type: body.type,
+}),
       });
 
     return {

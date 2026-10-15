@@ -6,7 +6,9 @@ import {
   getInstituteById,
   updateInstitute,
   deleteInstitute,
-  getInstituteDashboard
+  getInstituteDashboard,
+  getInstituteStudents,
+  getInstitutePsychometricAssessments,
 } from "./institute.service.js";
 
 
@@ -96,10 +98,49 @@ async(req,res)=>{
 export const getInstituteDashboardController =
 async (req,res)=>{
 
+  const instituteId =
+    req.institute?.instituteId || req.query.instituteId || req.params.instituteId;
+
+  if (!instituteId) {
+    return res.status(400).json({ success: false, message: "Institute ID is required" });
+  }
+
   const result =
     await getInstituteDashboard(
-      req.institute.instituteId
+      instituteId
     );
 
   res.json(result);
+};
+
+export const getInstituteStudentsController = async (req, res) => {
+  try {
+    const instituteId =
+      req.institute?.instituteId || req.query.instituteId || req.params.instituteId;
+
+    if (!instituteId) {
+      return res.status(400).json({ success: false, message: "Institute ID is required" });
+    }
+
+    const result = await getInstituteStudents(instituteId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getInstitutePsychometricAssessmentsController = async (req, res) => {
+  try {
+    const instituteId =
+      req.institute?.instituteId || req.query.instituteId || req.params.instituteId;
+
+    if (!instituteId) {
+      return res.status(400).json({ success: false, message: "Institute ID is required" });
+    }
+
+    const result = await getInstitutePsychometricAssessments(instituteId);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
