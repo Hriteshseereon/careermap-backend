@@ -41,7 +41,7 @@ export const hasFullModuleAccess = async (
     throw new Error("Module not found");
   }
 
-  // Assessment: free for institute students; otherwise require plan purchase
+  // Assessment: free for institute students OR 1st time user; otherwise require plan purchase
   if (isAssessmentModule(module)) {
     const user = await prisma.users.findUnique({
       where: { id: Number(userId) },
@@ -55,9 +55,25 @@ export const hasFullModuleAccess = async (
       };
     }
 
+    // 1st free psychometric test attempt check
+    const completedAttemptsCount = await prisma.assessmentAttempt.count({
+      where: {
+        userId: Number(userId),
+        status: "completed",
+      },
+    });
+
+    if (completedAttemptsCount === 0) {
+      return {
+        allowed: true,
+        isFreeAttempt: true,
+        module,
+      };
+    }
+
     const subscriptions = await getActiveSubscription(userId);
     const hasPlanAccess = subscriptions.some((subscription) =>
-      subscription.plan.modules.some((item) => item.id === Number(moduleId))
+      subscription.plan.modules.some((item) => item.id === Number(moduleId) || isAssessmentModule(item))
     );
 
     return {

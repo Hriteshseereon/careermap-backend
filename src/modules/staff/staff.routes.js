@@ -6,6 +6,7 @@ import {
   loginStaffController,
   getAllStaffController,
   getStaffByIdController,
+  updateStaffController,
   deleteStaffController
 }
 from "./staff.controller.js";
@@ -38,6 +39,18 @@ router.get(
   "/:id",
   protectAdmin,
   getStaffByIdController
+);
+
+router.put(
+  "/:id",
+  protectAdmin,
+  updateStaffController
+);
+
+router.patch(
+  "/:id",
+  protectAdmin,
+  updateStaffController
 );
 
 router.delete(

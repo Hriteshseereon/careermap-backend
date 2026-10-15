@@ -3,6 +3,7 @@ import {
   loginStaff,
   getAllStaff,
   getStaffById,
+  updateStaff,
   deleteStaff
 }
 from "./staff.service.js";
@@ -76,21 +77,64 @@ async(req,res)=>{
       req.params.id
     );
 
+  if (!data) {
+    return res.status(404).json({
+      success: false,
+      message: "Staff member not found",
+    });
+  }
+
   res.json({
     success:true,
     data
   });
 };
 
+export const updateStaffController =
+async(req,res)=>{
+
+  try{
+
+    const data =
+      await updateStaff(
+        req.params.id,
+        req.body
+      );
+
+    res.json({
+      success:true,
+      message:"Staff updated successfully",
+      data
+    });
+
+  }catch(error){
+
+    res.status(400).json({
+      success:false,
+      message:error.message,
+    });
+  }
+};
+
 export const deleteStaffController =
 async(req,res)=>{
 
-  await deleteStaff(
-    req.params.id
-  );
+  try{
 
-  res.json({
-    success:true,
-    message:"Deleted"
-  });
+    await deleteStaff(
+      req.params.id
+    );
+
+    res.json({
+      success:true,
+      message:"Deleted successfully"
+    });
+
+  }catch(error){
+
+    res.status(400).json({
+      success:false,
+      message:error.message,
+    });
+  }
 };

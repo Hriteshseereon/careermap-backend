@@ -985,7 +985,7 @@ export const assessmentService = {
       return { allowed: false, reason: "USER_NOT_FOUND", message: "User not found" };
     }
 
-    // 1. Institute students have free unlimited access
+    // 1. Institute students have free access
     if (canAccessAssessment(user)) {
       return {
         allowed: true,
@@ -994,7 +994,25 @@ export const assessmentService = {
       };
     }
 
-    // 2. Normal users: Check active subscriptions containing assessment module
+    // 2. Count completed psychometric assessment attempts for this user
+    const completedAttemptsCount = await prisma.assessmentAttempt.count({
+      where: {
+        userId: Number(userId),
+        status: "completed"
+      }
+    });
+
+    // 3. FIRST TIME RULE: 1st psychometric test attempt is completely FREE!
+    if (completedAttemptsCount === 0) {
+      return {
+        allowed: true,
+        isFreeAttempt: true,
+        completedAttemptsCount: 0,
+        message: "Access granted: Your 1st psychometric test attempt is FREE!"
+      };
+    }
+
+    // 4. SECOND TIME & ONWARDS: User must have an active subscription containing the assessment module
     const activeSubscriptions = await prisma.subscriptions.findMany({
       where: {
         userId: Number(userId),
@@ -1020,13 +1038,14 @@ export const assessmentService = {
     if (!validSubscription) {
       return {
         allowed: false,
-        reason: "NO_ACTIVE_PLAN",
+        reason: "PLAN_REQUIRED_FOR_RETAKE",
         requiresNewPlan: true,
-        message: "Assessment is locked. Please purchase an assessment plan to unlock access."
+        completedAttemptsCount,
+        message: "Aapka pehla free psychometric test complete ho chuka hai. Dobara test dene ke liye kripya assessment plan purchase karein."
       };
     }
 
-    // 3. One completed assessment per subscription rule
+    // 5. One completed assessment per purchased subscription rule
     // Check if user has already completed an attempt on or after the start date of this active subscription
     const completedAttempt = await prisma.assessmentAttempt.findFirst({
       where: {
@@ -1046,6 +1065,7 @@ export const assessmentService = {
         allowed: false,
         reason: "ALREADY_COMPLETED",
         requiresNewPlan: true,
+        completedAttemptsCount,
         completedAttemptId: completedAttempt.id,
         completedAt: completedAttempt.completedAt,
         message: "You have already completed your assessment under your current plan. Please subscribe to a new assessment plan to retake the test."
@@ -1054,8 +1074,11 @@ export const assessmentService = {
 
     return {
       allowed: true,
+      isFreeAttempt: false,
+      completedAttemptsCount,
       subscriptionId: validSubscription.id,
-      planTitle: validSubscription.plan?.title
+      planTitle: validSubscription.plan?.title,
+      message: "Access granted (Subscribed Plan)"
     };
   },
 
@@ -1085,7 +1108,7 @@ export const assessmentService = {
       throw new Error("User ID is required to start assessment");
     }
 
-    // Access check & 1 completed test per subscription enforcement
+    // Access check & 1st attempt free / subscription retake enforcement
     const access = await assessmentService.verifyUserAssessmentAccess(userId);
     if (!access.allowed) {
       const err = new Error(access.message);
@@ -1100,6 +1123,29 @@ export const assessmentService = {
       throw new Error("Published assessment not found");
     }
 
+    // Check if an in_progress attempt already exists to allow resuming
+    const existingInProgress = await prisma.assessmentAttempt.findFirst({
+      where: {
+        userId: Number(userId),
+        assessmentId: Number(assessmentId),
+        status: "in_progress"
+      },
+      orderBy: {
+        createdAt: "desc"
+      }
+    });
+
+    if (existingInProgress) {
+      return {
+        attemptId: existingInProgress.id,
+        assessmentId: existingInProgress.assessmentId,
+        status: existingInProgress.status,
+        startedAt: existingInProgress.startedAt,
+        isResumed: true,
+        isFreeAttempt: Boolean(access.isFreeAttempt)
+      };
+    }
+
     const attempt = await assessmentRepository.createAttempt({
       assessmentId: Number(assessmentId),
       userId: Number(userId),
@@ -1110,7 +1156,8 @@ export const assessmentService = {
       attemptId: attempt.id,
       assessmentId: attempt.assessmentId,
       status: attempt.status,
-      startedAt: attempt.startedAt
+      startedAt: attempt.startedAt,
+      isFreeAttempt: Boolean(access.isFreeAttempt)
     };
   },
 
