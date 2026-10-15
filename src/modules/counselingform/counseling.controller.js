@@ -6,7 +6,6 @@ import {
   deleteCounseling,
   generateCounselingReport,
   getCounselingsByCounselor,
-  parseMarksEntries,
 } from "./counseling.services.js";
 import PDFDocument from "pdfkit";
 
@@ -39,6 +38,81 @@ export const stripHtml = (html) => {
     .replace(/\r\n/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+};
+
+export const formatMarksForReport = (marksData, fallbackSubjects = []) => {
+  if (!marksData && (!fallbackSubjects || fallbackSubjects.length === 0)) return "-";
+
+  let source = marksData;
+  if (typeof source === "string") {
+    try {
+      source = JSON.parse(source);
+    } catch (e) {}
+  }
+
+  if (source && typeof source === "object" && !Array.isArray(source)) {
+    if (source.rawMarks !== undefined && source.rawMarks !== null) {
+      source = source.rawMarks;
+    }
+  }
+
+  const entries = [];
+
+  // If Array
+  if (Array.isArray(source)) {
+    source.forEach((item, idx) => {
+      if (item === undefined || item === null) return;
+      if (typeof item === "object") {
+        const sub = item.subject || item.subjectName || item.name || item.title || item.sub || `sub${idx + 1}`;
+        const score = item.score !== undefined ? item.score : (item.marks !== undefined ? item.marks : (item.mark !== undefined ? item.mark : ""));
+        const cleanSub = stripHtml(String(sub)).trim();
+        const cleanScore = stripHtml(String(score)).trim();
+        entries.push(cleanScore ? `${cleanSub} - ${cleanScore}` : cleanSub);
+      } else {
+        entries.push(stripHtml(String(item)).trim());
+      }
+    });
+  } else if (source && typeof source === "object") {
+    for (const [key, val] of Object.entries(source)) {
+      if (key.startsWith("_") || key === "rawMarks" || key === "totalPercentage" || key === "subjects") {
+        continue;
+      }
+      if (val === undefined || val === null) continue;
+
+      const cleanKey = stripHtml(String(key)).trim();
+
+      if (typeof val === "object") {
+        const subName = val.subject || val.subjectName || val.name || cleanKey;
+        const subScore = val.score !== undefined ? val.score : (val.marks !== undefined ? val.marks : (val.mark !== undefined ? val.mark : ""));
+        const cleanSubName = stripHtml(String(subName)).trim();
+        const cleanSubScore = stripHtml(String(subScore)).trim();
+        if (cleanSubName && cleanSubName !== cleanKey) {
+          entries.push(`${cleanKey} - ${cleanSubName} - ${cleanSubScore}`);
+        } else {
+          entries.push(`${cleanKey} - ${cleanSubScore}`);
+        }
+      } else {
+        const cleanVal = stripHtml(String(val)).trim();
+        if (cleanKey && cleanVal) {
+          entries.push(`${cleanKey} - ${cleanVal}`);
+        } else if (cleanVal) {
+          entries.push(cleanVal);
+        }
+      }
+    }
+  }
+
+  // Fallback to parsed subjects if entries is empty
+  if (entries.length === 0 && Array.isArray(fallbackSubjects) && fallbackSubjects.length > 0) {
+    fallbackSubjects.forEach((item) => {
+      if (!item) return;
+      const sub = item.subject || item.name || "Subject";
+      const score = item.score !== undefined ? item.score : (item.marks !== undefined ? item.marks : "-");
+      entries.push(`${stripHtml(String(sub)).trim()} - ${stripHtml(String(score)).trim()}`);
+    });
+  }
+
+  return entries.length > 0 ? entries.join("\n") : "-";
 };
 
 export const createCounselingController = async (req, res) => {
@@ -264,13 +338,7 @@ export const downloadCounselingReportController = async (req, res) => {
     );
  
     // Academic Marks / Latest Score
-    const parsedEntries = parseMarksEntries(data.marks);
-    let marksText = "-";
-    if (parsedEntries.length > 0) {
-      marksText = parsedEntries
-        .map((entry) => `${entry.subject} - ${entry.score}`)
-        .join("\n");
-    }
+    const marksText = formatMarksForReport(data.marks, data.subjects);
 
     const scoreLabel = data.stream
       ? `Latest Score (${data.stream})`
